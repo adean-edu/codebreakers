@@ -1,0 +1,1055 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Codebreakers: The Silent Service</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Silkscreen:wght@400;700&family=VT323&display=swap"><style>body{margin:0}[hidden]{display:none!important}</style><style>
+/* Layout concept: a surveillance-room terminal. Black glass, amber phosphor, grey typed dossiers, red stamps, film grain. One committed dark look. */
+:root {
+  --bg: #07090a; --ink: #dfe3dc; --mute: #8e9a93; --panel: #0d1311; --panel2: #141c19; --line: #2a3631; --line2: #3b4a43;
+  --amber: #f0b93a; --amber-d: #b8872a; --stamp: #e0544a; --green: #6fe09a; --blue: #5aa7bf; --focus: #8ab4f8;
+  --paper: #cfcdc1; --paper-ink: #1a1d1b; --paper-mute: #55584f;
+  --display: Impact, "Arial Narrow", sans-serif; --type: "Courier New", monospace; --body: "Atkinson Hyperlegible", system-ui, sans-serif; --mono: ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(240, 185, 58, .07), transparent 55%), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='.09'/></svg>"); background-attachment: fixed; }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px); opacity: .35; }
+.wrap { max-width: 800px; margin: 0 auto; padding-block: 18px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; position: relative; z-index: 1; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1; letter-spacing: .04em; text-wrap: balance; }
+h1 { font-size: clamp(2.6rem, 9vw, 4.4rem); } h2 { font-size: 1.7rem; color: var(--amber); } h3 { font-size: 1.4rem; }
+p { margin: 0 0 .7em; } p:last-child { margin-bottom: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; } [data-focus]:focus { outline: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.sr { position: absolute; left: -9999px; }
+/* top bar */
+.bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; padding: 8px max(16px, env(safe-area-inset-left, 0px)); background: #050707; border-bottom: 1px solid var(--line2); position: relative; z-index: 2; }
+.logo { background: none; border: 0; font-family: var(--display); font-size: 1.22rem; letter-spacing: .22em; color: var(--amber); padding: 2px 0; text-shadow: 0 0 12px rgba(240, 185, 58, .45); }
+.classif { font-family: var(--mono); font-size: 0.88rem; letter-spacing: .2em; color: var(--stamp); border: 1px solid var(--stamp); padding: 2px 8px; }
+.bar-r { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.mini { background: transparent; border: 1px solid var(--line2); color: var(--ink); padding: 6px 12px; font-size: 1.04rem; font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; border-radius: 2px; } .mini:hover { border-color: var(--amber); color: var(--amber); }
+.btn { background: var(--amber); color: #120d00; border: 0; border-radius: 2px; padding: 13px 26px; font-family: var(--display); font-size: 0.97rem; letter-spacing: .12em; box-shadow: 0 0 0 1px #000, 0 0 18px rgba(240, 185, 58, .35); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+.btn:hover:not(:disabled) { filter: brightness(1.1); } .btn:disabled { background: #3a3f3c; color: #7b837e; box-shadow: none; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line2); } .btn.ghost:hover { box-shadow: inset 0 0 0 1px var(--amber); color: var(--amber); }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.kick { font-family: var(--mono); font-size: 0.96rem; letter-spacing: .2em; color: var(--mute); text-transform: uppercase; margin-bottom: .5em; }
+.lede { font-size: 1.1rem; max-width: 62ch; color: #c9d0c8; } .small { font-size: .88rem; color: var(--mute); }
+.note { border-left: 3px solid var(--amber); padding: 4px 0 4px 12px; max-width: 70ch; color: #c9d0c8; }
+.err { color: var(--stamp); min-height: 1.2em; margin: 0; font-weight: 700; } .warn { color: var(--stamp); }
+/* panels */
+.panel { background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 1px solid var(--line2); border-radius: 2px; padding: 16px 18px; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+.panel::before, .panel::after { content: ""; position: absolute; width: 14px; height: 14px; border: 2px solid var(--amber); pointer-events: none; } .panel::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; } .panel::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+/* hero art */
+.hero { display: grid; gap: 22px; } .hero-art, .hero-art.small { border: 1px solid var(--line2); background: #000; overflow: hidden; aspect-ratio: 640 / 280; position: relative; box-shadow: 0 0 0 4px #000, 0 12px 40px rgba(0, 0, 0, .7); } .hero-art.small { aspect-ratio: 640 / 220; }
+.hero-art svg { width: 100%; height: 100%; display: block; }
+.hero-t { display: grid; gap: 14px; } .hero-t h1 { text-shadow: 0 0 24px rgba(240, 185, 58, .3); }
+.boot { font-family: var(--mono); font-size: 1.01rem; color: var(--green); line-height: 1.7; margin: 0; } .boot span { color: var(--mute); }
+.stampline { display: inline-block; font-family: var(--display); font-size: 1.01rem; letter-spacing: .2em; color: var(--stamp); border: 3px solid var(--stamp); padding: 0 12px; transform: rotate(-3deg); width: max-content; max-width: 100%; opacity: .92; }
+.how h2 { margin-bottom: 10px; } .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: s; } .steps li { counter-increment: s; display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; } .steps li::before { content: counter(s); font-family: var(--display); font-size: 1.30rem; color: #120d00; background: var(--amber); width: 34px; height: 34px; display: grid; place-items: center; line-height: 1; }
+/* roles */
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.rolecard { text-align: left; background: linear-gradient(180deg, var(--panel2), var(--panel)); color: var(--ink); border: 1px solid var(--line2); border-radius: 2px; padding: 0; display: grid; grid-template-columns: 1fr; gap: 0; overflow: hidden; align-content: start; }
+.rolecard .rp { border-bottom: 1px solid var(--line2); background: #000; } .rolecard .rp svg { width: 100%; height: auto; display: block; } .rolecard .rb { padding: 10px 12px; display: grid; gap: 3px; align-content: start; } .rolecard b { font-family: var(--display); font-weight: 400; font-size: 1.04rem; letter-spacing: .05em; line-height: 1.05; } .rolecard small { color: var(--mute); font-family: var(--mono); font-size: 0.91rem; } .rolecard .rd { font-size: .88rem; color: #c1c9c1; } .rcode { font-family: var(--mono); font-size: 0.88rem; color: var(--amber); letter-spacing: .2em; }
+.rolecard:hover { border-color: var(--amber-d); } .rolecard.on { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber), 0 0 24px rgba(240, 185, 58, .3); } 
+.rolecard { position: relative; } .rolecard.on .rcode::after { content: "  ▪ SELECTED"; color: var(--green); }
+.field { display: grid; gap: 6px; } label { font-family: var(--mono); font-size: 0.99rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+input, select, textarea { font: inherit; background: #050707; color: var(--ink); border: 1px solid var(--line2); border-radius: 2px; padding: 10px 12px; width: 100%; }
+input:focus, select:focus, textarea:focus { border-color: var(--amber); outline: none; box-shadow: 0 0 0 2px rgba(240, 185, 58, .3); }
+textarea { font-family: var(--mono); font-size: 1.10rem; line-height: 1.45; resize: vertical; } input[type=range] { padding: 0; accent-color: var(--amber); }
+/* round chrome */
+.steptrack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-family: var(--mono); font-size: 0.88rem; letter-spacing: .14em; } .st { padding: 6px 8px; border-top: 3px solid var(--line2); color: #66736c; display: flex; gap: 6px; align-items: baseline; text-transform: uppercase; } .st b { font-family: var(--display); font-weight: 400; font-size: 0.79rem; } .st.done { border-top-color: var(--green); color: var(--green); } .st.now { border-top-color: var(--amber); color: var(--amber); } .st .sl2 { display: none; } @media (min-width: 560px) { .st .sl2 { display: inline; } }
+.obj { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; border: 1px dashed var(--amber-d); background: rgba(240, 185, 58, .06); padding: 10px 14px; } .obj > span { font-family: var(--display); letter-spacing: .14em; color: #120d00; background: var(--amber); padding: 2px 10px; font-size: 0.79rem; } .obj p { margin: 0; color: #e7ecdf; }
+.hud { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)) auto; gap: 8px 16px; align-items: center; background: rgba(5, 7, 7, .94); border: 1px solid var(--line2); padding: 8px 14px; backdrop-filter: blur(4px); }
+.pips { display: flex; gap: 4px; } .pip { width: 12px; height: 18px; border: 1px solid var(--mute); } .pip.done { background: var(--green); border-color: var(--green); } .pip.now { background: var(--amber); border-color: var(--amber); box-shadow: 0 0 8px var(--amber); }
+.meter { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-family: var(--mono); font-size: 0.88rem; letter-spacing: .12em; text-transform: uppercase; min-width: 0; color: var(--mute); } .meter b { color: var(--ink); font-size: .85rem; } .mt { height: 10px; background: #1a2320; display: block; position: relative; background-image: repeating-linear-gradient(90deg, transparent 0 9px, rgba(0, 0, 0, .7) 9px 10px); } .mf { display: block; height: 100%; transition: width .6s; } .m-s { background: var(--blue); box-shadow: 0 0 8px var(--blue); } .m-i { background: var(--amber); box-shadow: 0 0 8px var(--amber); } .m-t { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.score { font-family: var(--mono); font-size: 0.88rem; letter-spacing: .12em; color: var(--mute); white-space: nowrap; } .score b { font-family: var(--display); font-size: 1.08rem; color: var(--ink); font-weight: 400; }
+@media (max-width: 620px) { .hud { grid-template-columns: 1fr 1fr 1fr; } .pips, .score { grid-column: span 3; } .meter { grid-template-columns: 1fr auto; } .meter .mt { grid-column: span 2; order: 3; } }
+.gauge-help { font-size: .88rem; color: var(--mute); } .gauge-help b { color: var(--ink); }
+/* paper documents */
+.paper { background: var(--paper); color: var(--paper-ink); padding: 18px 20px; position: relative; font-family: var(--type); font-size: 1.04rem; line-height: 1.55; box-shadow: 0 14px 30px rgba(0, 0, 0, .6); background-image: linear-gradient(180deg, rgba(255, 255, 255, .25), transparent 30%, rgba(0, 0, 0, .08)); animation: docin .5s ease-out both; }
+.paper.eyes { padding-top: 22px; } .paper h2 { color: #14231c; font-size: 1.37rem; margin: 2px 0 8px; font-family: var(--display); } .paper .small { color: var(--paper-mute); } .paper p { font-family: var(--type); }
+@keyframes docin { from { opacity: 0; transform: translateY(8px) rotate(-.4deg); } to { opacity: 1; transform: none; } }
+.dochead { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 18px; font-family: var(--mono); font-size: 0.91rem; letter-spacing: .08em; border-bottom: 2px solid var(--paper-ink); padding-bottom: 8px; margin-bottom: 12px; text-transform: uppercase; } .dochead b { color: var(--paper-mute); font-weight: 600; }
+.stamp { position: absolute; top: -14px; right: 12px; font-family: var(--display); font-size: 0.94rem; color: var(--stamp); border: 3px solid var(--stamp); padding: 0 10px; letter-spacing: .14em; transform: rotate(3deg); background: rgba(207, 205, 193, .92); }
+.src { font-family: var(--mono) !important; font-size: 0.94rem; letter-spacing: .14em; color: #9b2d25; text-transform: uppercase; margin-bottom: .5em; }
+.redact { background: #111; color: #111; padding: 0 4px; user-select: none; }
+.eq { font-family: var(--type); font-size: 1.1rem; margin: 0; } .eq b { font-family: var(--mono); font-size: 0.91rem; letter-spacing: .16em; color: var(--amber); display: block; text-transform: uppercase; } .paper .eq b { color: #7a5200; }
+.terms { display: grid; gap: 6px; font-size: .92rem; color: var(--mute); } .terms p { margin: 0; } .terms b { color: var(--amber); }
+/* decoder */
+.decoder { display: grid; gap: 14px; } .cipher { font-family: var(--mono); background: #020303; color: var(--amber); padding: 10px 14px; border: 1px solid var(--line2); display: grid; gap: 4px; overflow-wrap: anywhere; box-shadow: inset 0 0 20px rgba(240, 185, 58, .08); } .cipher code { font-size: 1.95rem; letter-spacing: .16em; font-family: var(--mono); text-shadow: 0 0 10px currentColor; } .cipher.out { color: var(--green); min-height: 4.4em; } .clabel { font-size: .64rem; letter-spacing: .24em; color: var(--mute); }
+.diskwrap { display: grid; grid-template-columns: minmax(210px, 280px) 1fr; gap: 20px; align-items: center; } @media (max-width: 620px) { .diskwrap { grid-template-columns: 1fr; justify-items: center; } .dctl { width: 100%; } }
+#disk { width: 100%; max-width: 280px; touch-action: none; cursor: grab; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .7)); } #disk:active { cursor: grabbing; } #disk .d1 { fill: #121a1f; stroke: var(--amber); stroke-width: 3; } #disk .d2 { fill: #1d3342; stroke: var(--amber-d); stroke-width: 2; } #disk .d3 { fill: #050707; stroke: var(--amber-d); stroke-width: 1.5; } #disk .d4 { fill: var(--amber); } #disk .dl { font-family: var(--mono); font-size: 14px; font-weight: 600; } #disk .dl.o { fill: #f2e9c9; } #disk .dl.n { fill: var(--green); font-size: 13px; } #disk .dmark { stroke: var(--stamp); stroke-width: 4; } #inner { transition: transform .2s; }
+@media (prefers-reduced-motion: reduce) { #inner, .mf, .paper, .granted { transition: none; animation: none; } }
+.dctl { display: grid; gap: 10px; } .dset { display: flex; gap: 12px; align-items: center; justify-content: space-between; } .dset .mini { font-size: 1.1rem; padding: 6px 16px; } .dmsg { min-height: 1.3em; font-weight: 700; color: var(--green); margin: 0; font-family: var(--mono); font-size: 1.10rem; }
+.granted { font-family: var(--display); font-size: 1.44rem; letter-spacing: .2em; color: var(--green); border: 3px solid var(--green); width: max-content; max-width: 100%; padding: 0 14px; transform: rotate(-2deg); animation: stampin .4s cubic-bezier(.2, 1.6, .4, 1) both; text-shadow: 0 0 14px var(--green); }
+@keyframes stampin { from { opacity: 0; transform: scale(2) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(-2deg); } }
+/* orders */
+.menu { list-style: none; margin: 12px 0 10px; padding: 0; display: grid; gap: 10px; }
+.mitem { width: 100%; display: grid; grid-template-columns: 40px 1fr; gap: 12px; text-align: left; align-items: center; padding: 12px 14px; background: rgba(0, 0, 0, .06); border: 2px solid #8a8878; color: var(--paper-ink); font-family: var(--body); font-size: 1.02rem; border-radius: 2px; } .mitem:hover { border-color: #14231c; background: rgba(0, 0, 0, .1); } .mitem[aria-pressed="true"] { background: #14231c; color: #e9efe4; border-color: #14231c; box-shadow: 0 0 0 3px var(--amber); }
+.key { font-family: var(--display); font-size: 1.08rem; width: 36px; height: 36px; display: grid; place-items: center; background: #14231c; color: var(--amber); border-radius: 4px; box-shadow: 0 2px 0 #000; } .mitem[aria-pressed="true"] .key { background: var(--amber); color: #120d00; }
+.sendrow { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; } .sendrow .small { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .chip { font-family: var(--mono); font-size: 1.01rem; border: 1px solid #5a5d52; padding: 3px 10px; color: var(--paper-ink); } .chip.up { border-color: #1c6b3a; background: #cfe6d0; } .chip.dn { border-color: #9b2d25; background: #ecd0cb; }
+.slots { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; position: relative; } .slots::before { content: ""; position: absolute; left: 6%; right: 6%; top: 50%; border-top: 2px solid var(--stamp); opacity: .55; } @media (max-width: 620px) { .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); } .slots::before { display: none; } }
+.slot { background: #0a0f0d; border: 1px dashed var(--line2); padding: 8px 9px; display: grid; gap: 2px; font-family: var(--mono); min-width: 0; position: relative; z-index: 1; } .slot span { font-size: .64rem; color: var(--mute); letter-spacing: .1em; text-transform: uppercase; } .slot b { font-size: .92rem; overflow-wrap: anywhere; color: #4d5a53; } .slot.mine, .slot.got { background: var(--paper); border: 1px solid #000; transform: rotate(-.8deg); box-shadow: 0 6px 12px rgba(0, 0, 0, .6); } .slot.got:nth-child(even), .slot.mine:nth-child(even) { transform: rotate(.9deg); } .slot.mine b, .slot.got b { color: var(--paper-ink); font-family: var(--type); font-weight: 400; } .slot.mine span, .slot.got span { color: var(--paper-mute); } .slot.mine::before, .slot.got::before { content: ""; position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--stamp); box-shadow: 0 2px 3px rgba(0, 0, 0, .6); }
+details.post { border: 1px solid var(--line2); padding: 10px 14px; } summary { cursor: pointer; font-family: var(--mono); font-size: 1.07rem; letter-spacing: .08em; text-transform: uppercase; } details.post textarea { margin: 10px 0; }
+/* end + decode */
+.endhero { display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center; background: linear-gradient(180deg, var(--panel2), #050707); border: 1px solid var(--line2); padding: 20px; position: relative; } .endhero .portrait { width: 100%; display: block; border: 1px solid var(--line2); } .endhero .pw { position: relative; } .endhero .stampbig { position: absolute; left: -12px; bottom: -14px; } @media (max-width: 620px) { .endhero { grid-template-columns: 110px 1fr; gap: 14px; } }
+.stampbig { font-family: var(--display); font-size: 0.83rem; color: var(--stamp); border: 3px solid var(--stamp); padding: 2px 10px; transform: rotate(-8deg); letter-spacing: .12em; text-align: center; line-height: 1.15; background: rgba(7, 9, 10, .88); width: max-content; max-width: 160px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; } .stat { background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 1px solid var(--line2); padding: 12px 14px; display: grid; gap: 2px; min-width: 0; } .stat.wide { grid-column: span 2; border-color: var(--amber-d); } @media (max-width: 620px) { .stat.wide { grid-column: 1 / -1; } }
+.sl { font-family: var(--mono); font-size: 0.86rem; letter-spacing: .2em; color: var(--mute); } .stat b { font-family: var(--display); font-weight: 400; font-size: 1.66rem; line-height: 1; color: var(--ink); } .stat b.t { font-size: 1.6rem; } .stat b.mono { font-family: var(--mono); font-size: 1.95rem; letter-spacing: .1em; color: var(--amber); text-shadow: 0 0 12px rgba(240, 185, 58, .4); overflow-wrap: anywhere; } .stat small { color: var(--mute); font-size: .78rem; }
+.meters3 { display: grid; gap: 8px; max-width: 460px; }
+.journey { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; } .journey li { display: grid; grid-template-columns: 150px 1fr; gap: 2px 14px; padding: 9px 12px; border: 1px solid var(--line2); background: var(--panel); } .journey li > :nth-child(n+3) { grid-column: 2; } .jd { font-family: var(--mono); font-size: 0.94rem; color: var(--mute); } .jk { font-family: var(--mono); font-size: 0.94rem; color: var(--amber); } .pc { font-family: var(--type); color: var(--green); } @media (max-width: 620px) { .journey li { grid-template-columns: 1fr; } .journey li > :nth-child(n+3) { grid-column: 1; } }
+.dform { display: flex; gap: 10px; flex-wrap: wrap; } .dform input { flex: 1 1 200px; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; font-size: 1.37rem; }
+.decoded { display: grid; gap: 10px; } .decoded .dp { display: grid; grid-template-columns: 90px 1fr; gap: 14px; align-items: start; } .decoded .dp .portrait { width: 100%; border: 1px solid #000; } .decoded h3 { margin-bottom: 2px; color: #14231c; font-size: 1.7rem; } .decoded .field { margin-top: 8px; } .decoded label { color: var(--paper-mute); } .decoded textarea { margin: 6px 0; background: #e5e3d8; color: var(--paper-ink); border-color: #8a8878; }
+.decoded .journey li { background: rgba(0, 0, 0, .05); border-color: #8a8878; } .decoded .jd { color: var(--paper-mute); } .decoded .pc { color: #14231c; font-weight: 700; } .decoded select { background: #e5e3d8; color: var(--paper-ink); border-color: #8a8878; } .decoded .mini { color: var(--paper-ink); border-color: #14231c; } .decoded .warn { color: #9b2d25; }
+.cardwrap { max-width: 640px; overflow: hidden; border: 1px solid var(--line2); } .cardwrap svg { width: 100%; height: auto; display: block; }
+.brow { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line2); background: linear-gradient(180deg, var(--panel2), var(--panel)); } .brow.full { border-color: var(--green); box-shadow: 0 0 20px rgba(111, 224, 154, .15); } .brow h3 { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; } .cnt { font-family: var(--mono); font-size: 0.94rem; letter-spacing: .12em; color: var(--mute); } .brow.full .cnt { color: var(--green); } .fullmsg { font-family: var(--type) !important; font-size: 1.5rem; letter-spacing: .05em; line-height: 1.2; color: #14231c; }
+.chiplist { list-style: none; margin: 8px 0 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; } .chipb { font-family: var(--mono); font-size: 0.99rem; background: transparent; border: 1px solid var(--line2); padding: 5px 12px; color: var(--ink); } .chipb:hover { border-color: var(--amber); }
+.mono { font-family: var(--mono); }
+.teacher section { display: grid; gap: 8px; } .teacher ul, .teacher ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; } .key li { margin-bottom: 6px; }
+.wrap > .mini { justify-self: start; }
+.blink { animation: blink 1s steps(2) infinite; color: var(--green); } @keyframes blink { 50% { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .blink { animation: none; } }
+.granted { margin: 10px 0 12px; } .dmsg { margin-top: 4px; }
+@media (max-width: 560px) { .rolecard { grid-template-columns: 104px 1fr; } .rolecard .rp { grid-row: span 2; border-bottom: 0; border-right: 1px solid var(--line2); align-self: start; } .roles { grid-template-columns: 1fr; } }
+.roles { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+.portrait { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* ===== PIXEL SKIN: flat 16-colour palette, hard 4px edges, pixel fonts, stepped motion ===== */
+:root { --bg: #07090a; --ink: #e6e3d6; --mute: #8d9a96; --panel: #11161a; --panel2: #1b2226; --line: #2c373c; --line2: #46555b; --amber: #f0b93a; --amber-d: #a67c5c; --stamp: #e0544a; --green: #5f9e6e; --blue: #4f7d96; --paper: #e6e3d6; --paper-ink: #07090a; --paper-mute: #46555b;
+  --display: "Silkscreen", "Press Start 2P", monospace; --type: "VT323", ui-monospace, monospace; --mono: "VT323", ui-monospace, monospace; --px: 4px; }
+* { border-radius: 0 !important; transition-timing-function: steps(4, end) !important; animation-timing-function: steps(6, end) !important; }
+body { background: var(--bg); background-image: none; } body::after { display: none; }
+h1 { font-size: clamp(1.5rem, 6.2vw, 2.5rem); line-height: 1.25; letter-spacing: .02em; text-shadow: 4px 4px 0 #000; } h2 { font-size: 1.05rem; line-height: 1.35; } h3 { font-size: .95rem; line-height: 1.35; }
+.hero-t h1, .logo { text-shadow: 4px 4px 0 #000; } .logo { font-size: 1.15rem; letter-spacing: .14em; }
+.bar { border-bottom: 4px solid var(--line2); background: var(--bg); }
+.classif { border: 2px solid var(--stamp); font-size: 1rem; }
+.mini { border: 2px solid var(--line2); font-size: 1.15rem; padding: 4px 12px; background: var(--panel); } .mini:hover { border-color: var(--amber); }
+.btn { font-size: .85rem; letter-spacing: .08em; padding: 16px 24px; color: #07090a; background: var(--amber); box-shadow: inset 4px 4px 0 rgba(255, 255, 255, .28), inset -4px -4px 0 rgba(0, 0, 0, .32); clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)); }
+.btn:hover:not(:disabled) { filter: none; background: #f6cf6a; } .btn:active:not(:disabled) { box-shadow: inset 4px 4px 0 rgba(0, 0, 0, .32), inset -4px -4px 0 rgba(255, 255, 255, .2); } .btn:disabled { background: var(--line); color: var(--mute); box-shadow: none; }
+.btn.ghost { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 4px var(--line2); } .btn.ghost:hover { box-shadow: inset 0 0 0 4px var(--amber); background: var(--panel); }
+.panel { background: var(--panel); border: 4px solid var(--line2); box-shadow: 6px 6px 0 #000; }
+.panel::before, .panel::after { width: 16px; height: 16px; border-width: 4px; } .panel::before { top: -4px; left: -4px; } .panel::after { bottom: -4px; right: -4px; }
+.hero-art, .hero-art.small { border: 4px solid var(--line2); box-shadow: 6px 6px 0 #000; } .hero-art svg { image-rendering: pixelated; }
+.stampline { border-width: 4px; font-size: 1rem; transform: none; } .granted { border-width: 4px; font-size: 1.1rem; transform: none; }
+.steps li::before { font-size: 1.1rem; width: 36px; height: 36px; }
+.rolecard { background: var(--panel); border: 4px solid var(--line2); } .rolecard .rp { border-bottom: 4px solid var(--line2); } .rolecard:hover { border-color: var(--amber-d); } .rolecard.on { border-color: var(--amber); box-shadow: 6px 6px 0 #000; } .rolecard b { font-size: .95rem; line-height: 1.3; } .rolecard small { font-size: 1.05rem; } .rolecard .rd { font-size: .92rem; }
+input, select, textarea { border: 2px solid var(--line2); background: var(--bg); } input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 2px var(--amber); } textarea { font-size: 1.25rem; line-height: 1.1; }
+.hud { background: var(--bg); backdrop-filter: none; border: 4px solid var(--line2); } .pip { border-width: 2px; } .pip.now { box-shadow: none; } .m-s, .m-i, .m-t { box-shadow: none; } .mt { height: 12px; } .mf { transition: width .5s steps(8, end); }
+.steptrack .st { border-top-width: 4px; } .obj { border: 4px solid var(--amber-d); background: var(--panel2); } .obj > span { font-size: .8rem; }
+.paper { box-shadow: 6px 6px 0 #000; font-size: 1.4rem; line-height: 1.2; } .paper h2 { font-size: 1rem; } .eq { font-size: 1.4rem; }
+.slot { border: 2px dashed var(--line2); } .brow { background: var(--panel); border: 4px solid var(--line2); }
+.note { border-left-width: 4px; }
+svg.portrait, svg.scene { image-rendering: pixelated; shape-rendering: crispEdges; }
+.cipher, .cipher *, .plain, .plain * { text-shadow: none !important; } .cipher { border: 4px solid var(--line2); background: var(--bg); font-size: 1.9rem; letter-spacing: .12em; }
+.stamp, .stampbig, .granted, .stampline { transform: none !important; } .stampbig { border-width: 4px; } .stamp { border-width: 4px; }
+.stat, .endhero, .brow { background: var(--panel) !important; border: 4px solid var(--line2); } .stat { border-width: 4px; }
+@keyframes docin { from { opacity: 0; } to { opacity: 1; } } @keyframes stampin { from { opacity: 0; } to { opacity: 1; } }
+
+.pan { animation: pan 8s linear infinite; will-change: transform; } @keyframes pan { to { transform: translateX(-960px); } } @media (prefers-reduced-motion: reduce) { .pan { animation: none; } }
+
+/* cipher play */
+#inner { transition: transform .14s steps(4); }
+.sigrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .sigrow b { font-family: var(--mono); font-size: .9rem; letter-spacing: .12em; color: var(--amber); min-width: 6.5em; }
+.sbar { display: flex; gap: 3px; } .sbar i { width: 9px; height: 16px; background: #1b2226; border: 2px solid #2c373c; } .sbar i.on { background: var(--blue); border-color: var(--blue); } .sbar i.on.warm { background: var(--amber); border-color: var(--amber); } .sbar i.on.hot { background: var(--green); border-color: var(--green); }
+.lt { display: inline-block; } .lt.won { animation: ltpop .42s steps(5) both; color: var(--green); } @keyframes ltpop { 0% { transform: translateY(0); opacity: .2; } 40% { transform: translateY(-8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+.diskwrap { position: relative; } .diskwrap.burst::after { content: ""; position: absolute; left: 50%; top: 38%; width: 6px; height: 6px; background: var(--amber); box-shadow: 0 -70px 0 var(--green), 0 70px 0 var(--green), -70px 0 0 var(--amber), 70px 0 0 var(--amber), -50px -50px 0 var(--green), 50px -50px 0 var(--amber), -50px 50px 0 var(--amber), 50px 50px 0 var(--green); animation: burst .9s steps(6) forwards; pointer-events: none; } @keyframes burst { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #inner { transition: none; } .lt.won, .diskwrap.burst::after { animation: none; } }
+.logo { text-align: left; line-height: 1.15; letter-spacing: .08em; font-size: 1rem; }
+@media (max-width: 720px) { .logo { font-size: .8rem; letter-spacing: .04em; max-width: 12.5em; } }
+.decoded .mini { background: #e5e3d8; color: #14231c; border-color: #14231c; } .decoded .mini:hover { background: #14231c; color: #f0b93a; border-color: #14231c; }
+
+</style></head><body><div id="app"></div>
+<script>
+/* CODEBREAKERS: THE SILENT SERVICE: a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
+const DATA = (function () {
+  const KINDS = {
+    cover: { s: 4, i: 6, t: 2, p: 20 }, share: { s: 1, i: 5, t: 5, p: 20 },
+    open: { s: -10, i: 9, t: -2, p: 11 }, hold: { s: 8, i: -8, t: -2, p: 8 },
+    hold3: { s: 0, i: -6, t: -4, p: 7 }, blunder: { s: -6, i: -5, t: -6, p: 3 }
+  };
+  const ORDER = [["cover", "open", "hold"], ["cover", "open", "hold"], ["share", "hold3", "blunder"], ["cover", "open", "hold"], ["cover", "open", "hold"], ["cover", "open", "hold"]];
+  const ROLE_IDS = ["BP", "NV", "FA", "MI", "UL"];
+  const ROUNDS = [
+    { id: "r1", date: "1939 to 1940", title: "A Gift from Poland", scene: "enigma",
+      sitrep: ["July 1939. Weeks before Germany invades Poland, Polish codebreakers meet British and French officers outside Warsaw. They have been reading Germany's Enigma machine since 1932, and they hand over replica machines and their methods.", "Britain takes the knowledge to a country house called Bletchley Park. Germany's army and air force change their machine settings every day at midnight, so each morning the work starts over. The only thing worse than not reading the codes is letting the enemy find out that you can."],
+      eq: "How do you use a secret without losing it?",
+      terms: [{ t: "Enigma", d: "The cipher machine Germany used for military messages. Each letter typed came out as a different letter." }, { t: "Cipher", d: "A way of scrambling a message so that only someone with the key can read it." }],
+      msg: ["POLAND", "GAVE US", "THE FIRST", "KEY TO", "ENIGMA"],
+      real: "In July 1939 the Polish Cipher Bureau, whose mathematicians Marian Rejewski, Jerzy Różycki and Henryk Zygalski had broken Enigma in the early 1930s, gave replicas and methods to Britain and France. Bletchley Park built on that gift. Without it, Britain would have started years behind.", ask: "Why might a smaller country's secret help a bigger one win?" },
+    { id: "r2", date: "1941", title: "The Atlantic", scene: "convoy",
+      sitrep: ["Spring 1941. German U-boats sink merchant ships faster than Britain can build them. In May, sailors capture codebooks from a U-boat, and Bletchley can read some U-boat orders for the first time.", "Ultra, the name for this intelligence, shows exactly where the wolf packs wait. Steering a convoy around them saves ships. Doing it too neatly, too often, tells Germany that someone is reading its mail."],
+      eq: "When is saving lives today worth risking tomorrow's secret?",
+      terms: [{ t: "Ultra", d: "The code name for intelligence from the highest-level German ciphers, such as Enigma." }, { t: "Cover story", d: "A believable explanation, such as a patrol aircraft's sighting, for how you really knew something." }],
+      msg: ["NEVER ACT", "ON ULTRA", "WITHOUT", "A COVER", "STORY"],
+      real: "Acting on Ultra intelligence needed a plausible cover story, such as a reconnaissance flight that could have 'found' a convoy or a ship by chance. The cover explained how you knew without hinting at the codebreaking. The rule helped keep Enigma's secret for years.", ask: "Why did leaders accept losing some battles to protect a source?" },
+    { id: "r3", date: "Late 1941 to early 1942", title: "When the Signals Stop", scene: "silence",
+      sitrep: ["November 1941. Japanese aircraft carriers leave port under strict radio silence. American listeners who track them every day suddenly hear nothing. Across the Atlantic, in February 1942, Germany adds a fourth rotor to its U-boat Enigma, and Bletchley goes dark too.", "Both sides of the Allied intelligence world face the same question. When the signals stop, is that nothing to worry about, or is the silence the warning?"],
+      eq: "What does it mean when the signals stop?",
+      terms: [{ t: "Radio silence", d: "Ships or units deliberately not transmitting, so no one can track them by their signals." }, { t: "Blackout", d: "A period when codebreakers cannot read an enemy cipher after the enemy changes it." }],
+      msg: ["SILENCE", "ON THE", "RADIO", "IS ALSO", "A SIGNAL"],
+      real: "In late November 1941, Japan's carrier force sailed toward Hawaii under radio silence, and American analysts lost track of it. The attack on Pearl Harbor came on December 7. Historians still debate who knew what. In February 1942 the 'Shark' blackout left Bletchley unable to read U-boat traffic for about ten months. In both cases, the missing signal mattered.", ask: "How should you plan when you know you have lost sight of the enemy?" },
+    { id: "r4", date: "May to June 1942", title: "Water at Midway", scene: "midway",
+      sitrep: ["Spring 1942. American codebreakers in Hawaii can read parts of Japan's main naval code, called JN-25. They see Japan preparing a big strike on a place the Japanese call 'AF'.", "Washington thinks AF is somewhere else. A Navy officer named Joseph Rochefort thinks it is Midway Island. He has a clever way to find out, and not much time to do it."],
+      eq: "How do you prove a hunch before it is too late?",
+      terms: [{ t: "JN-25", d: "The code the Japanese navy used for most of its messages; the Allies read parts of it." }, { t: "Midway", d: "A small American island in the Pacific, about halfway between Asia and North America." }],
+      msg: ["AF", "IS SHORT", "OF", "FRESH", "WATER"],
+      real: "Rochefort's team had Midway send a plain-language radio message saying its water plant had broken. Soon after, Japanese code messages reported that 'AF' was short of fresh water. That proved AF was Midway. In early June 1942, American carriers were waiting and sank four Japanese carriers. Midway is widely seen as the turning point of the war in the Pacific.", ask: "Why was a test better than an argument?" },
+    { id: "r5", date: "April 1943", title: "Spending a Secret", scene: "intercept",
+      sitrep: ["April 1943. In the Pacific, an intercepted message gives the schedule of Admiral Yamamoto, who planned the attack on Pearl Harbor, for a visit to a front-line island on April 18. American fighters could reach him, but only just.", "In Europe, the same month, British planners drop a body carrying forged papers into the sea off Spain. It is a lie designed to make Germany look in the wrong place. Both plans depend on keeping a very small secret."],
+      eq: "Who decides when a secret is worth spending?",
+      terms: [{ t: "Coast-watcher", d: "Allied observers hidden on Pacific islands who radioed warnings about Japanese ships and planes." }, { t: "Deception", d: "Planting false information so the enemy makes the wrong choice." }],
+      msg: ["YAMAMOTO", "WILL VISIT", "BOUGAINVILLE", "ON THE", "EIGHTEENTH"],
+      real: "On April 18, 1943, American P-38 fighters shot down Yamamoto's plane over Bougainville after codebreakers read his flight plan. The Americans spread a story that a coast-watcher had spotted him, as cover. Japan suspected its code might be read but kept using it. Meanwhile, Operation Mincemeat, the 'man who never was', helped convince Germany that the Allies would land in Greece and Sardinia.", ask: "How do you weigh a single big result against a lasting secret?" },
+    { id: "r6", date: "1944", title: "A Lie for D-Day", scene: "decoy",
+      sitrep: ["Spring 1944. The Allies plan to land in Normandy. To keep Germany guessing, they create a fake army, with inflatable tanks and false radio chatter, apparently preparing to cross at Calais. Double agents back up the story.", "Codebreakers now read very senior German messages, including ones using a cipher called Tunny. They can see whether the lie is believed. A lot depends on a story that cannot be tested in advance."],
+      eq: "How do you lie to an enemy and stay honest with your own side?",
+      terms: [{ t: "Double agent", d: "A spy who appears to work for one side while secretly working for the other." }, { t: "Operation Fortitude", d: "The Allied deception campaign meant to make Germany expect an invasion at Calais." }],
+      msg: ["BERLIN", "BELIEVES", "THE MAIN", "ATTACK", "IS CALAIS"],
+      real: "Operation Fortitude convinced much of the German high command that the main landing would come at Calais, even after the Normandy landings began. Some German armored divisions were held back for weeks. Double agents such as Juan Pujol García, code-named Garbo, helped. Bletchley decrypts let the Allies see that the lie was being believed.", ask: "What is the difference between deceiving an enemy and deceiving yourself?" }
+  ];
+  const T = (s) => s; // marker for translators/proofreaders
+  const ROLES = [
+    { id: "BP", name: "Bletchley Park Analyst", short: "Codebreaker", place: "Buckinghamshire, England", color: "#7a4e2d", blurb: "You break German ciphers in a country house. You decide who gets to know what the codes say.",
+      echo: "Real people in roles like yours include Alan Turing and Gordon Welchman, who developed methods and machines, Joan Clarke, and Mavis Batey, who helped break an Italian naval cipher before the Battle of Cape Matapan. Most of Bletchley's staff were women.",
+      qs: ["Navy cryptanalysts: how did your team prove what you suspected?", "Ultra Liaison officers: how did you explain orders without saying why?", "Case officers: did the deception hold up in the decrypts you saw?"],
+      r: [
+        { src: "Hut 6 log, 1940", text: "Germany's army and air force change their Enigma settings at midnight. You have the Polish methods, a handful of staff and not enough machines. One morning's key can unlock a whole day of orders, but only if the secret stays inside the hut.", ask: "How do you run Hut 6 in these first months?",
+          c: [["Work on a strict need-to-know basis and send results out under a cover name.", "Results go out as reports from a made-up agent. Commanders get the intelligence, and the Germans have no reason to suspect a broken machine."], ["Brief every senior commander on exactly how the traffic is read, so they trust it.", "The commanders trust the product, but dozens of people now know the secret. Each one is a possible leak, and the circle is hard to shrink."], ["Keep every result inside the hut until the work is perfect.", "The secret is safe, but nothing changes at the front. Leaders cannot use what they never receive."]] },
+        { src: "Naval Section note, 1941", text: "Since a U-boat's codebooks were captured in May, your hut can read U-boat orders. A wolf pack waits along a convoy's usual route. Rerouting is easy. Rerouting too often, and too precisely, may tell Germany something is wrong.", ask: "How do you advise the Admiralty?",
+          c: [["Reroute convoys in varied ways and ask for patrol flights to give a believable reason.", "Fewer ships are lost. Aircraft seem to find U-boats by chance, and Germany blames bad luck."], ["Dodge every wolf pack exactly, every time, and tell the escorts why.", "Ships are saved for a while, but the pattern is too perfect. German analysts start asking whether their codes are safe."], ["Warn no one, so the secret stays absolutely safe.", "The secret holds. A convoy sails into the wolf pack, and ships and sailors are lost that could have been saved."]] },
+        { src: "Hut 8 diary, February 1942", text: "Without warning, U-boat traffic turns to nonsense. Germany has added a fourth rotor to its machines, and your section can read none of it. Nobody knows how long that will last. The Admiralty is asking what you can still tell them.", ask: "What do you tell the Admiralty during the blackout?",
+          c: [["Say plainly that the window is closed, then pass on every other clue you can still gather.", "The news is unwelcome, but the Admiralty plans around it. Other sources fill part of the gap while your colleagues work on the new machine."], ["Say nothing and hope the problem fixes itself.", "The Admiralty plans as if you can still see, and a silent hut is read as a safe sea. Trust in your section drops."], ["Pretend you can still read it and give your best guesses as fact.", "Your guesses sound confident and some are wrong. When the errors come out, the Admiralty stops trusting the rest."]] },
+        { src: "Letter from a friendly service, 1942", text: "The Americans in Hawaii are racing to read the Japanese navy's code. They have asked for help with a code group that seems to mean 'AF'. Sharing what you know could help them, but it adds more people to the circle.", ask: "Do you share what you have with the Americans?",
+          c: [["Send exactly what is useful, through the secure channel, and nothing else.", "The Americans get what they need in time, without a flood of extra detail. A narrow channel keeps the circle small."], ["Send everything, including how you learned it, so they can use it any way they like.", "The Americans are grateful and the exchange speeds up, but your sources and methods are now in more files than you can count."], ["Hold it back, because the secret matters more than their problem.", "Nothing leaks, but the Americans work without your piece of the puzzle, and the question about AF stays open longer."]] },
+        { src: "Hut 3 summary, April 1943", text: "A body carrying forged papers has been left off the Spanish coast, to convince Germany that the Allies will land in Greece and Sardinia instead of Sicily. Only your decrypts can show whether Germany believed it. If the answer reaches too many desks, the trick could be exposed.", ask: "How do you report whether the deception worked?",
+          c: [["Report to the small planning group only, and explain what changed in German orders.", "The planners learn that German forces are moving toward Greece and Sardinia. The deception stays inside a small circle."], ["Circulate the news widely so every planner can adjust at once.", "More people can adjust their plans, but more people now know you read German orders about Allied plans. Rumors travel."], ["Wait until you are completely certain before telling anyone.", "You wait for certainty while planners work blind for days. The secret is fine, but the timing is not."]] },
+        { src: "Newmanry report, 1944", text: "An electronic machine named Colossus helps your colleagues read a different German cipher, called Tunny, used by the high command. A message shows that Hitler's staff still expect the main attack at Calais. The deception planners would like to know. Changing plans in response is risky.", ask: "How do you pass on the news?",
+          c: [["Pass it straight to the deception planners with a clear note that Germany believes the story.", "The planners keep feeding the false story, and the Normandy landings meet weaker armored opposition than they might have."], ["Tell all invasion units, so everyone feels confident.", "Confidence rises, but a secret meant for a few is now in many mess halls. Some of it is almost certain to leak."], ["Say nothing, because the deception should not be touched.", "Deceivers and planners work without confirmation. The story holds anyway, but nobody can be sure it will."]] }
+      ] },
+    { id: "NV", name: "Navy Cryptanalyst", short: "US Navy", place: "Washington and Hawaii", color: "#2b4a6b", blurb: "You work on Japan's naval codes for the US Navy. You decide what the fleet is told, and when.",
+      echo: "Real people in roles like yours include Joseph Rochefort, who led the Hawaii team (Station HYPO) at Midway, Agnes Meyer Driscoll, who broke earlier Japanese naval codes, and the hundreds of Navy WAVES who worked in cryptology.",
+      qs: ["Bletchley analysts: what could you share that would have helped us read JN-25?", "Field agents: how did your reports reach people like me?", "Ultra Liaison officers: how did you explain our results to commanders?"],
+      r: [
+        { src: "Navy memo, 1939 to 1940", text: "A new Japanese naval code has appeared. Later it will be called JN-25. The Navy has few trained analysts and several priorities. You can put most of your effort on the new code, or spread your team across other tasks. Nobody knows when the code will matter.", ask: "How do you use your small team?",
+          c: [["Focus the team on the new code and share findings only with a small group in Washington.", "The team learns the code steadily and quietly. When war comes, you will already have a head start."], ["Tell the fleet about the new code and every early finding, so it can prepare.", "The fleet is excited and well-briefed, but half-solved results travel widely, and so does the fact that you are working on the code."], ["Hold the work until the whole code is solved, so nothing is half-known.", "No half-truths spread, but the work is slow and unseen. When it is needed, nobody trusts a team that has shown nothing."]] },
+        { src: "Navy Department, February 1941", text: "In a few weeks you will be sent to Britain to swap cipher knowledge. The British know how to read German machine ciphers. You know about Japanese ones. Giving too little will end the exchange. Giving too much could put American secrets in British files.", ask: "What do you carry in your briefcase?",
+          c: [["Bring a carefully chosen part of your knowledge, and promise more in exchange.", "Both sides trade key pieces and build trust. The partnership becomes one of the most important of the war."], ["Hand over everything at once to build trust.", "The trust is quick and real, but your office hears that some American methods are now in files you cannot control."], ["Bring nothing and ask them to go first.", "The British give little in return, and a promising partnership starts cold."]] },
+        { src: "Fleet Radio Unit report, December 1941", text: "For days the radio traffic from the Japanese carriers has gone silent: no signals, no call signs, nothing you can track. Your officers say they might be in home waters, or they might be at sea. You cannot prove which. Pearl Harbor's commander wants to know where they are.", ask: "What do you put in your report?",
+          c: [["State clearly that you have lost track of the carriers and why that worries you.", "The report is uncomfortable but honest. The unknown is now a visible risk, and more people are asking where the carriers are."], ["Report only what is known and leave out the gap.", "Everything in your report is correct. Without the gap, though, readers assume nothing is missing."], ["Say they are probably in home waters, to avoid alarming anyone.", "The guess sounds reassuring. If the carriers turn up somewhere else, that line is the one people will remember."]] },
+        { src: "Station HYPO, May 1942", text: "The Japanese keep mentioning a place they call 'AF'. You believe it is Midway Island, but Washington believes it is somewhere else. You have a way to test it: have Midway send a plain-language message saying its water plant has broken, then watch whether Japan repeats it in code.", ask: "Do you run the test?",
+          c: [["Run the water-plant test and watch the code for the answer.", "Within days, Japanese traffic says AF is short of water. Your suspicion is confirmed, and the Navy prepares for Midway."], ["Skip the test and tell the admiral outright that AF is Midway.", "He listens, but Washington argues with you, and without proof the planners hesitate."], ["Drop the idea, in case the test reveals your methods.", "No test means no proof. The debate drags on, and precious days are lost."]] },
+        { src: "Fleet Radio Unit Pacific, April 1943", text: "An intercepted message gives the schedule of Admiral Yamamoto, the Japanese fleet commander, for a visit to a front-line island on April 18. American fighters could reach him. Shooting him down would be a blow to Japan, but it would also show that you can read his schedule.", ask: "What do you recommend?",
+          c: [["Recommend the interception, with a cover story that points to a coast-watcher sighting.", "The pilots reach him, and the cover story holds well enough. Japanese leaders suspect bad luck more than a broken code."], ["Recommend the interception with no cover; the target is too valuable.", "The mission works, but no explanation is offered, and Japan begins wondering how the Americans knew."], ["Recommend against it, so the code stays safe.", "No one learns anything about your code. Yamamoto flies on, and a chance is gone."]] },
+        { src: "Intelligence summary, 1944", text: "A Japanese ambassador in Berlin has toured German defenses in France and reported to Tokyo in a code you can read. His report describes where the guns are and how strong each part of the coast is. Planners would love it, but it comes from a different source than the rest of their intelligence.", ask: "How do you deliver it?",
+          c: [["Pass it to the planners as one source among many, in a short summary.", "Planners adjust the landing plans, and your source stays hidden among many."], ["Send the full text to every unit that might use it.", "Everyone gets a copy, and every copy is a risk. More hands touch it than should."], ["Keep it, because the source is too valuable to risk.", "The source stays secure, but the planners go without an unusually detailed picture of the coast."]] }
+      ] },
+    { id: "FA", name: "Resistance Courier", short: "Field agent", place: "Occupied Europe", color: "#46603a", blurb: "You carry messages and proof across occupied Europe. You decide which risks to take with other people's safety.",
+      echo: "Real people in roles like yours include Virginia Hall, an American who helped organize resistance networks in France, and Nancy Wake, who worked as a courier and organizer with the French Resistance. Polish couriers also carried vital evidence about secret weapons.",
+      qs: ["Bletchley analysts: did our reports ever give you your cover story?", "MI5 case officers: how did you decide which of our rumors to plant?", "Ultra Liaison officers: how did you hide where your information came from?"],
+      r: [
+        { src: "Courier's note, 1939 to 1940", text: "You are carrying a small parcel by train: a replica of a code machine, with papers in a diplomatic bag. Your job is to hand it to a stranger in Paris. A border guard looks at you twice. You can take the long way, the fast way, or wait until you feel safe.", ask: "How do you travel?",
+          c: [["Take a slower, less-watched route and keep the parcel with a trusted official.", "The parcel arrives intact. The slower route took more time, but no one was suspicious."], ["Take the fast, direct route and hope no one stops you.", "You are stopped, but the diplomatic bag holds. You got there faster, but you were seen and noted."], ["Stay put and wait for better days.", "The parcel stays safe, but the people waiting for it do not have it in time."]] },
+        { src: "Network report, 1941", text: "Your network watches a German U-boat base on the French coast. London has asked for the dates when boats leave. The Germans do not know that Britain already reads their orders, and your reports could serve as a cover for what London knows. But if the Germans think there is a spy, they will search for you.", ask: "How do you report?",
+          c: [["Report only what you can safely see, with your normal routine.", "London gets a steady trickle of sightings that can explain how it knows when boats sail. Your routine does not change, so it draws no eyes."], ["Send detailed daily reports so London can act at once.", "London loves the detail, but the Germans notice the radio traffic and begin tracking transmitters nearby. You move, quickly."], ["Stop reporting until the heat dies down.", "You are safe, but London has less cover for its secret and fewer eyes on the coast."]] },
+        { src: "Message from the coast, February 1942", text: "Three large German warships have been in Brest for months. Dock workers whisper that they will leave soon. You can pass the whisper to London, but the chain of couriers takes days, and no one is sure it is true. Silence from your end may be read as 'nothing to report'.", ask: "What do you send?",
+          c: [["Send the rumor at once, labeled as uncertain, with the names of those who saw it.", "London reads the uncertainty and the warning. They cannot stop everything, but they are not entirely surprised."], ["Wait to confirm it first.", "Your confirmation arrives after the ships have gone. London learns the truth from the news."], ["Leave it out, since it is only gossip.", "The ships leave, and London has no warning from you. Next time they may not trust your silence."]] },
+        { src: "Instructions from London, 1942", text: "London asks you to pass a harmless rumor to a contact you suspect is being watched. If the Germans act on it, London will know who is leaking. It is a trap, and it puts your contact at risk.", ask: "Do you carry the rumor?",
+          c: [["Carry it, but tell your contact to treat it carefully and move afterwards.", "The rumor is heard, the Germans act on it, and London learns where the leak is. Your contact was ready and slips away."], ["Carry it as ordered, without telling your contact what it is for.", "The test works, but your contact is caught off guard and shaken. You will not forget how that felt."], ["Refuse, because your contact's safety matters more.", "Your contact is safe. The leak stays hidden, and more people may be at risk later."]] },
+        { src: "Home Army report, 1943", text: "Your network has learned of a secret rocket program, and a courier has a few scraps of metal and a hand-drawn map to prove it. Getting it out takes weeks, across the country. London wants proof, and the Germans want to find whoever took it.", ask: "How do you move the proof?",
+          c: [["Split the parts among several couriers and use different routes.", "Pieces arrive over several weeks. London puts them together, and the network is not found."], ["Send it all together by the fastest route.", "Everything arrives quickly in one parcel, but one checkpoint nearly catches you. London has its proof, and you have learned a lesson."], ["Destroy it, since a captured courier could bring the network down.", "No one is caught. But London has no proof, and the rocket site goes unchallenged for longer."]] },
+        { src: "Radio signal, June 1944", text: "On the radio you hear lines of poetry. They tell your network that the invasion is near and that sabotage orders will follow. If you act too early, you reveal your hand. If you act too late, your help is wasted. German listeners know about these lines, too.", ask: "How do you act?",
+          c: [["Pass the signal quietly to your cell and wait for the final order before acting.", "The cells are ready, and the final order triggers well-timed sabotage. German reinforcements find roads and rails cut."], ["Start sabotage at once, everywhere.", "Bridges fall quickly, but so do many in your network, as German patrols respond to the early signs."], ["Do nothing until the Allies are safely ashore.", "Your network is safe, but the Germans move reinforcements unimpeded for the first crucial days."]] }
+      ] },
+    { id: "MI", name: "MI5 Case Officer", short: "Double-cross", place: "London", color: "#6a3d5a", blurb: "You run double agents who feed lies to Germany. You decide how much truth the lies need.",
+      echo: "Real people in roles like yours include J. C. Masterman, who chaired the Twenty Committee that ran double agents, Tomás Harris, Juan Pujol García's case officer, and Ewen Montagu, who helped plan Operation Mincemeat.",
+      qs: ["Bletchley analysts: could you tell whether the Germans believed our agents?", "Field agents: how do you check whether a story is believed?", "Ultra Liaison officers: how did you keep our deception secret from commanders?"],
+      r: [
+        { src: "MI5 file, 1939 to 1940", text: "A radio operator who works for German intelligence has been arrested. He is willing to send messages for Britain instead. The Germans still trust him, and a double agent could feed them whatever you choose. Or you could simply lock him up.", ask: "What do you do with him?",
+          c: [["Run him as a double agent, feeding true but harmless information.", "The Germans believe him and send questions that show what they want to know. It is the beginning of a system that will grow."], ["Feed him big, bold secrets to impress the Germans.", "The Germans are impressed, then suspicious: no real spy gets that much so easily."], ["Lock him up and close the file.", "There is no risk and no reward. The Germans send a replacement you do not know about."]] },
+        { src: "MI5 report, 1941", text: "Your double agents are trusted, but the Germans keep asking for details of troop and ship movements. Some can be given, some cannot. A decrypted German message shows how much the German intelligence service trusts one agent.", ask: "How do you manage the agents' reports?",
+          c: [["Approve a steady mix of true minor details and plausible, harmless nonsense.", "The agents stay credible. The Germans send more money and more questions."], ["Give all the true details, so the Germans never doubt.", "The agents seem excellent, and so do the enemy's plans, now based on real information."], ["Cut off the reports before they cause harm.", "The agents go quiet, and the Germans begin to doubt them."]] },
+        { src: "Liaison note, August 1941", text: "A double agent has crossed the Atlantic with a long list of questions from his German handlers. Many are about a naval base in Hawaii. You do not know why. He will meet the head of the FBI in a few days.", ask: "What do you tell the Americans?",
+          c: [["Tell the FBI clearly that this list may point to a future target, and flag the Hawaii questions.", "The warning is on paper, and the FBI can read it. What it does with that is up to them."], ["Mention only what is needed to keep the agent's cover.", "Your agent's cover holds, but a clue goes unread."], ["Say nothing about the questions, since it is not your business.", "The list is lost among other papers. Later, people will wish someone had underlined it."]] },
+        { src: "Case notes, 1942", text: "A Spanish double agent, who has invented an entire network of fictional spies, keeps sending reports to Germany. His made-up agents have names, habits and pay. Adding another would make the story richer, but every addition is one more thing to keep straight.", ask: "Do you expand the network?",
+          c: [["Add one new agent, carefully, with a personality and a history.", "The new character becomes useful and believable. The Germans respond by trusting the network more."], ["Add a dozen agents at once.", "The ghost network grows quickly and has many holes. Keeping the stories straight takes everything you have."], ["Freeze the network as it is.", "Frozen stories look stiff. Germany stays interested, but does not grow convinced."]] },
+        { src: "Naval Intelligence, April 1943", text: "A body dressed as a Royal Marines officer carries a briefcase with forged letters about a coming Allied invasion of Greece and Sardinia. It has washed ashore in Spain, where German agents will see it. Your team must decide what to do next.", ask: "How do you make sure the fake papers are believed?",
+          c: [["Let it play out naturally, with careful details and a bit of waiting.", "The papers pass through Spanish and German hands, and the details hold. The Germans reinforce the wrong places."], ["Push the story hard through every channel.", "The harder you push, the less natural it looks. Some Germans start to doubt."], ["Abandon the plan in case it looks too good.", "The papers are never found or believed, and a good chance is lost."]] },
+        { src: "Twenty Committee, June 1944", text: "A double agent has sent Germany a stream of reports that a huge army in southeast England will land at Calais. Hours before the real landing in Normandy, he wants to send a warning that it has begun, so the Germans trust him later. The warning would arrive too late to help them.", ask: "Do you let him send it?",
+          c: [["Let him send it, timed so it cannot help the Germans but boosts his credibility.", "The Germans receive it too late to act, and trust him more afterwards. He then says Normandy is only a first step."], ["Have him send it early, to look as useful as possible.", "Early notice puts Allied soldiers at risk. You will regret that choice."], ["Keep him silent for the whole night.", "He is silent when it matters, and the Germans question his reliability."]] }
+      ] },
+    { id: "UL", name: "Ultra Liaison Officer", short: "Delivery", place: "Commands in the field", color: "#8a6a1f", blurb: "You carry Ultra decrypts to generals who cannot be told how you know. You decide how much to say.",
+      echo: "Real people in roles like yours include the officers of the Special Liaison Units, organized by Group Captain F. W. Winterbotham. They carried decrypts to commanders, waited while they read them, and took the paper back.",
+      qs: ["Bletchley analysts: what did you wish commanders understood about your work?", "Navy cryptanalysts: how did you deal with commanders who wanted proof?", "Case officers: how did we avoid contradicting your deception?"],
+      r: [
+        { src: "SLU brief, 1940", text: "You are one of a few officers trained to carry decrypts to commanders. You read the paper to him, wait while he reads it, then take it back. The commander wants to know how you know. You cannot say.", ask: "How do you brief the general?",
+          c: [["Describe it as a reliable source, ask for strict secrecy and take back the paper.", "He takes the source on trust and acts on it. The paper goes back in your bag."], ["Explain the whole process so he feels more trust.", "He understands and trusts it, but now an extra person knows. He tells his deputy 'in confidence'."], ["Do not brief him, because the risk of a leak is too high.", "He decides without the facts. The secret is safe, but his plans are less well informed."]] },
+        { src: "Western Approaches, 1941", text: "An escort commander wants to know why you advise him to change course at night. A decrypt shows a wolf pack ahead. You cannot say so, but you can say something. His crews respect him, and trust is good for morale.", ask: "How do you justify the order?",
+          c: [["Say air patrol sightings suggest danger, and ask for aircraft to match.", "He follows it, aircraft appear overhead, and the cover story fits. The convoy gets through."], ["Tell the truth, quietly, in a corner.", "He understands completely, but now carries a dangerous secret in a dangerous job. If his ship were lost, so would the secret be."], ["Give no reason and expect him to follow.", "He follows the order without much trust. Next time he may not."]] },
+        { src: "Desert command, early 1942", text: "A decrypt warns of a German push. Your general is busy, tired, and has been burned by false alarms. He dismisses the message as gossip. You can try again, find another way to show it matters, or let it be.", ask: "What do you do?",
+          c: [["Ask for a short private meeting and show how the message fits with other signs.", "He listens, and the warning becomes an item on his list. It may not save the day, but it is not ignored."], ["Leave it, since he made his decision.", "The warning gets lost. When the push comes, he is surprised."], ["Reveal that it comes from a secret machine, to make him take it seriously.", "He takes it seriously now, but you broke the rules. Your superiors learn of it, and your career pays for it."]] },
+        { src: "Mediterranean, 1942", text: "A decrypt shows the route of an enemy supply convoy to North Africa. The convoy could be sunk, but an attack will look suspicious unless something explains how the planes found it. Sinking it would save many lives later.", ask: "How do you propose the attack?",
+          c: [["Request a reconnaissance flight first, so the strike seems to follow a sighting.", "The scout plane 'finds' the convoy, bombers follow, and the Germans wonder about spies, not codes."], ["Order the strike at once, without a pretext.", "The convoy is sunk, but the timing is eerie. German officers are told to check their ciphers."], ["Let the convoy pass, to protect the secret.", "The convoy reaches port, and the enemy army grows stronger. The secret is safe, but costly."]] },
+        { src: "Pacific command, April 1943", text: "An American general asks you to be ready. If Yamamoto's flight can be intercepted, the order must go out quickly. The planners ask you how many people need to see the decrypt.", ask: "How many people see the decrypt?",
+          c: [["Only the commander, the planner and the pilots' leader, and nobody else.", "The right three people know, and the mission goes ahead smoothly."], ["Brief every officer involved, so no one is left out.", "Everyone is ready, but more than twenty people now know the secret. The risk gets spread around."], ["Show it to the commander alone and let him decide.", "The commander is cautious, and the mission is called off at the last minute. The window closes."]] },
+        { src: "SHAEF headquarters, 1944", text: "A decrypt shows that the German high command still thinks the main invasion will come at Calais. Allied generals are eager to know whether to send more troops to Normandy. A commander wants to speed up. You can brief him before he acts, or after.", ask: "Do you brief him?",
+          c: [["Brief him now, privately, with a note to keep it within the staff.", "He moves with confidence, and the secret remains small."], ["Announce the news to the whole staff.", "The staff cheers, and the secret is no longer small. Gossip is faster than orders."], ["Hold the news until after the landings, to be safe.", "He acts without knowing, and some of his decisions are less bold than they could be."]] }
+      ] }
+  ];
+  const ENDINGS = [
+    { id: "burned", title: "The Burned Source", tag: "Too loud, too soon", bonus: 2, desc: "You got results, but the enemy noticed. A pattern too perfect, too many people in the know, and Germany and Japan start changing their codes. The secret you were guarding stopped being one.", ask: "Where was the line between using a secret and spending it?" },
+    { id: "lone", title: "The Lone Operator", tag: "Right, but alone", bonus: 4, desc: "You protected the secret but lost the trust of the people who needed it. In the end, intelligence only matters if someone acts on it.", ask: "What do you owe the people who rely on you, even when you can't tell them everything?" },
+    { id: "quiet", title: "The Quiet Hand", tag: "Secrets kept, enemies beaten", bonus: 20, desc: "You used intelligence boldly and hid where it came from. Convoys got through, deceptions held, and the enemy never learned how much you knew. Few people would know your name for thirty years.", ask: "What would it cost you to do great things and never be able to say so?" },
+    { id: "vault", title: "The Vault", tag: "The secret was safe", bonus: 8, desc: "Nothing leaked. But a secret that never changes anything isn't doing its job, and some of the people who needed to know never did.", ask: "When is protecting a secret a failure to use it?" },
+    { id: "gambler", title: "The Gambler", tag: "High impact, high risk", bonus: 8, desc: "You changed events, over and over. The price was that more people knew and more risks piled up. Some gambles paid off, but you will never know how many close calls there were.", ask: "How many risks are too many to take with a secret you do not own?" },
+    { id: "steady", title: "The Steady Hand", tag: "A balanced professional", bonus: 12, desc: "You did your job without drama. Some intelligence was used, some was held back, and the war went on. Nobody remembers your best decisions, which is how it was supposed to work.", ask: "How do you know if you made the best choice when you can't see the alternative?" }
+  ];
+  const RANKS = [{ min: 0, title: "Trainee" }, { min: 85, title: "Analyst" }, { min: 115, title: "Section Head" }, { min: 140, title: "Senior Analyst" }, { min: 165, title: "Master of the Silent Service" }];
+  return { KINDS, ORDER, ROLE_IDS, ROUNDS, ROLES, ENDINGS, RANKS };
+})();
+if (typeof module !== "undefined") module.exports = DATA;
+
+/* Pure rules: ordering, ciphers, Signal IDs, scoring. */
+const Logic = (function () {
+  const D = typeof DATA !== "undefined" ? DATA : require("./data.js");
+  const clamp = (v) => Math.max(0, Math.min(100, v));
+  const roleIdx = (id) => D.ROLE_IDS.indexOf(id);
+  const roleById = (id) => D.ROLES.find((r) => r.id === id);
+  /* order[j] = index into role.r[round].c shown in slot j */
+  function order(rid, round) { const o = (roleIdx(rid) * 2 + round) % 3; return [0, 1, 2].map((j) => (j + o) % 3); }
+  function kindOf(round, ci) { return D.ORDER[round][ci]; }
+  function shiftFor(rid, round) { return ((round * 7 + roleIdx(rid) * 5 + 3) % 25) + 1; }
+  function encode(text, k) { return text.replace(/[A-Z]/g, (c) => String.fromCharCode(((c.charCodeAt(0) - 65 + k) % 26) + 65)); }
+  function decode(text, k) { return text.replace(/[A-Z]/g, (c) => String.fromCharCode(((c.charCodeAt(0) - 65 - k + 26 * 2) % 26) + 65)); }
+  const piece = (round, rid) => D.ROUNDS[round].msg[roleIdx(rid)];
+  function newState(role, name) { return { role, name, i: 0, st: { s: 50, i: 50, t: 50 }, score: 0, path: "", log: [] }; }
+  function choose(S, slot) {
+    const r = S.i, ci = order(S.role.id, r)[slot], c = S.role.r[r].c[ci], k = D.KINDS[kindOf(r, ci)];
+    const fx = { s: k.s, i: k.i, t: k.t };
+    ["s", "i", "t"].forEach((m) => { S.st[m] = clamp(S.st[m] + fx[m]); });
+    S.score += k.p; S.path += "ABC"[slot];
+    S.log.push({ i: r, slot, label: c[0], out: c[1], fx, pts: k.p, kind: kindOf(r, ci) });
+    return { c, fx, pts: k.p };
+  }
+  function ending(st) {
+    const by = (id) => D.ENDINGS.find((e) => e.id === id);
+    if (st.s <= 38) return by("burned"); if (st.t <= 35) return by("lone");
+    if (st.s >= 62 && st.i >= 58) return by("quiet"); if (st.s >= 62) return by("vault");
+    if (st.i >= 70) return by("gambler"); return by("steady");
+  }
+  function finalScore(S) { const e = ending(S.st), meters = Math.round((S.st.s + S.st.i + S.st.t) / 3 * 0.5); return { total: S.score + meters + e.bonus, meters, ending: e.bonus, e }; }
+  function rank(total) { let r = D.RANKS[0]; D.RANKS.forEach((x) => { if (total >= x.min) r = x; }); return r; }
+  const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  function chk(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 31 + body.charCodeAt(i) * (i + 7)) % 1024; return ALPHA[h >> 5] + ALPHA[h & 31]; }
+  function signalId(S) { const body = S.role.id + "-" + S.path; return body + "-" + chk(body); }
+  /* Rebuild a finished game from a Signal ID. Returns null if invalid. */
+  function parseSignal(raw) {
+    const m = /^([A-Z]{2})-([ABC]{6})-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
+    if (!m || roleIdx(m[1]) < 0 || chk(m[1] + "-" + m[2]) !== m[3]) return null;
+    const role = roleById(m[1]), S = newState(role, ""); const picks = [];
+    for (let r = 0; r < 6; r++) { S.i = r; const slot = "ABC".indexOf(m[2][r]); const res = choose(S, slot); picks.push({ slot, label: res.c[0], kind: kindOf(r, order(role.id, r)[slot]) }); }
+    const fs = finalScore(S);
+    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e };
+  }
+  return { clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk };
+})();
+if (typeof module !== "undefined") module.exports = Logic;
+
+/* Pixel art: 16-colour palette, 4x pixel scale, no smoothing, animated "on twos" (12 drawings per second). */
+const ART = (function () {
+  const PAL = { K: "#07090a", D: "#11161a", E: "#1b2226", C: "#2c373c", H: "#46555b", r: "#7a2a25", R: "#b3352b", s: "#6b4a3a", m: "#a67c5c", l: "#d3ab86", A: "#f0b93a", W: "#e6e3d6", O: "#4a5232", g: "#8d9a96", G: "#5f9e6e", V: "#518c5f", B: "#4f7d96" };
+  const hs = (x, y, s) => { let n = (x * 374761393 + y * 668265263 + (s || 0) * 69069) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967295; };
+  function Cv(w, h, bg) {
+    const c = Array.from({ length: h }, () => Array(w).fill(bg || "K")), v = (a, x, y) => (typeof a === "function" ? a(x, y) : a);
+    const o = { w, h, c,
+      p(x, y, ch) { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < w && y < h) c[y][x] = ch; },
+      r(x0, y0, x1, y1, a) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) o.p(x, y, v(a, x, y)); },
+      e(cx, cy, rx, ry, a) { for (let y = Math.floor(cy - ry - 1); y <= Math.ceil(cy + ry + 1); y++) for (let x = Math.floor(cx - rx - 1); x <= Math.ceil(cx + rx + 1); x++) { const u = (x + .5 - cx) / rx, q = (y + .5 - cy) / ry; if (u * u + q * q <= 1) o.p(x, y, v(a, x, y)); } },
+      l(x0, y0, x1, y1, a) { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1); for (let i = 0; i <= n; i++) { const x = Math.round(x0 + (x1 - x0) * i / n), y = Math.round(y0 + (y1 - y0) * i / n); o.p(x, y, v(a, x, y)); } },
+      poly(pts, a) { const ys = pts.map((q) => q[1]); for (let y = Math.floor(Math.min(...ys)); y <= Math.ceil(Math.max(...ys)); y++) { const yc = y + .5, xs = []; for (let i = 0; i < pts.length; i++) { const A = pts[i], B = pts[(i + 1) % pts.length]; if ((A[1] <= yc && B[1] > yc) || (B[1] <= yc && A[1] > yc)) xs.push(A[0] + (yc - A[1]) * (B[0] - A[0]) / (B[1] - A[1])); } xs.sort((a, b) => a - b); for (let k = 0; k + 1 < xs.length; k += 2) for (let x = Math.round(xs[k]); x < Math.round(xs[k + 1]); x++) o.p(x, y, v(a, x, y)); } },
+      sky(y0, y1, list) { for (let y = y0; y <= y1; y++) for (let x = 0; x < w; x++) { let i = list.findIndex((q) => y < q[1]); if (i < 0) i = list.length - 1; let ch = list[i][0]; if (i < list.length - 1 && y >= list[i][1] - 2 && ((x + y) & 1)) ch = list[i + 1][0]; c[y][x] = ch; } } };
+    return o;
+  }
+  const lighter = { E: "C", C: "H", B: "g", D: "E", H: "g" };
+  const waves = (c, y0, y1, sh, ph) => { for (let y = y0; y <= y1; y++) if (y % 3 === (ph || 0)) for (let x = 0; x < c.w; x++) if ((x + y * 5 + sh * 2) % 8 < 3) { const b = c.c[y][x]; if (lighter[b]) c.c[y][x] = lighter[b]; } };
+  const S = {}, CH = {};
+  // ---- 1. Enigma on a night desk
+  CH.enigma = { k: 6, ro: 3, wh: 8 };
+  S.enigma = (p) => {
+    const c = Cv(160, 70, "D"), k = p.k || 0, ro = p.ro || 0, wh = p.wh || 0;
+    c.r(0, 0, 159, 69, (x) => (x % 10 < 2 ? "E" : "D")); c.r(0, 58, 159, 69, "E"); c.r(0, 58, 159, 58, "H"); c.r(0, 59, 159, 59, "C");
+    c.r(34, 10, 125, 66, "s"); c.r(34, 10, 125, 10, "m"); c.r(34, 10, 34, 66, "m"); c.r(125, 10, 125, 66, "K"); c.r(34, 66, 125, 66, "K");
+    c.r(38, 22, 121, 63, "D"); c.r(38, 22, 121, 22, "K"); c.r(38, 22, 38, 63, "K");
+    for (let i = 0; i < 3; i++) { const x = 66 + i * 10; c.r(x, 6, x + 7, 13, (X) => ((X + ro + i) % 3 === 0 ? "g" : "H")); c.r(x, 13, x + 7, 13, "K"); c.r(x + 1, 16, x + 6, 20, "W"); c.r(x + 2, 17, x + 4 + ((ro + i) % 2), 19, "K"); c.r(x, 16, x, 20, "K"); c.r(x + 7, 16, x + 7, 20, "K"); }
+    const rows = [[9, 46, 26, 42], [8, 50, 31, 48], [9, 46, 36, 54]], seq = [[0, 3], [1, 4], [2, 1], [0, 6], [1, 2], [2, 7]], [lr, lc] = seq[k];
+    rows.forEach(([n, x0, ly, ky], ri) => { for (let j = 0; j < n; j++) { const x = x0 + j * 8, on = ri === lr && j === lc;
+      c.r(x, ly, x + 2, ly + 2, on ? "A" : "C"); if (on) { c.p(x - 1, ly + 1, "r"); c.p(x + 3, ly + 1, "r"); c.p(x + 1, ly - 1, "r"); c.p(x + 1, ly + 3, "r"); } else c.p(x + 1, ly + 1, "H");
+      const yy = ky + (on ? 1 : 0); c.r(x, yy, x + 4, yy + 3, "C"); c.r(x + 1, yy, x + 3, yy + 3, on ? "H" : "g"); c.p(x + 2, yy + 1, "K"); } });
+    c.r(44, 60, 115, 64, "E"); for (let x = 46; x < 114; x += 4) c.r(x, 62, x + 1, 62, "K"); c.l(50, 62, 58, 63, "R"); c.l(70, 62, 84, 63, "A"); c.l(92, 62, 104, 63, "g");
+    c.r(6, 34, 28, 60, "W"); c.r(6, 34, 6, 60, "g"); for (let y = 38; y < 58; y += 4) c.r(9, y, 8 + 6 + ((y * 3) % 9), y, y % 8 ? "H" : "K"); c.l(20, 52, 33, 62, "A"); c.p(34, 63, "K"); c.p(19, 51, "R");
+    c.e(140, 44, 15, 15, "K"); c.e(140, 44, 14, 14, "H"); for (let i = 0; i < 26; i++) { const a = Math.PI * 2 * (i + wh / 8) / 26; c.p(140 + Math.cos(a) * 11.5, 44 + Math.sin(a) * 11.5, "W"); }
+    c.e(140, 44, 8, 8, "C"); for (let i = 0; i < 26; i++) { const a = Math.PI * 2 * (i - wh / 8) / 26; c.p(140 + Math.cos(a) * 6, 44 + Math.sin(a) * 6, "g"); } c.e(140, 44, 2, 2, "A");
+    return c;
+  };
+  // ---- 2. Atlantic convoy at night
+  CH.convoy = { w: 4, sm: 4, wk: 2 };
+  S.convoy = (p) => {
+    const c = Cv(160, 70, "D"), w = p.w || 0, sm = p.sm || 0, wk = p.wk || 0;
+    c.sky(0, 34, [["D", 12], ["E", 22], ["C", 30], ["H", 35]]); for (let y = 0; y < 18; y++) for (let x = 0; x < 160; x++) if (hs(x, y, 3) > .985) c.p(x, y, "W");
+    c.e(124, 13, 6, 6, "g"); c.e(126, 12, 5, 5, "W");
+    c.r(0, 35, 159, 69, (x, y) => { const d = y - 35; return d < 6 ? "C" : d < 18 ? "E" : "D"; }); waves(c, 36, 69, w, 0);
+    [[10, 33], [50, 33], [92, 34]].forEach(([x, y], i) => { c.r(x, y, x + 20, y + 1, "K"); c.r(x + 6, y - 3, x + 10, y - 1, "K"); c.r(x + 12, y - 4, x + 13, y - 1, "K"); c.l(x + 8, y - 8, x + 8, y - 3, "K"); for (let j = 0; j < 4; j++) c.p(x + 14 + j * 3 + ((sm + i) % 2), y - 5 - (j >> 1) - ((sm + j) % 2), "H"); });
+    c.poly([[18, 43], [74, 43], [80, 41], [72, 47], [22, 47]], "K"); c.r(40, 38, 50, 42, "K"); c.r(34, 35, 36, 42, "K"); c.r(54, 36, 56, 42, "K"); c.r(62, 39, 66, 42, "K"); c.l(45, 38, 45, 29, "K"); c.l(40, 32, 50, 32, "K"); c.p(43, 40, "A"); c.p(47, 40, "A");
+    c.r(18, 43, 74, 43, "H"); for (let i = 0; i < 16; i++) c.p(17 - i + wk, 47 + ((i + wk) % 3 === 0 ? 1 : 0), i < 6 ? "W" : "g"); c.p(80 + wk, 47, "W"); c.p(78, 48, "g");
+    c.r(134, 50, 135, 57, "H"); c.r(132, 49, 136, 50, "H"); c.p(131, 49, "K"); for (let i = 1; i < 9; i++) { c.p(134 - i * 1 - wk, 58 + (i >> 1), "g"); c.p(135 + i + wk, 58 + (i >> 1), "g"); }
+    return c;
+  };
+  // ---- 3. Radio room: silence on the wire
+  CH.silence = { nd: 12, sw: 10, kb: 6, lp: 4, tp: 4 };
+  S.silence = (p) => {
+    const c = Cv(160, 70, "D"), nd = p.nd || 0, sw = p.sw || 0, kb = p.kb || 0, lp = p.lp || 0, tp = p.tp || 0;
+    c.r(0, 0, 159, 69, (x) => (x % 10 < 2 ? "E" : "D")); c.r(0, 60, 159, 69, "E"); c.r(0, 60, 159, 60, "H");
+    c.r(26, 6, 134, 62, "E"); c.r(26, 6, 134, 6, "H"); c.r(26, 6, 26, 62, "H"); c.r(134, 6, 134, 62, "K"); c.r(26, 62, 134, 62, "K"); c.r(30, 10, 130, 58, "C");
+    c.e(54, 34, 19, 19, "K"); c.e(54, 34, 18, 18, "D"); c.r(34, 16, 74, 52, (x, y) => ((x + 54 - 54) % 3 === 0 && y % 3 === 0 && (x - 54) ** 2 + (y - 34) ** 2 < 17 * 17 ? "H" : null) || (c.c[y][x]));
+    c.r(80, 13, 124, 27, "K"); c.r(81, 14, 123, 26, "D"); for (let x = 84; x <= 120; x += 4) c.r(x, 15, x, 17, "g"); const pos = 84 + Math.abs(((nd * 6) % 72) - 36); c.r(pos, 14, pos, 26, "A");
+    [[90, 42], [114, 42]].forEach(([x, y], i) => { c.e(x, y, 6, 6, "K"); c.e(x, y, 5, 5, "H"); c.e(x, y, 3, 3, "g"); const a = (i ? 1 : -1) * kb * .35; c.l(x, y, x + Math.cos(a) * 4, y + Math.sin(a) * 4, "K"); });
+    c.r(80, 50, 124, 57, "K"); c.r(81, 51, 123, 56, "D"); c.r(82, 54, 122, 54, "G"); c.p(82 + sw * 4, 54, "W"); c.p(83 + sw * 4, 54, "g");
+    c.r(125, 10, 129, 14, "K"); c.r(126, 11, 128, 13, lp < 2 ? "R" : "r");
+    c.e(8, 55, 4, 4, "H"); c.e(26, 55, 4, 4, "H"); c.e(8, 55, 2, 2, "K"); c.e(26, 55, 2, 2, "K"); for (let a = Math.PI; a <= Math.PI * 2; a += .12) c.p(17 + Math.cos(a) * 9, 55 + Math.sin(a) * 12, "H");
+    c.r(138, 62, 154, 65, "C"); c.l(140, 61, 152, 59, "A"); c.r(139, 58, 141, 60, "K");
+    c.r(140, 2, 152, 52, "W"); c.r(140, 2, 140, 52, "g"); for (let y = 2; y < 24; y++) if ((y + tp) % 4 === 0) c.r(142 + (hs(y + tp * 0, 1, 5) > .5 ? 0 : 3), y, 144 + (hs(y, 1, 5) > .5 ? 1 : 6), y, "K");
+    c.r(140, 50, 152, 52, "g");
+    return c;
+  };
+  // ---- 4. Midway at dusk
+  CH.midway = { w: 4, pm: 2 };
+  S.midway = (p) => {
+    const c = Cv(160, 70, "D"), w = p.w || 0, pm = p.pm || 0;
+    c.sky(0, 35, [["D", 6], ["E", 14], ["C", 22], ["H", 28], ["r", 32], ["R", 36]]); c.e(112, 35, 8, 8, "A");
+    c.r(0, 36, 159, 69, (x, y) => { const d = y - 36; return d < 6 ? "B" : d < 18 ? "C" : "E"; }); for (let y = 37; y < 70; y += 2) { const hw = Math.max(0, 7 - ((y - 36) >> 2)); for (let x = 112 - hw; x <= 112 + hw; x++) if ((x + y) % 2 === 0) c.p(x, y, "A"); } waves(c, 38, 69, w, 1);
+    c.poly([[-6, 46], [0, 39], [14, 35], [34, 33], [66, 33], [84, 35], [98, 39], [106, 46], [98, 51], [80, 53], [20, 53], [2, 51]], "l"); [[12, 37, 4], [21, 36, 3], [46, 36, 3], [77, 35, 4], [89, 37, 3]].forEach(([x, y, r]) => { c.e(x, y, r, 2, "O"); c.e(x - 1, y - 1, r - 1, 1, "G"); });
+    // 1942 Pacific airfield: dirt strip, Quonset huts, wooden watchtower, radar, AA gun, revetted fighters
+    c.r(6, 41, 94, 42, "m");   // dirt apron
+    c.poly([[8, 43], [92, 43], [95, 48], [5, 48]], (X, Y) => (hs(X, Y, 8) < .18 ? "m" : "s")); c.r(8, 43, 92, 43, "m"); for (let x = 12; x < 90; x += 6) c.r(x, 45, x + 2, 45, "m");
+    // Quonset huts: corrugated half-barrels
+    const hut = (cx, r, hgt) => { for (let y = 42 - hgt; y <= 42; y++) for (let x = cx - r; x <= cx + r; x++) { const u = (x - cx) / (r + .5), q = (y - 42) / (hgt + .5); if (u * u + q * q <= 1) c.p(x, y, y < 42 - hgt + 1 ? "G" : (x - cx) % 3 === 0 ? "C" : "O"); } c.r(cx - 1, 40, cx + 1, 42, "D"); };
+    hut(47, 7, 6); hut(62, 7, 6); hut(76, 5, 4);
+    // wooden watchtower on stilts
+    c.l(26, 42, 28, 36, "s"); c.l(32, 42, 30, 36, "s"); c.r(25, 35, 33, 35, "s"); c.r(26, 32, 32, 34, "m"); c.r(27, 33, 31, 33, "g"); c.r(25, 31, 33, 31, "E"); c.l(29, 31, 29, 28, "K");
+    // SCR-270 radar: a big lattice "bedspring" on a mast
+    c.r(11, 37, 11, 42, "C"); c.r(8, 32, 14, 36, "C"); c.r(9, 33, 13, 35, "D"); for (let x = 9; x <= 13; x += 2) c.l(x, 33, x, 35, "g"); c.r(9, 34, 13, 34, "g");
+    // anti-aircraft gun in a sandbag ring
+    c.e(92, 41, 3.5, 1.6, "m"); c.e(92, 40.6, 2, .9, "s"); c.l(92, 40, 94, 37, "K"); c.r(90, 40, 94, 40, "H");
+    // fuel drums
+    [[38, 40], [40, 40], [39, 38], [36, 41]].forEach(([x, y]) => { c.r(x, y, x + 1, y + 1, "r"); c.p(x, y, "R"); });
+    // revetted fighters (F4F Wildcats) with sand berms
+    [[17, 41], [84, 42]].forEach(([x, y]) => { c.r(x - 3, y + 1, x + 11, y + 2, "m"); c.r(x - 3, y - 2, x - 2, y + 1, "m"); c.r(x + 10, y - 2, x + 11, y + 1, "m"); c.r(x - 3, y + 2, x + 11, y + 2, "s");
+      c.r(x, y, x + 7, y + 1, "H"); c.r(x + 8, y, x + 8, y + 1, "K"); c.p(x + 9, y - 1, "W"); c.p(x + 9, y + 1, "W"); c.r(x + 3, y - 1, x + 5, y + 2, "g"); c.r(x, y - 2, x + 1, y - 1, "H"); c.p(x + 4, y - 1, "B"); c.p(x + 2, y, "W"); });
+    [[3, 44, 0], [97, 44, 1]].forEach(([x, y, i]) => { c.l(x, y, x + 1, y - 5, "s"); const t = x + 1, u = y - 5; [[-3, 0], [-2, -2], [3, 0], [2, -2], [0, -3]].forEach(([dx, dy], j) => c.l(t, u, t + dx, u + dy + 2, j % 2 ? "G" : "O")); });
+    c.r(124, 33, 158, 35, "K"); c.r(122, 32, 158, 32, "E"); c.r(140, 26, 144, 32, "K"); c.l(142, 20, 142, 26, "K"); c.r(128, 31, 129, 31, "g"); c.r(134, 31, 135, 31, "g"); for (let i = 0; i < 6; i++) c.p(158 - i * 3 - (w % 2), 36, "W");
+    return c;
+  };
+  // ---- 5. Intercepting Yamamoto: a Japanese bomber over the islands, a P-38 closes in
+  CH.intercept = { t: 16 };
+  const intBG = () => {
+    const W = 400, c = Cv(W, 70, "B");
+    c.r(0, 0, W - 1, 33, "B"); c.r(0, 27, W - 1, 30, "g"); c.r(0, 31, W - 1, 33, "W");
+    [[20, 9, 14, 3], [78, 17, 18, 4], [128, 6, 12, 3], [190, 21, 16, 3], [250, 8, 15, 3], [310, 18, 18, 4], [370, 7, 12, 3], [45, 25, 10, 2], [225, 26, 12, 2], [340, 27, 11, 2]].forEach(([X, y, rx, ry]) => { c.e(X, y + 1, rx, ry, "g"); c.e(X - 1, y, rx - 1, ry, "W"); });
+    c.r(0, 34, W - 1, 69, "B");
+    for (let y = 34; y < 70; y++) for (let x = 0; x < W; x++) if ((x + y * 5) % 8 < 2 && y % 3 === 0) c.p(x, y, y > 46 ? "g" : "H");
+    const xc = (y) => 142 + (y - 34) * .32 + 4 * Math.sin(y * .45) + 2.5 * Math.sin(y * 1.1 + 1);
+    const hh = (x) => { const k = Math.min(1, Math.max(0, (x - 150) / 80)); return Math.round(k * .5 * (12 + 8 * Math.sin(x * .045) + 4 * Math.sin(x * .11 + 1) + 12 * Math.max(0, Math.sin(x * .02 - .4)) ** 2)); };
+    const sw0 = (y) => 9 + 1.5 * Math.sin(y * .8);
+    // distant hills: two clean, solid ridges
+    for (let x = 140; x < W; x++) { const h = hh(x); for (let y = 33 - h; y <= 33; y++) c.p(x, y, y === 33 - h ? "g" : "H"); }
+    for (let x = 140; x < W; x++) { const h = Math.round(hh(x) * .55); for (let y = 33 - h; y <= 34; y++) c.p(x, y, y === 33 - h ? "H" : "C"); }
+    // water edge, foam, sand: smooth bands that follow the coast
+    for (let y = 34; y < 70; y++) for (let x = 0; x < W; x++) {
+      const d = x - xc(y), sw = sw0(y); let ch = null;
+      if (d > -6 && d < -3) ch = (y % 3 === 0) ? "g" : null;
+      else if (d >= -3 && d < 0) ch = "W";
+      else if (d >= 0 && d < 2) ch = "m";
+      else if (d >= 2 && d < sw) ch = "l";
+      else if (d >= sw) ch = "E";
+      if (ch) c.p(x, y, ch);
+    }
+    for (let y = 34; y < 70; y++) for (let x = 0; x < W; x++) if (x - xc(y) >= sw0(y)) c.p(x, y, (x * 3 + y * 5) % 9 === 0 ? "l" : "m");
+    // jungle canopy: round crowns in rows, but every tree differs in size, height, shade and spacing
+    for (let row = 0; row < 10; row++) {
+      const yb = 37 + row * row * .5 + row * 2.2, rb = 2 + row * .5, step = Math.round(rb * 1.5);
+      for (let x0 = 148 - ((row * 7) % 5); x0 < W + 8; x0 += step) {
+        const h1 = hs(row, Math.round(x0), 3), h2 = hs(row, Math.round(x0), 4), h3 = hs(row, Math.round(x0), 5);
+        if (h3 < .12) continue;                                                        // small clearings
+        const r = rb * (.7 + h1 * .75), tx = Math.round(x0 + (h2 - .5) * step * .9), ty = Math.round(yb + (h1 - .5) * 2.4), tall = h2 > .8 ? 1.35 : .8 + h3 * .35;
+        if (tx - xc(ty) < sw0(ty) + r * .5) continue;
+        if (h1 > .8) {                                                                   // occasional broadleaf tree
+          c.e(tx, ty + 1, r * 1.0, r * .85 * tall, "O"); c.e(tx, ty, r * 1.05, r * .9 * tall, "V");
+          if (h3 > .5) c.e(tx + r * .35, ty + r * .35 * tall, r * .6, r * .45 * tall, "O");
+          continue;
+        }
+        const pr = Math.max(3, r * 1.25), lean = Math.round((h2 - .5) * pr * .8), topx = tx + lean, topy = Math.round(ty - pr * 1.1);
+        c.l(tx, Math.round(ty + pr * .5), topx, topy, "s");                               // trunk
+        if (h3 < .06) continue;                                                           // thin the palms out so crowns stay distinct
+        const cr = Math.max(2, pr * .9);
+        c.e(topx, topy + 2, cr * 1.1, cr * .6, "E");                                   // shaded underside
+        [[-1, .5], [-.6, .9], [0, 1], [.6, .9], [1, .5]].forEach(([fx, fy]) => c.l(topx, topy, Math.round(topx + fx * cr * 1.25), Math.round(topy + fy * cr * .5), "O"));
+        c.e(topx, topy, cr, cr * .5, "V");                                               // bright crown
+        [[-1.1, .1], [-.55, -.55], [.55, -.55], [1.1, .1], [0, -.7]].forEach(([fx, fy]) => c.l(topx, topy, Math.round(topx + fx * cr * 1.1), Math.round(topy + fy * cr * .8), "V"));
+      }
+    }
+    c.r(0, 33, 139, 33, "g");
+    return c;
+  };
+  S.intercept = (p) => {
+    const t = p.t || 0, c = Cv(160, 70, ".");
+    const bomber = (ox, oy) => {
+      const q = (x, y, ch) => c.p(ox + x, oy + y, ch), P = (pts, a) => c.poly(pts.map(([x, y]) => [ox + x, oy + y]), a);
+      P([[3, 4], [0, -6], [7, -6], [12, 2]], "O"); c.r(ox - 2, oy + 6, ox + 11, oy + 6, "E");
+      P([[0, 5], [8, 3], [22, 1], [38, 0], [48, 2], [55, 5], [57, 7], [52, 10], [38, 12], [20, 12], [8, 9], [0, 7]], (X, Y) => (Y - oy >= 8 ? "g" : "O"));
+      c.r(ox + 18, oy + 8, ox + 48, oy + 9, "E"); c.r(ox + 18, oy + 8, ox + 48, oy + 8, "H");
+      c.e(ox + 38, oy + 8, 7, 2.8, "C"); c.r(ox + 43, oy + 6, ox + 45, oy + 10, "H");
+      for (let y = 2; y <= 14; y++) if ((y + t) % 2) q(47, y, "W"); q(47, 8, "K");
+      c.r(ox + 45, oy + 2, ox + 50, oy + 4, "K"); q(46, 3, "W"); c.e(ox + 30, oy, 3, 2, "H");
+    };
+    const lightning = (ox, oy) => {
+      const q = (x, y, ch) => c.p(ox + x, oy + y, ch), R = (x0, y0, x1, y1, ch) => c.r(ox + x0, oy + y0, ox + x1, oy + y1, ch), P = (pts, a) => c.poly(pts.map(([x, y]) => [ox + x, oy + y]), a);
+      P([[4, 5], [3, -5], [8, -5], [11, 5]], "H"); R(2, -5, 9, -5, "E");              // far fin
+      R(2, 7, 17, 8, "H");                                                                // far boom
+      P([[2, 6], [0, -4], [6, -4], [10, 5]], "g"); R(0, -4, 6, -4, "W"); R(1, -3, 1, 2, "H"); // near fin
+      R(0, 5, 17, 7, "g"); R(0, 7, 17, 7, "H");                                           // near boom
+      P([[14, 4], [22, 3], [32, 4], [37, 6], [37, 9], [32, 11], [22, 11], [14, 8]], (X, Y) => (Y - oy >= 8 ? "H" : "g")); // engine nacelle
+      c.e(ox + 20, oy + 3, 3, 1.6, "C"); q(19, 2, "g");                                    // turbo bulge
+      R(12, 10, 33, 11, "E");                                                             // wing edge
+      P([[22, 1], [34, 0], [39, 3], [38, 5], [22, 5]], "g"); R(23, 1, 36, 1, "W"); R(22, 4, 38, 5, "H");        // central pod
+      c.e(ox + 27, oy + 1, 3.6, 2.4, "K"); c.e(ox + 28, oy + .5, 2.2, 1.2, "H"); q(27, 0, "W"); // bubble canopy
+      R(38, 3, 43, 3, "E"); R(38, 4, 42, 4, "H");                                         // nose guns
+      c.e(ox + 8, oy + 5.5, 2.6, 2.2, "W"); c.e(ox + 8, oy + 5.5, 1.5, 1.3, "B");         // roundel
+      for (let y = 0; y <= 14; y++) if ((y + t) % 2) { q(38, y + 1, "W"); q(39, y + 1, "g"); } q(38, 7, "A");
+    };
+    const bob = (t >> 3) & 1;
+    bomber(62, 12 + bob);
+    const k = 1.0, ky = .8, dy = 28, d = Cv(160, 70, ".");
+    for (let y = 0; y < 70; y++) for (let x = 0; x < 160; x++) { const sx = Math.floor(62 + (x - 62) / k), sy = Math.floor(12 + (y - 12 - dy) / ky); if (sx >= 0 && sx < 160 && sy >= 0 && sy < 70) d.c[y][x] = c.c[sy][sx]; }
+    d.e(76, 45 + Math.round(bob * .8), 2.6, 2.6, "W"); d.e(76, 45 + Math.round(bob * .8), 1.6, 1.6, "R");
+    const o = d.c.map((r) => r.slice()); for (let y = 0; y < 70; y++) for (let x = 0; x < 160; x++) if (d.c[y][x] === "." && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => (d.c[y + b] || [])[x + a] && d.c[y + b][x + a] !== ".")) o[y][x] = "K";
+    d.c = o; return d;
+  };
+  // ---- 6. The decoy army: a lie for D-Day
+  CH.decoy = { ib: 6, rw: 4, pm: 2, wv: 7 };
+  S.decoy = (p) => {
+    const c = Cv(160, 70, "B"), ib = p.ib || 0, rw = p.rw || 0, pm = p.pm || 0, wv = p.wv || 0;
+    c.r(0, 0, 159, 27, "B"); c.r(0, 24, 159, 26, "g"); c.r(0, 27, 159, 27, "W");
+    [[28, 7, 11, 2], [92, 10, 13, 2], [60, 19, 9, 2]].forEach(([x, y, rx, ry]) => { c.e(x, y + 1, rx, ry, "g"); c.e(x - 1, y, rx - 1, ry, "W"); });
+    // the Channel and the white cliffs of Dover
+    c.r(0, 28, 159, 37, "B"); for (let y = 29; y < 37; y += 2) for (let x = 0; x < 160; x++) { if ((x + y * 3 + wv) % 7 < 2) c.p(x, y, "H"); else if ((x * 3 + y + wv * 2) % 19 === 0) c.p(x, y, "g"); }
+    for (let y = 30; y < 37; y += 2) for (let x = 0; x < 160; x++) if ((x - y * 2 + wv * 3) % 23 === 0) c.p(x, y, "W");
+    c.poly([[104, 37], [108, 22], [122, 14], [160, 12], [160, 37]], "W"); c.poly([[104, 37], [108, 22], [114, 24], [112, 37]], "g"); for (let y = 18; y < 37; y += 3) c.r(114 + (y % 7), y, 118 + (y % 11), y, "g");
+    c.poly([[108, 22], [122, 14], [160, 12], [160, 16], [124, 19], [110, 25]], "G");
+    // the field
+    c.r(0, 37, 159, 69, "G"); for (let y = 38; y < 70; y += 3) for (let x = (y * 7) % 9; x < 160; x += 9) c.p(x, y, "O");
+    const TK = [
+      "...........GGGGGGG..........",
+      "..........GOOOOOOOG.........",
+      "..........OOOOOOEOOEEEEEEEEE",
+      "...GGGGGGGGOOOOOOOOGGGG.....",
+      "..OOOOOOOOOOOOOOOOOOOOOOG...",
+      "..OWOWOOOOOOOOOOOOOOOOOOOG..",
+      "..OOWOOOOOOOOOOOOOOOOOOOOOG.",
+      ".EEEEEEEEEEEEEEEEEEEEEEEEEE.",
+      "EHCHEHCHEHCHEHCHEHCHEHCHEHCE",
+      ".EEEEEEEEEEEEEEEEEEEEEEEEEE.",
+      "..DDDDDDDDDDDDDDDDDDDDDDDD.."];
+    const DROP = [[], [1, 5], [0, 1, 5, 6], [0, 1, 4, 5, 6]];
+    const tank = (x, y, f, sc) => { // a hand-drawn tank; f 0..3 = how inflated; sc = pixel scale
+      const rows = TK.filter((r, i) => DROP[3 - f].indexOf(i) < 0).map((r) => r.split(""));
+      if (f < 3) rows.forEach((r, j) => r.forEach((ch, i) => { if ((ch === "O" || ch === "G") && (i * 3 + j * 5) % 11 === 0) r[i] = "E"; }));
+      rows.forEach((r, j) => r.forEach((ch, i) => { if (ch !== ".") for (let a = 0; a < sc; a++) for (let b = 0; b < sc; b++) c.p(x + i * sc + a, y + (j + (11 - rows.length)) * sc + b, ch); }));
+    };
+    [[44, 36], [76, 36], [108, 36]].forEach(([x, y]) => tank(x, y, 3, 1));
+    tank(126, 50, 3, 1);
+    tank(58, 46, Math.min(3, ib), 2);
+    // radio truck and mast: false radio traffic
+    c.r(10, 49, 28, 56, "O"); c.r(10, 49, 28, 49, "G"); c.r(12, 51, 17, 54, "C"); c.r(28, 50, 32, 56, "O"); c.r(29, 51, 31, 53, "C"); c.e(15, 57, 2.4, 2.4, "K"); c.e(29, 57, 2.4, 2.4, "K"); c.r(19, 51, 26, 54, "H");
+    c.l(22, 49, 22, 22, "K"); c.l(18, 38, 26, 38, "K"); c.l(19, 30, 25, 30, "K"); c.p(22, 21, "A");
+    for (let k = 1; k <= 3; k++) { const rr = 3 + ((k * 5 + rw * 5) % 15); for (let a = -1.2; a <= 1.2; a += .07) { c.p(22 + Math.cos(a) * rr * 1.2, 22 + Math.sin(a) * rr * .7 + 1, "W"); c.p(22 + Math.cos(a) * rr * 1.2, 23 + Math.sin(a) * rr * .7 + 1, rr < 9 ? "W" : "g"); } }
+    // soldier working a foot pump: hose runs to the valve on the tank
+    const sx = 47, sy = 66;
+    c.r(sx, sy - 10, sx + 3, sy - 3, "O"); c.r(sx, sy - 10, sx + 3, sy - 10, "G"); c.r(sx, sy - 2, sx + 1, sy + 2, "E"); c.r(sx + 2, sy - 2, sx + 3 + pm, sy + 2, "E");
+    c.e(sx + 1.5, sy - 13, 2.4, 2.4, "l"); c.r(sx - 1, sy - 16, sx + 4, sy - 15, "O"); c.r(sx, sy - 14, sx + 3, sy - 14, "O");
+    c.r(sx + 4, sy - 8, sx + 7, sy - 7 + pm, "O");                                              // arm
+    c.r(sx + 5, sy + 1 - pm * 2, sx + 12, sy + 2, "R"); c.r(sx + 5, sy + 2, sx + 12, sy + 2, "r"); c.r(sx + 4, sy + 2, sx + 13, sy + 3, "E"); // bellows pump
+    c.l(sx + 12, sy, sx + 17, sy - 2, "K"); c.l(sx + 17, sy - 2, 66, 61, "K"); c.p(66, 60, "A");  // hose to valve
+    return c;
+  };
+  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3 }, cacheS = {};
+  // the panning background is rasterised once so the browser can slide a single image smoothly
+  function intPan() {
+    const g = intBG().c, H = g.length, W = g[0].length;
+    try {
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const x = cv.getContext("2d");
+      for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) { x.fillStyle = PAL[g[y][i]] || "#000"; x.fillRect(i, y, 1, 1); }
+      return `<g class="pan"><image href="${cv.toDataURL("image/png")}" x="0" y="0" width="${W * 4}" height="${H * 4}" preserveAspectRatio="none" style="image-rendering:pixelated"/></g>`;
+    } catch (e) { return `<g class="pan"><g transform="scale(4)" shape-rendering="crispEdges">${paths(g)}</g></g>`; }
+  }
+  function sceneSVG(id) {
+    if (cacheS[id]) return cacheS[id];
+    if (id === "intercept") {
+      const N = 16; let o = `${intPan()}<g transform="scale(4)" shape-rendering="crispEdges">`;
+      for (let st = 0; st < N; st++) { const g = S.intercept({ t: st }).c, m = g.map((r) => r.map((q) => q !== ".")); o += `<g class="pxa" data-s="t" data-n="${N}" data-h="2" data-p="${st}"${st ? ' display="none"' : ""}>${paths(g, m)}</g>`; }
+      return (cacheS[id] = o + "</g>");
+    }
+    const draw = S[id] || S.enigma, ch = CH[id] || CH.enigma, base = draw({});
+    let s = `<g transform="scale(4)" shape-rendering="crispEdges">${paths(base.c)}`;
+    for (const k in ch) for (let st = 1; st < ch[k]; st++) { const g = draw({ [k]: st }).c; const m = g.map((r, y) => r.map((q, x) => q !== base.c[y][x])); const d = paths(g, m); if (d) s += `<g class="pxa" data-s="${k}" data-n="${ch[k]}" data-h="${HOLD[k] || 1}" data-p="${st}" display="none">${d}</g>`; }
+    return (cacheS[id] = s + "</g>");
+  }
+  const frame = (id) => `<svg class="scene" viewBox="0 0 640 280" preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true">${sceneSVG(id)}</svg>`;
+  // ---- Pixel-art portraits: 30x35 grid, drawn at 4x, 14-colour palette, crisp edges, animated "on twos" (12 drawings/sec) ----
+  const GW = 30, GH = 35;
+  const FONT = { A: "010101111101101", B: "110101110101110", C: "011100100100011", D: "110101101101110", E: "111100110100111", F: "111100110100100", G: "011100101101011", H: "101101111101101", I: "111010010010111", J: "001001001101010", K: "101101110101101", L: "100100100100111", M: "101111111101101", N: "111101101101101", O: "010101101101010", P: "110101110100100", Q: "010101101110011", R: "110101110101101", S: "011100010001110", T: "111010010010010", U: "101101101101111", V: "101101101101010", W: "101101111111101", X: "101101010101101", Y: "101101010010010", Z: "111001010100111" };
+  function px(rid, st) {
+    const c = Array.from({ length: GH }, (_, y) => Array.from({ length: GW }, (_, x) => (x % 8 < 2 ? "E" : "D"))), f = Array.from({ length: GH }, () => Array(GW).fill(0));
+    const put = (x, y, ch) => { if (x >= 0 && y >= 0 && x < GW && y < GH) { c[y][x] = ch; f[y][x] = 1; } };
+    const col = (v, x, y) => (typeof v === "function" ? v(x, y) : v);
+    const rect = (x0, y0, x1, y1, v) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) put(x, y, col(v, x, y)); };
+    const ell = (cx, cy, rx, ry, v) => { for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const a = (x + .5 - cx) / rx, b = (y + .5 - cy) / ry; if (a * a + b * b <= 1) put(x, y, col(v, x, y)); } };
+    const dt = (x, y) => (x + y) & 1, dy = st.breath ? 1 : 0;
+    const SK = { BP: ["m", "l", "l"], NV: ["s", "s", "m"], FA: ["s", "m", "l"], MI: ["m", "l", "l"], UL: ["s", "m", "l"] }[rid], [sd, sm, sl] = SK;
+    const CL = { BP: ["D", "s", "m"], NV: ["K", "E", "C"], FA: ["E", "C", "H"], MI: ["E", "H", "g"], UL: ["E", "O", "g"] }[rid], [cd, cm, cl] = CL;
+    const HD = { BP: [7, 9.8], NV: [8.2, 9], FA: [6.6, 9.3], MI: [7.2, 10.2], UL: [8, 9.2] }[rid];
+    // neck (thicker for NV, slimmer for FA)
+    const nw = { NV: [11, 18], FA: [13, 16] }[rid] || [12, 17]; rect(nw[0], 20, nw[1], 27, (x, y) => (x >= nw[1] - 1 && y > 22 ? sm : sd));
+    // shoulders
+    const sp = rid === "FA" ? { 26: [10, 19], 27: [8, 21], 28: [6, 23], 29: [4, 25] } : rid === "NV" ? { 26: [7, 22], 27: [4, 25], 28: [2, 27], 29: [1, 28] } : { 26: [9, 20], 27: [7, 22], 28: [5, 24], 29: [3, 26] };
+    for (let y = 26; y <= 36; y++) { const [a, b] = sp[y] || [sp[29][0] - (rid === "NV" ? 1 : 0), sp[29][1]]; for (let x = a; x <= b; x++) put(x, y + dy, x <= 9 ? cd : x <= 11 ? (dt(x, y) ? cd : cm) : x >= 24 ? cl : x >= 22 ? (dt(x, y) ? cm : cl) : cm); }
+    const V = { 26: [11, 18], 27: [11, 18], 28: [12, 17], 29: [12, 17], 30: [13, 16], 31: [13, 16], 32: [14, 15] };
+    if (rid !== "FA") for (const y in V) for (let x = V[y][0]; x <= V[y][1]; x++) put(x, +y + dy, "W");
+    if (rid === "BP") { for (const [x, y] of [[12, 27], [13, 27], [12, 28], [13, 28], [16, 27], [17, 27], [16, 28], [17, 28]]) put(x, y + dy, "R"); rect(14, 27 + dy, 15, 28 + dy, "r"); [[14, 31], [14, 34]].forEach(([x, y]) => put(x, y + dy, "W")); rect(8, 33 + dy, 10, 35 + dy, "m"); }
+    if (rid === "MI") { [[10, 26], [9, 27], [9, 28], [10, 29], [19, 26], [20, 27], [20, 28], [19, 29]].forEach(([x, y]) => put(x, y + dy, "C")); rect(7, 22, 10, 26, "C"); rect(19, 22, 22, 26, "H"); rect(13, 28 + dy, 15, 33 + dy, "r"); }
+    if (rid === "NV") { [[9, 30], [20, 30], [9, 33], [20, 33]].forEach(([x, y]) => put(x, y + dy, "A")); rect(4, 27 + dy, 8, 28 + dy, "A"); rect(21, 27 + dy, 25, 28 + dy, "A"); }
+    if (rid === "UL") { rect(22, 29 + dy, 25, 30 + dy, "A"); rect(5, 29 + dy, 8, 30 + dy, "A"); rect(10, 27 + dy, 11, 28 + dy, "R"); rect(18, 27 + dy, 19, 28 + dy, "R"); }
+    if (rid === "FA") { rect(9, 24 + dy, 20, 27 + dy, (x, y) => (x <= 11 ? "r" : x >= 17 ? "R" : dt(x, y) ? "r" : "R")); rect(13, 28 + dy, 16, 31 + dy, (x) => (x < 15 ? "r" : "R")); rect(12, 32 + dy, 13, 34 + dy, "r"); rect(16, 32 + dy, 17, 34 + dy, "R"); }
+    // hair behind/around the face (long hair for FA)
+    if (rid === "FA") { rect(6, 9, 9, 27 + dy, (x, y) => (x <= 7 ? "D" : "E")); rect(20, 9, 23, 27 + dy, (x) => (x >= 22 ? "E" : "H")); }
+    // head
+    const [hrx, hry] = HD; ell(15, 12.5, hrx, hry, (x, y) => (x <= 10 ? sd : x === 11 ? (dt(x, y) ? sd : sm) : x >= 19 ? sl : x === 18 ? (dt(x, y) ? sl : sm) : sm));
+    if (rid === "NV") { rect(8, 17, 21, 20, (x, y) => (x <= 10 ? sd : x >= 19 ? sl : sm)); put(14, 21, "s"); put(15, 21, "s"); rect(9, 21, 20, 21, (x) => (x === 14 || x === 15 ? "s" : x < 14 ? sd : sm)); }
+    rect(6, 12, 6, 14, sd); rect(23, 12, 23, 14, sm); if (rid === "FA") { put(23, 15, "A"); }
+    for (let x = 13; x <= 16; x++) put(x, 19, sd);
+    // face
+    if (rid !== "BP") rect(7, 9, 22, 11, (x, y) => (x >= 19 && y === 11 ? sm : sd));
+    const by = rid === "BP" ? 10 : 11;
+    if (rid === "FA") { [11, 12, 17, 18].forEach((x) => put(x, by, "E")); put(10, 12, "K"); put(19, 12, "K"); }
+    else if (rid === "NV") { [10, 11, 12, 17, 18, 19].forEach((x) => { put(x, by, "K"); put(x, by - 1, "K"); }); }
+    else [10, 11, 12, 17, 18, 19].forEach((x) => put(x, by, "K"));
+    if (st.blink) { put(11, 12, "K"); put(12, 12, "K"); put(17, 12, "K"); put(18, 12, "K"); } else { put(11, 12, "W"); put(12, 12, "K"); put(17, 12, "W"); put(18, 12, "K"); }
+    put(14, 13, sd); put(14, 14, sd); put(14, 15, sd); put(14, 16, sd); put(15, 16, "K");
+    if (rid === "FA") { [13, 14, 15, 16].forEach((x) => put(x, 18, "R")); [14, 15].forEach((x) => put(x, 19, "r")); put(9, 15, "l"); put(20, 15, "l"); }
+    else if (rid === "UL") { [13, 14, 15, 16].forEach((x) => put(x, 18, "K")); rect(10, 16, 19, 17, "r"); put(9, 17, "r"); put(20, 17, "r"); put(14, 16, "r"); put(15, 16, "r"); rect(7, 10, 8, 15, "r"); rect(21, 10, 22, 15, "r"); put(9, 14, "R"); put(20, 14, "R"); }
+    else if (rid === "MI") { [13, 14, 15, 16].forEach((x) => put(x, 18, "K")); rect(11, 16, 18, 16, "K"); put(10, 17, "K"); put(19, 17, "K"); for (let y = 17; y <= 21; y++) for (let x = 9; x <= 20; x++) if (dt(x, y) && c[y][x] !== "K" && f[y][x]) c[y][x] = x < 14 ? "s" : "m"; }
+    else { [13, 14, 15, 16].forEach((x) => put(x, 18, "K")); put(12, 18, sd); put(17, 18, sd); }
+    // headwear / hair
+    if (rid === "BP") {
+      const hair = { 1: [11, 13], 2: [9, 19], 3: [7, 21], 4: [7, 22], 5: [7, 22], 6: [7, 22], 7: [7, 9], 8: [7, 8], 9: [7, 7] }; for (const y in hair) for (let x = hair[y][0]; x <= hair[y][1]; x++) put(x, +y, x >= 17 && y <= 4 ? "m" : (x * 3 + +y * 2) % 5 === 0 ? "D" : "s");
+      put(16, 1, "D"); put(17, 0 + 1, "D"); put(19, 1, "s"); put(14, 2, "m"); for (const y of [7, 8, 9]) put(22, y, "D"); put(21, 7, "D"); rect(15, 6, 18, 7, "D");
+      for (let x = 10; x <= 13; x++) { put(x, 11, "g"); put(x, 13, "g"); } put(10, 12, "g"); put(13, 12, "g"); for (let x = 16; x <= 19; x++) { put(x, 11, "g"); put(x, 13, "g"); } put(16, 12, "g"); put(19, 12, "g"); put(14, 11, "g"); put(15, 11, "g");
+      put(23, 9, "A"); put(24, 8, "A"); put(25, 7, "A"); put(23, 10, "A");
+    }
+    if (rid === "NV") {
+      const cr = { 1: [10, 19], 2: [8, 21], 3: [6, 23], 4: [6, 23], 5: [6, 23], 6: [6, 23] }; for (const y in cr) for (let x = cr[y][0]; x <= cr[y][1]; x++) put(x, +y, x <= 9 ? "H" : "W");
+      rect(6, 7, 23, 8, "K"); rect(7, 9, 22, 9, "K"); rect(5, 10, 24, 10, "K"); put(20, 9, "E"); put(21, 9, "E"); rect(14, 3, 15, 5, "A"); rect(13, 4, 16, 4, "A");
+    }
+    if (rid === "FA") {
+      ell(14, 6, 9.2, 3.8, (x, y) => (y <= 4 && x >= 14 ? "H" : "E")); put(14, 1, "K"); put(14, 2, "E"); rect(9, 8, 10, 9, "E");
+      [[8, 7], [9, 7], [20, 7], [21, 8]].forEach(([x, y]) => put(x, y, "E")); rect(10, 9, 14, 9, "E"); rect(18, 9, 21, 10, "H");
+    }
+    if (rid === "MI") {
+      const cr = { 1: [10, 19], 2: [9, 20], 3: [8, 21], 4: [8, 21], 5: [8, 21], 6: [8, 21] }; for (const y in cr) for (let x = cr[y][0]; x <= cr[y][1]; x++) put(x, +y, x >= 18 ? "C" : "E");
+      rect(13, 1, 16, 2, "K"); rect(8, 7, 21, 8, "A"); rect(2, 9, 27, 9, (x) => (x >= 20 ? "C" : "E")); rect(4, 10, 25, 10, "K");
+    }
+    if (rid === "UL") {
+      const cr = { 2: [9, 20], 3: [8, 21], 4: [8, 21], 5: [7, 22], 6: [7, 22], 7: [7, 22], 8: [7, 22] }; for (const y in cr) for (let x = cr[y][0]; x <= cr[y][1]; x++) put(x, +y, x <= 9 ? (dt(x, +y) ? "E" : "O") : x >= 20 ? "g" : "O");
+      rect(14, 3, 15, 8, "E"); rect(7, 8, 22, 8, "E"); rect(11, 6, 12, 7, "A"); rect(8, 9, 21, 9, "K"); rect(9, 10, 20, 10, sd);
+    }
+    const out = c.map((r) => r.slice());
+    for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (!f[y][x] && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => f[y + b] && f[y + b][x + a])) out[y][x] = "K";
+    for (let y = 26; y <= 34; y++) for (let x = 0; x <= 12; x++) out[y][x] = "K";
+    for (let y = 27; y <= 33; y++) for (let x = 1; x <= 11; x++) out[y][x] = "A";
+    let tx = 3; rid.split("").forEach((ch) => { const M = ch === "M", g = M ? "1000111011101011000110001" : FONT[ch], w = M ? 5 : 3; for (let k = 0; k < 5 * w; k++) if (g[k] === "1") out[28 + ((k / w) | 0)][tx + (k % w)] = "K"; tx += w + 1; });
+    for (let i = 0; i < GW; i++) { out[0][i] = "K"; out[GH - 1][i] = "K"; } for (let i = 0; i < GH; i++) { out[i][0] = "K"; out[i][GW - 1] = "K"; }
+    return out;
+  }
+  const paths = (g, only) => { const by = {}, GH = g.length, GW = g[0].length; for (let y = 0; y < GH; y++) { let x = 0; while (x < GW) { if (only && !only[y][x]) { x++; continue; } const ch = g[y][x]; let e = x; while (e + 1 < GW && g[y][e + 1] === ch && (!only || only[y][e + 1])) e++; (by[ch] = by[ch] || []).push(`M${x} ${y}h${e - x + 1}v1h-${e - x + 1}z`); x = e + 1; } } return Object.entries(by).map(([ch, d]) => `<path fill="${PAL[ch]}" d="${d.join("")}"/>`).join(""); };
+  const cache = {};
+  function portraitInner(rid, u, anim) {
+    const key = rid + (anim ? "a" : "s");
+    if (!cache[key]) {
+      const base = px(rid, { blink: 0, breath: 0, smoke: -1 }); let s = `<g transform="scale(4)" shape-rendering="crispEdges">${paths(base)}`;
+      if (anim) {
+        const diff = (g) => { const m = g.map((r, y) => r.map((ch, x) => ch !== base[y][x])); return paths(g, m); };
+        const sets = [["b", 0, { blink: 1, breath: 0, smoke: -1 }], ["r", 0, { blink: 0, breath: 1, smoke: -1 }]]; 
+        sets.forEach(([n, p, st]) => { s += `<g class="pxa" data-s="${n}" data-p="${p}" display="none">${diff(px(rid, st))}</g>`; });
+      }
+      cache[key] = s + "</g>";
+    }
+    return cache[key];
+  }
+  const portrait = (rid, u) => `<svg viewBox="0 0 120 140" role="img" aria-hidden="true" class="portrait" data-o="${(rid.charCodeAt(0) * 7 + rid.charCodeAt(1) * 3) % 40}">${portraitInner(rid, u || rid, true)}</svg>`;
+  const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  function wheel(v) {
+    const c = Cv(71, 71, "D"), cx = 35.5, cy = 35.5, glyph = (ch, x, y, col) => { const g = FONT[ch]; for (let k = 0; k < 15; k++) if (g[k] === "1") c.p(Math.round(x - 1) + (k % 3), Math.round(y - 2) + ((k / 3) | 0), col); };
+    c.e(cx, cy, 35.5, 35.5, "A"); c.e(cx, cy, 33.5, 33.5, "E"); c.e(cx, cy, 25, 25, "H"); c.e(cx, cy, 24, 24, "C"); c.e(cx, cy, 14.5, 14.5, "D"); c.e(cx, cy, 2.2, 2.2, "A");
+    for (let i = 0; i < 26; i++) { const a = Math.PI * 2 * i / 26; glyph(ALPHA[i], cx + 29.5 * Math.sin(a), cy - 29.5 * Math.cos(a), "W"); }
+    for (let i = 0; i < 26; i++) { const a = Math.PI * 2 * (i + v) / 26; glyph(ALPHA[i], cx + 20.5 * Math.sin(a), cy - 20.5 * Math.cos(a), "G"); }
+    c.r(32, 0, 38, 0, "R"); c.r(33, 1, 37, 1, "R"); c.r(34, 2, 36, 2, "R"); c.r(35, 3, 35, 3, "R");
+    return `<g transform="scale(4)" shape-rendering="crispEdges">${paths(c.c)}</g>`;
+  }
+  return { scene: (id) => frame(id), portrait, portraitInner, wheel };
+})();
+
+(function () {
+  const D = DATA, L = Logic;
+  const $ = (s, r) => (r || document).querySelector(s), $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } } };
+  const root = document.getElementById("app");
+  let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null;
+  const METERS = [["s", "Secrecy", "Does the enemy still believe its codes are safe?"], ["i", "Impact", "Did your intelligence change events?"], ["t", "Trust", "Do the people who rely on you still trust you?"]];
+  const saveGame = (done) => { if (S) store.set("cb_game", { S, done: !!done, at: Date.now() }); };
+  const loadGame = () => { const g = store.get("cb_game", null); return g && g.S && g.S.role && L.roleById(g.S.role.id) && Array.isArray(g.S.log) ? g : null; };
+  const board = () => { const b = store.get("cb_board", { sig: [], own: null }); b.sig = b.sig || []; return b; };
+  const KIND_NOTE = { cover: "Used with a cover story", share: "Shared honestly", open: "Acted openly", hold: "Held back", hold3: "Stayed silent", blunder: "Guessed" };
+
+  /* ---------- shared UI ---------- */
+  function topbar(extra) {
+    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE SILENT SERVICE</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-go="board">Decoder board</button></nav></header>`;
+  }
+  function hud() {
+    const pips = D.ROUNDS.map((r, i) => `<span class="pip ${i < S.i ? "done" : i === S.i ? "now" : ""}" title="Round ${i + 1}"></span>`).join("");
+    const bars = METERS.map(([k, n, h]) => `<div class="meter" title="${esc(h)}"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
+    return `<div class="hud" role="group" aria-label="Status"><div class="pips" aria-label="Round ${S.i + 1} of 6">${pips}</div>${bars}<div class="score">SCORE <b>${S.score}</b></div></div>`;
+  }
+  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); }
+  function go(v) {
+    if (v === "board") { if (view !== "board") prevView = view; }
+    
+    view = v; render(); window.scrollTo(0, 0);
+    try { history.replaceState(null, "", v === "board" ? "#board" : location.pathname + location.search); } catch (e) { }
+  }
+  function render() {
+    ({ title: renderTitle, pick: renderPick, round: renderRound, end: renderEnd, board: renderBoard }[view] || renderTitle)();
+    bindGo(); const h = $("[data-focus]"); if (h) h.focus({ preventScroll: true });
+  }
+  function copyText(text, btn, done) {
+    const row = btn && btn.closest(".row"), msg = row && row.nextElementSibling && row.nextElementSibling.classList.contains("cmsg") ? row.nextElementSibling : null, ok = () => { if (msg) msg.textContent = done || "Copied. Paste it into Padlet."; if (btn) { const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => { btn.textContent = t; }, 1500); } };
+    const fb = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); let d = false; try { d = document.execCommand("copy"); } catch (e) { } ta.remove(); if (d) ok(); else if (msg) msg.textContent = "Select the text and press Ctrl+C (Cmd+C on a Mac)."; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fb); else fb();
+  }
+
+  /* ---------- title ---------- */
+  function renderTitle() {
+    const b = board(), n = b.sig.length, saved = loadGame();
+    root.innerHTML = topbar() + `<main class="wrap">
+      <section class="hero"><div class="hero-art">${ART.scene("enigma")}</div>
+        <div class="hero-t"><span class="stampline">TOP SECRET</span><h1 data-focus tabindex="-1">Codebreakers: The Silent Service</h1>
+        <p class="lede">You hold one piece of a secret message. The people who hold the rest are your classmates. Crack your fragment, make the call, then use Padlet to piece the message together.</p>
+        <p class="boot">&gt; CLEARANCE: <span>GRANTED</span><br>&gt; OPERATION: <span>SIX ROUNDS, 1939 TO 1944</span><br>&gt; ASSET: <span>YOU</span><b class="blink">_</b></p>
+        <div class="row">${saved ? `<button class="btn" id="resume">Resume: ${esc(saved.S.role.name)}, round ${Math.min(saved.S.i + 1, 6)}</button>` : ""}<button class="btn${saved ? " ghost" : ""}" id="start">${saved ? "Start a new game" : "Begin operation"}</button><button class="btn ghost" data-go="board">Decoder board${n ? ` (${n})` : ""}</button></div></div></section>
+      <section class="how panel"><h2>Your mission</h2><ol class="steps">
+        <li><span><b>Play your role.</b> Six rounds. Each has a private briefing, a coded fragment to crack, and orders to give.</span></li>
+        <li><span><b>Post your file to Padlet.</b> You finish with a case card and a Signal ID.</span></li>
+        <li><span><b>Decode classmates.</b> Paste their Signal IDs into the decoder. You see what their role did, and pieces of the secret messages unlock.</span></li>
+                <li><span><b>Reply on Padlet.</b> Reply to each classmate you decode, using a question you pick from the list.</span></li>
+        <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then submit the decoded messages to your teacher for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
+    $("#start").addEventListener("click", () => { if (saved) store.set("cb_game", null); go("pick"); });
+    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { S = saved.S; picked = S.role.id; stage = "brief"; solved = false; chosen = null; go(saved.done ? "end" : "round"); });
+  }
+
+  /* ---------- role pick ---------- */
+  function renderPick() {
+    root.innerHTML = topbar() + `<main class="wrap"><div><p class="kick">STEP 1 OF 2 · PERSONNEL FILES</p><h1 data-focus tabindex="-1">Choose your role</h1></div>
+      <p class="lede">Pick any role you like. Every role holds a different piece of the message in every round.</p>
+      <div class="roles" role="radiogroup" aria-label="Role">${D.ROLES.map((r) => `<button class="rolecard${picked === r.id ? " on" : ""}" role="radio" aria-checked="${picked === r.id}" data-r="${r.id}"><span class="rp">${ART.portrait(r.id, "pk" + r.id)}</span><span class="rb"><span class="rcode">${r.id}</span><b>${esc(r.name)}</b><small>${esc(r.place)}</small></span><span class="rb rd">${esc(r.blurb)}</span></button>`).join("")}</div>
+      <div class="field"><label for="cname">STEP 2 OF 2 · Your name or codename (printed on your Padlet card)</label><input id="cname" maxlength="24" autocomplete="off" value="${esc(store.get("cb_name", ""))}"></div>
+      <div class="row"><button class="btn" id="begin" disabled>Begin round 1</button><button class="btn ghost" data-go="title">Back</button></div><p class="err" id="perr" role="alert"></p></main>`;
+    const bb = $("#begin"), sync = () => { bb.disabled = !picked; };
+    $$(".rolecard").forEach((c) => c.addEventListener("click", () => { picked = c.dataset.r; $$(".rolecard").forEach((x) => { const on = x.dataset.r === picked; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); }); sync(); }));
+    sync();
+    bb.addEventListener("click", () => {
+      const name = $("#cname").value.trim(); if (!name) { $("#perr").textContent = "Enter a name or codename first."; $("#cname").focus(); return; }
+      store.set("cb_name", name); S = L.newState(L.roleById(picked), name); stage = "brief"; solved = false; chosen = null;
+      const b = board(); b.own = { role: S.role.id, rounds: 0 }; b.prog = b.prog || {}; b.prog[S.role.id] = 0; store.set("cb_board", b); saveGame(false); go("round");
+    });
+  }
+
+  /* ---------- round ---------- */
+  const OBJ = {
+    brief: "Read the situation below. When you are ready, open your envelope for a private briefing that no other role receives.",
+    decrypt: "Decrypt your fragment. Drag the dial, or use the arrows or slider, until the green DECODED line reads as English.",
+    decide: "Choose your orders. Click an option (or press A, B or C), then press Send orders.",
+    outcome: "Debrief. See what your decision caused and how your gauges moved, then continue."
+  };
+  function steps(cur) {
+    return `<ol class="steptrack" aria-label="Round steps">${["Briefing", "Decrypt", "Decide", "Debrief"].map((n, i) => `<li class="st ${i < cur ? "done" : i === cur ? "now" : ""}" ${i === cur ? 'aria-current="step"' : ""}><b>${i + 1}</b><span class="sl2">${n}</span></li>`).join("")}</ol>`;
+  }
+  function renderRound() {
+    const rd = D.ROUNDS[S.i], role = S.role, rr = role.r[S.i];
+    const head = `<div><p class="kick">ROUND ${S.i + 1} OF 6 · ${esc(rd.date)}</p><h1 data-focus tabindex="-1">${esc(rd.title)}</h1></div>`;
+    let body = "", cur = 0, obj = OBJ.brief;
+    if (stage === "brief") {
+      body = `<div class="hero-art small">${ART.scene(rd.scene)}</div><div class="paper">${rd.sitrep.map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+        <p class="eq"><b>Essential question</b> ${esc(rd.eq)}</p><div class="terms">${rd.terms.map((t) => `<p><b>${esc(t.t)}.</b> ${esc(t.d)}</p>`).join("")}</div>
+        ${S.i === 0 ? `<p class="gauge-help">Your three gauges: <b>Secrecy</b> (does the enemy still trust its codes?), <b>Impact</b> (did your intelligence change events?) and <b>Trust</b> (do your colleagues still rely on you?). Strong careers need all three.</p>` : ""}
+        <div class="row"><button class="btn" id="next">Open your envelope</button></div>`;
+    } else if (stage === "work") {
+      cur = solved ? 2 : 1; obj = solved ? OBJ.decide : OBJ.decrypt;
+      const k = L.shiftFor(role.id, S.i), pl = L.piece(S.i, role.id), cipher = L.encode(pl, k), pos = L.roleIdx(role.id) + 1;
+      body = `<div class="paper eyes"><span class="stamp">EYES ONLY</span><div class="dochead"><span><b>FROM</b> ${esc(rr.src)}</span><span><b>TO</b> ${esc(role.name)}</span><span><b>DATE</b> ${esc(rd.date)}</span><span><b>REF</b> NK-${String(S.i + 1).padStart(2, "0")}-${role.id}</span></div><p>${esc(rr.text)}</p><p class="small">Other roles in your class received different briefings for this round.</p></div>
+        <section class="decoder panel" aria-labelledby="dt"><h2 id="dt">Intercept: piece ${pos} of 5</h2><p>An operator copied down your station's part of a message. It is a simple shift cipher: every letter was moved the same number of places. Rotate the inner ring until the text reads as English.</p>
+        <div class="cipher" aria-label="Coded text"><span class="clabel">INTERCEPTED</span><code>${esc(cipher)}</code></div>
+        <div class="diskwrap"><svg id="disk" viewBox="0 0 260 260" role="img" aria-label="Cipher disk. Drag to rotate."></svg>
+          <div class="dctl"><div class="dset"><button class="mini" id="dm" aria-label="Turn the disk back one">◀</button><label for="dr">Shift <b id="dv">0</b></label><button class="mini" id="dp" aria-label="Turn the disk forward one">▶</button></div>
+          <input id="dr" type="range" min="0" max="25" value="0" aria-valuetext="Shift 0"><div class="sigrow"><span class="clabel">SIGNAL</span><div class="sbar" id="sbar" role="img" aria-label="Signal strength">${"<i></i>".repeat(13)}</div><b id="slab">NOISE</b></div>
+          <div class="cipher out" aria-live="polite"><span class="clabel">DECODED</span><code id="dout"></code></div>
+          <div class="row"><button class="mini" id="dkey">Need a hint?</button><button class="mini" id="dsnd" aria-pressed="true">Sound: on</button></div><div id="dmsg" role="status"></div></div></div></section>
+        <section id="decide" ${solved ? "" : "hidden"}></section>`;
+    } else {
+      cur = 3; obj = OBJ.outcome;
+      const lg = S.log[S.log.length - 1], pl = L.piece(S.i, role.id);
+      const chips = METERS.map(([m, n]) => `<span class="chip ${lg.fx[m] >= 0 ? "up" : "dn"}">${n} ${lg.fx[m] >= 0 ? "+" : ""}${lg.fx[m]}</span>`).join("");
+      const slots = D.ROLES.map((r) => `<li class="slot ${r.id === role.id ? "mine" : ""}"><span>${esc(r.short)}</span><b>${r.id === role.id ? esc(pl) : "?????"}</b></li>`).join("");
+      body = `<div class="paper"><p class="src">Outcome</p><p>${esc(lg.out)}</p><div class="chips">${chips}<span class="chip">+${lg.pts} experience</span></div></div>
+        <div class="paper"><p class="src">In history</p><p>${esc(rd.real)}</p></div>
+        <section class="panel"><h2>The message so far</h2><p class="small">Your piece is pinned. The other four belong to other roles. They unlock when you decode classmates' Signal IDs on the Decoder board.</p><ol class="slots">${slots}</ol></section>
+        <div class="row"><button class="btn" id="next">${S.i < 5 ? "Next round" : "Close the file"}</button></div>`;
+    }
+    root.innerHTML = topbar() + `<main class="wrap">${hud()}${head}${steps(cur)}<div class="obj" role="note"><span>OBJECTIVE</span><p id="objt">${esc(obj)}</p></div>${body}</main>`;
+    if (stage === "brief") $("#next").addEventListener("click", () => { stage = "work"; solved = false; chosen = null; render(); window.scrollTo(0, 0); });
+    else if (stage === "work") bindWork();
+    else {
+      $("#next").addEventListener("click", () => { S.i++; stage = "brief"; solved = false; chosen = null; if (S.i >= 6) { S.i = 5; go("end"); } else { saveGame(false); render(); window.scrollTo(0, 0); } });
+    }
+  }
+  function bindWork() {
+    const role = S.role, k = L.shiftFor(role.id, S.i), pl = L.piece(S.i, role.id), cipher = L.encode(pl, k);
+    const svg = $("#disk"), A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; let o = "", inn = "";
+    for (let i = 0; i < 26; i++) { const a = i * 360 / 26; o += `<text transform="rotate(${a} 130 130) translate(130 20)" class="dl o" text-anchor="middle">${A[i]}</text>`; inn += `<text transform="rotate(${a} 130 130) translate(130 52)" class="dl n" text-anchor="middle">${A[i]}</text>`; }
+    svg.setAttribute("viewBox", "0 0 260 260");
+    svg.innerHTML = `<circle cx="130" cy="130" r="126" class="d1"/><circle cx="130" cy="130" r="90" class="d2"/><circle cx="130" cy="130" r="64" class="d3"/><g>${o}</g><g id="inner">${inn}</g><path d="M130 4v18" class="dmark"/><circle cx="130" cy="130" r="6" class="d4"/>`;
+    const r = $("#dr"), out = $("#dout"); let prevV = -1;
+    let snd = store.get("cb_sound", true), ac = null;
+    const tick = (lock) => {
+      try { if (navigator.vibrate) navigator.vibrate(lock ? [20, 30, 40] : 8); } catch (e) { }
+      if (!snd) return;
+      try {
+        ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume();
+        const t0 = ac.currentTime;
+        if (lock) {   // a small desk bell: inharmonic partials with a long decay
+          [[1, .16, 1.5], [2.76, .09, .9], [5.4, .05, .5], [8.93, .025, .3]].forEach(([m, v, d]) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "sine"; o.frequency.value = 880 * m; g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d); o.connect(g); g.connect(ac.destination); o.start(t0); o.stop(t0 + d + .05); });
+        } else {      // a lockpick tick: a very short, bright burst of noise with a tiny metallic ring
+          const n = Math.floor(ac.sampleRate * .02), buf = ac.createBuffer(1, n, ac.sampleRate), d = buf.getChannelData(0);
+          for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 4);
+          const src = ac.createBufferSource(), bp = ac.createBiquadFilter(), g = ac.createGain(); src.buffer = buf; bp.type = "bandpass"; bp.frequency.value = 2600 + Math.random() * 900; bp.Q.value = 1.8; g.gain.value = 1; src.connect(bp); bp.connect(g); g.connect(ac.destination); src.start(t0);
+          const o = ac.createOscillator(), g2 = ac.createGain(); o.type = "sine"; o.frequency.value = 1700 + Math.random() * 400; g2.gain.setValueAtTime(.05, t0); g2.gain.exponentialRampToValueAtTime(0.0001, t0 + .05); o.connect(g2); g2.connect(ac.destination); o.start(t0); o.stop(t0 + .06);
+        }
+      } catch (e) { }
+    };
+    const sb = $("#dsnd"); const syncSnd = () => { sb.textContent = "Sound: " + (snd ? "on" : "off"); sb.setAttribute("aria-pressed", String(snd)); }; syncSnd();
+    sb.addEventListener("click", () => { snd = !snd; store.set("cb_sound", snd); syncSnd(); if (snd) tick(false); });
+    const set = (v) => {
+      v = ((v % 26) + 26) % 26; r.value = v; $("#dv").textContent = v; r.setAttribute("aria-valuetext", "Shift " + v);
+      const inn2 = $("#inner"); inn2.style.transformOrigin = "130px 130px"; inn2.style.transform = `rotate(${v * 360 / 26}deg)`;
+      const dec = L.decode(cipher, v), dist = Math.min(Math.abs(v - k), 26 - Math.abs(v - k)), lit = 13 - dist;
+      out.innerHTML = Array.from(dec).map((ch, i) => `<span class="lt${v === k ? " won" : ""}" style="animation-delay:${v === k ? i * 45 : 0}ms">${esc(ch)}</span>`).join("");
+      $$("#sbar i").forEach((e, i) => { e.className = i < lit ? (lit >= 12 ? "on hot" : lit >= 9 ? "on warm" : "on") : ""; });
+      $("#slab").textContent = v === k ? "LOCKED" : lit >= 12 ? "ALMOST!" : lit >= 9 ? "WARMER" : lit >= 6 ? "FAINT" : "NOISE";
+      if (v !== prevV) { tick(v === k); prevV = v; }
+      if (v === k) win();
+    };
+    const win = () => {
+      if (solved) return; solved = true; const dw = $(".diskwrap"); if (dw) { dw.classList.add("burst"); setTimeout(() => dw.classList.remove("burst"), 1200); } $("#dmsg").innerHTML = `<div class="granted">ACCESS GRANTED</div><p class="dmsg">Your piece reads: ${esc(pl)}.</p>`;
+      const dec = $("#decide"); dec.hidden = false; renderDecide(dec); const o2 = $("#objt"); if (o2) o2.textContent = OBJ.decide;
+      const st = $$(".st"); st.forEach((e, i) => { e.classList.toggle("done", i < 2); e.classList.toggle("now", i === 2); }); 
+      dec.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    };
+    r.addEventListener("input", () => set(+r.value)); $("#dm").addEventListener("click", () => set(+r.value - 1)); $("#dp").addEventListener("click", () => set(+r.value + 1));
+    let hn = 0; const hints = () => { const lo = Math.max(1, k - 4), hi = Math.min(25, lo + 8); return [
+      "Look for the shortest words in the intercepted text. One and two letter words are easiest to crack. Turn the wheel until they make sense.",
+      `The clerk narrows it down: the shift is somewhere from ${lo} to ${hi}.`,
+      `The clerk remembers that your piece starts with the letter ${pl[0]}. Turn the wheel until the decoded text starts with ${pl[0]}.`]; };
+    const hb = $("#dkey"); const hlab = () => { hb.textContent = hn >= 3 ? "No more hints" : `Need a hint? (${hn} of 3 used)`; hb.disabled = hn >= 3; }; hlab();
+    hb.addEventListener("click", () => { if (hn >= 3 || solved) return; const h = hints(); $("#dmsg").innerHTML = h.slice(0, hn + 1).map((t, i) => `<p class="dmsg"><b>Hint ${i + 1}.</b> ${esc(t)}</p>`).join(""); hn++; hlab(); });
+    /* drag the wheel */
+    let drag = null; const ang = (ev) => { const b = svg.getBoundingClientRect(); return Math.atan2(ev.clientY - (b.top + b.height / 2), ev.clientX - (b.left + b.width / 2)) * 180 / Math.PI; };
+    svg.addEventListener("pointerdown", (ev) => { drag = { a: ang(ev), v: +r.value, acc: 0, last: ang(ev) }; try { svg.setPointerCapture(ev.pointerId); } catch (e) { } });
+    svg.addEventListener("pointermove", (ev) => { if (!drag) return; const a = ang(ev); let d = a - drag.last; if (d > 180) d -= 360; if (d < -180) d += 360; drag.acc += d; drag.last = a; const nv = drag.v + Math.round(drag.acc / (360 / 26)); if (nv !== +r.value && ((nv % 26) + 26) % 26 !== +r.value) set(nv); });
+    const end = () => { drag = null; }; svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
+    if (solved) { set(k); $("#dmsg").innerHTML = `<p class="dmsg">Decoded: ${esc(pl)}.</p>`; renderDecide($("#decide")); } else set(0);
+  }
+  function renderDecide(el) {
+    const role = S.role, rr = role.r[S.i], ord = L.order(role.id, S.i), pl = L.piece(S.i, role.id);
+    el.innerHTML = `<div class="paper"><p class="src">Orders · your piece: ${esc(pl)}</p><h2>${esc(rr.ask)}</h2><ul class="menu">${ord.map((ci, j) => `<li><button class="mitem" data-j="${j}" aria-pressed="false"><span class="key">${"ABC"[j]}</span><span>${esc(rr.c[ci][0])}</span></button></li>`).join("")}</ul>
+      <div class="sendrow"><button class="btn" id="send" disabled>Send orders</button><p class="small" id="shint">Select an option first. You cannot undo orders once sent.</p></div></div>`;
+    const sel = (j) => { chosen = j; $$(".mitem", el).forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.j === j))); $("#send").disabled = false; $("#shint").textContent = "Option " + "ABC"[j] + " selected. Press Send orders (or Enter) to commit."; };
+    const send = () => { if (chosen === null || stage !== "work") return; L.choose(S, chosen); const b = board(); b.own = { role: role.id, rounds: S.i + 1 }; b.prog = b.prog || {}; b.prog[role.id] = Math.max(b.prog[role.id] || 0, S.i + 1); store.set("cb_board", b); stage = "outcome"; render(); window.scrollTo(0, 0); };
+    $$(".mitem", el).forEach((b) => b.addEventListener("click", () => sel(+b.dataset.j)));
+    $("#send").addEventListener("click", send);
+    window.__sel = sel; window.__send = send;
+  }
+  document.addEventListener("keydown", (ev) => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || view !== "round" || stage !== "work" || !solved) return;
+    const tag = ev.target && ev.target.tagName; if (/TEXTAREA|INPUT|SELECT/.test(tag)) return;
+    const j = "abc".indexOf(ev.key.toLowerCase());
+    if (j >= 0 && ev.key.length === 1 && window.__sel) { ev.preventDefault(); window.__sel(j); }
+    else if (ev.key === "Enter" && tag !== "BUTTON" && chosen !== null && window.__send) { ev.preventDefault(); window.__send(); }
+  });
+
+  /* ---------- end ---------- */
+  function renderEnd() {
+    const fs = L.finalScore(S), e = fs.e, rank = L.rank(fs.total), id = L.signalId(S), role = S.role, rIdx = D.RANKS.indexOf(rank);
+    S.ended = { fs, e, rank, id };
+    const b = board(); b.own = { role: role.id, rounds: 6 }; b.prog = b.prog || {}; b.prog[role.id] = 6; store.set("cb_board", b); saveGame(true);
+    const meters = METERS.map(([k, n]) => `<div class="meter"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
+    root.innerHTML = topbar() + `<main class="wrap">
+      <section class="endhero"><div class="pw">${ART.portrait(role.id, "end")}<div class="stampbig">CLEARED<br>${esc(rank.title.toUpperCase())}</div></div><div><p class="kick">FILE CLOSED · ${esc(role.name.toUpperCase())}</p><h1 data-focus tabindex="-1">${esc(e.title)}</h1><p class="small">${esc(e.tag)}</p><p>${esc(e.desc)}</p></div></section>
+      <section class="stats"><div class="stat"><span class="sl">FINAL SCORE</span><b>${fs.total}</b><small>Choices ${S.score} · Stats ${fs.meters} · Ending ${fs.ending}</small></div><div class="stat"><span class="sl">RANK</span><b class="t">${esc(rank.title)}</b><small>${rIdx + 1} of ${D.RANKS.length}</small></div><div class="stat wide"><span class="sl">SIGNAL ID</span><b class="mono" id="sigid">${id}</b><small>Goes on your Padlet card. Classmates decode it.</small></div></section>
+      <div class="meters3">${meters}</div>
+      <p class="note"><b>Think about it.</b> ${esc(e.ask)}</p><p class="note"><b>Real people in roles like yours.</b> ${esc(role.echo)}</p>
+      <section><h2>Your decisions</h2><ol class="journey">${S.log.map((x) => `<li><span class="jd">${esc(D.ROUNDS[x.i].date)}</span><b>${esc(D.ROUNDS[x.i].title)}</b><span>${"ABC"[x.slot]}. ${esc(x.label)}</span><span class="jk">${esc(KIND_NOTE[x.kind])}</span></li>`).join("")}</ol></section>
+      <section class="decoder"><h2>Decode a classmate</h2><p>Find a classmate's Padlet card from a different role. Type their Signal ID here. You will see their choices and unlock their pieces of the messages.</p>${decoderForm()}</section>
+      <section class="padlet"><h2>Post to Padlet</h2><p>Add your card image and post text to the class Padlet. Then decode classmates from other roles with the Signal IDs on their cards, and reply to their posts.</p>
+        <div class="cardwrap" id="cardsvg">${cardSVG()}</div><div class="row"><button class="btn" id="dl">Download card image</button><button class="btn ghost" id="cpimg">Copy image</button></div>
+        <div class="field"><label for="qsel">Question for your classmates</label><select id="qsel">${role.qs.concat([e.ask]).map((q, i) => `<option value="${i}">${esc(clip(q, 100))}</option>`).join("")}</select></div>
+        <div class="field"><label for="ptext">Post text (edit it so it sounds like you)</label><textarea id="ptext" rows="12"></textarea></div><div class="row"><button class="btn" id="cptext">Copy post text</button><button class="btn ghost" id="again">Play another role</button></div><p class="small cmsg" role="status"></p></section></main>`;
+    const qs = role.qs.concat([e.ask]), paint = () => { $("#ptext").value = cardText(qs[+$("#qsel").value]); };
+    $("#qsel").addEventListener("change", paint); paint();
+    $("#cptext").addEventListener("click", (ev) => copyText($("#ptext").value, ev.currentTarget, "Copied. Paste it into your Padlet post."));
+    $("#again").addEventListener("click", () => { store.set("cb_game", null); S = null; picked = null; go("pick"); });
+    $("#dl").addEventListener("click", downloadCard); $("#cpimg").addEventListener("click", copyCard);
+    bindDecoder();
+  }
+  function cardText(q) {
+    const fs = S.ended.fs, role = S.role;
+    const L1 = "━━━━━━━━━━━━━━━━━━━━";
+    return [`${S.name.toUpperCase()} · ${role.name} · ${S.ended.e.title}`, `${S.ended.rank.title} · Score ${fs.total}`, "", L1, `SIGNAL ID: ${S.ended.id}`, L1, "", `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, "", L1, "MY DECISIONS", L1, ...S.log.map((x) => `${x.i + 1}. ${D.ROUNDS[x.i].title}: ${x.label}`), "", L1, "MY PIECES", L1, ...D.ROUNDS.map((r, i) => `${i + 1}. "${L.piece(i, role.id)}"`), "", L1, "QUESTION FOR YOU", L1, q, "", L1, "To reply: decode my Signal ID in Codebreakers: The Silent Service, then quote it in your reply.", "#NeedToKnow"].join("\n");
+  }
+  function cardSVG() {
+    const role = S.role, fs = S.ended.fs, W = 640, H = 500;
+    const rows = S.log.map((x, i) => `<text x="206" y="${272 + i * 31}" font-size="12" fill="#dfe3dc"><tspan fill="#f0b93a" font-weight="700">${i + 1}  ${esc(L.piece(i, role.id))}</tspan></text><text x="206" y="${286 + i * 31}" font-size="11" fill="#8e9a93">${esc(clip(x.label, 54))}</text>`).join("");
+    const bar = (k, n, y) => `<text x="206" y="${y}" font-size="11" fill="#8e9a93" letter-spacing="2">${n.toUpperCase()}</text><rect x="290" y="${y - 9}" width="220" height="9" fill="#1a2320"/><rect x="290" y="${y - 9}" width="${S.st[k] * 2.2}" height="9" fill="${{ s: "#4f7d96", i: "#f0b93a", t: "#5f9e6e" }[k]}"/><text x="520" y="${y}" font-size="11" fill="#dfe3dc">${S.st[k]}</text>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Courier New, monospace" shape-rendering="crispEdges"><rect width="${W}" height="${H}" fill="#07090a"/><rect x="10" y="10" width="${W - 20}" height="${H - 20}" fill="none" stroke="#46555b" stroke-width="4"/>
+      <path d="M10 34v-24h24M${W - 34} ${H - 10}h24v-24" stroke="#f0b93a" stroke-width="4" fill="none"/>
+      <text x="28" y="40" font-size="11" fill="#e0544a" letter-spacing="4">TOP SECRET // CODEBREAKERS: THE SILENT SERVICE</text>
+      <g transform="translate(28 56)"><rect width="152" height="176" fill="#000" stroke="#46555b" stroke-width="4"/><svg x="0" y="0" width="152" height="176" viewBox="0 0 120 140" preserveAspectRatio="xMidYMid slice">${ART.portraitInner(role.id, "cd")}</svg></g>
+      <text x="206" y="82" font-size="30" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="126" font-size="13" fill="#8e9a93">${esc(S.ended.e.title)}</text>
+      <g><rect x="396" y="40" width="200" height="60" fill="none" stroke="#e0544a" stroke-width="4"/><text x="496" y="64" text-anchor="middle" font-size="12" fill="#e0544a" font-weight="700" letter-spacing="3">CLEARED</text><text x="496" y="88" text-anchor="middle" font-size="14" fill="#e0544a" font-weight="700">${esc(clip(S.ended.rank.title.toUpperCase(), 18))}</text></g>
+      ${bar("s", "Secrecy", 156)}${bar("i", "Impact", 176)}${bar("t", "Trust", 196)}
+      <text x="206" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SCORE</text><text x="262" y="222" font-size="15" font-weight="700" fill="#dfe3dc">${fs.total}</text><text x="320" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SIGNAL ID</text><text x="398" y="222" font-size="17" font-weight="700" fill="#f0b93a" letter-spacing="2">${S.ended.id}</text>
+      <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">PIECES</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="12" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(L.piece(i, role.id), 12))}</text>`).join("")}
+      ${S.log.map((x, i) => `<text x="206" y="${284 + i * 31}" font-size="11" fill="#c9d0c8">${esc(clip(x.label, 56))}</text>`).join("")}
+      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Codebreakers: The Silent Service to read my choices. · Unit 10 World History</text></svg>`;
+  }
+  async function cardPNG() {
+    const svg = $("#cardsvg svg"), vb = svg.viewBox.baseVal, scale = 2, xml = new XMLSerializer().serializeToString(svg);
+    const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml); });
+    const c = document.createElement("canvas"); c.width = vb.width * scale; c.height = vb.height * scale; const cx = c.getContext("2d"); cx.imageSmoothingEnabled = false; cx.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise((res) => c.toBlob(res, "image/png"));
+  }
+  async function downloadCard() {
+    const msg = (t) => { const m = $("#cardsvg").closest("section").querySelector(".cmsg"); if (m) m.textContent = t; };
+    try {
+      const blob = await cardPNG(), name = "need-to-know-" + S.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".png";
+      let dl = null; try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) { }
+      if (dl) { try { await dl.save({ filename: name, data: blob }); msg("Card image saved. Attach it to your Padlet post."); return; } catch (e) { if (e && e.code === "declined") return; } }
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); msg("Card image downloaded. Attach it to your Padlet post.");
+    } catch (e) { msg("Could not make the image. Take a screenshot of the card instead."); }
+  }
+  async function copyCard() {
+    const m = $("#cardsvg").closest("section").querySelector(".cmsg");
+    try { const blob = await cardPNG(); await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); m.textContent = "Card image copied. Paste it into Padlet."; } catch (e) { m.textContent = "Your browser would not copy the image. Use Download instead."; }
+  }
+
+  /* ---------- decoder ---------- */
+  function decoderForm() { return `<div class="dform"><label for="sid" class="sr">Signal ID</label><input id="sid" placeholder="Example: BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="dgo">Decode</button></div><p class="err" id="derr" role="alert"></p><div id="dres" aria-live="polite"></div>`; }
+  function bindDecoder() {
+    const run = () => {
+      const p = L.parseSignal($("#sid").value), err = $("#derr"); $("#dres").innerHTML = "";
+      if (!p) { err.textContent = "That Signal ID does not decode. Check the letters and dashes. It looks like XX-ABCABC-YY."; return; }
+      err.textContent = ""; const b = board(); if (b.sig.indexOf(p.id) < 0) { b.sig.push(p.id); store.set("cb_board", b); }
+      lastDecoded = p.id; $("#dres").innerHTML = decodedCard(p); bindReply(p);
+    };
+    $("#dgo").addEventListener("click", run); $("#sid").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
+    if (lastDecoded && view === "board") { const p = L.parseSignal(lastDecoded); if (p) { $("#sid").value = ""; } }
+  }
+  function decodedCard(p) {
+    const mine = S && S.role ? S : null;
+    const rows = p.picks.map((x, i) => `<li><span class="jd">R${i + 1} · ${esc(D.ROUNDS[i].title)}</span><span class="pc">“${esc(L.piece(i, p.role.id))}”</span><span>${esc(x.label)}</span></li>`).join("");
+    const sameRole = mine && mine.role.id === p.role.id;
+    return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}<ol class="journey">${rows}</ol>
+      <div class="field"><label for="rr">Reply about round</label><select id="rr">${D.ROUNDS.map((r, i) => `<option value="${i}">${i + 1}. ${esc(r.title)}</option>`).join("")}</select></div>
+      <div class="field"><label for="rq">Question for them (pick one)</label><select id="rq"></select></div>
+      <textarea id="rtext" rows="6" readonly aria-label="Reply text"></textarea><div class="row"><button class="mini" id="cprep">Copy reply</button></div><p class="small cmsg" role="status"></p><p class="small">Paste this as a reply on their card post on Padlet.</p></div>`;
+  }
+
+  const REPLY_QS = ["What did you think would happen when you made that choice?", "Which of Secrecy, Impact or Trust were you protecting?", "Would you make the same choice again? Why or why not?", "What did your role know that other roles did not?"];
+  function bindReply(p) {
+    const rrs = $("#rr"), rq = $("#rq"), ta = $("#rtext"); if (!rrs) return;
+    const fill = () => { const r = +rrs.value, prev = rq.value; rq.innerHTML = [D.ROUNDS[r].ask].concat(REPLY_QS).map((q, i) => `<option value="${i}">${esc(clip(q, 90))}</option>`).join(""); if (prev) rq.value = prev; paint(); };
+    const paint = () => {
+      const r = +rrs.value, qs = [D.ROUNDS[r].ask].concat(REPLY_QS), mineRole = (S && S.role) || (board().own && L.roleById(board().own.role));
+      let mine = mineRole ? `I played ${mineRole.name}.` : "";
+      if (S && S.log[r]) mine = `I chose: ${S.log[r].label}\n` + (S.log[r].label === p.picks[r].label ? "We made the same call." : "We made different calls.");
+      const L1 = "━━━━━━━━━━━━━━━━━━━━";
+      ta.value = [`DECODED ${p.id} (${p.role.name})`, L1, `ROUND ${r + 1}: ${D.ROUNDS[r].title}`, L1, `You chose: ${p.picks[r].label}`, ...(mine ? ["", mine] : []), "", L1, "QUESTION FOR YOU", L1, qs[+rq.value || 0]].join("\n");
+    };
+    rrs.addEventListener("change", fill); rq.addEventListener("change", paint); fill();
+    $("#cprep").addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Paste it as a reply on their Padlet post."));
+  }
+
+  /* ---------- completion post ---------- */
+  function completionText(b, parsed, refl) {
+    const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = store.get("cb_name", "") || "Anonymous";
+    const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
+  }
+  function completion(b, parsed, full) {
+    if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p></section>`;
+    return `<section class="padlet panel"><h2>All six messages decoded</h2><p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
+      <div class="field"><label for="crefl">Your reflection (one or two sentences)</label><textarea id="crefl" rows="3" placeholder="Which message surprised you most, and why?"></textarea></div>
+      <div class="field"><label for="cptext2">Your submission</label><textarea id="cptext2" rows="14" readonly></textarea></div>
+      <div class="row"><button class="btn" id="cppost">Copy submission</button></div><p class="small cmsg" role="status"></p></section>`;
+  }
+
+  /* ---------- board ---------- */
+  function renderBoard() {
+    const b = board(), parsed = b.sig.map(L.parseSignal).filter(Boolean), have = {};
+    parsed.forEach((p) => { have[p.role.id] = true; });
+    const own = b.own || null;
+    const prog = b.prog || {}; if (own && prog[own.role] === undefined) prog[own.role] = own.rounds;
+    const known = (r, rid) => (prog[rid] || 0) > r || !!have[rid];
+    let full = 0;
+    const rows = D.ROUNDS.map((rd, r) => {
+      const n = D.ROLES.filter((x) => known(r, x.id)).length, done = n === 5; if (done) full++;
+      const slots = D.ROLES.map((x) => `<li class="slot ${known(r, x.id) ? "got" : ""}"><span>${esc(x.short)}</span><b>${known(r, x.id) ? esc(L.piece(r, x.id)) : "?????"}</b></li>`).join("");
+      return `<section class="brow ${done ? "full" : ""}"><h3>Round ${r + 1}: ${esc(rd.title)} <span class="cnt">${done ? "● MESSAGE COMPLETE" : n + " OF 5 PIECES"}</span></h3><ol class="slots">${slots}</ol>${done ? `<div class="paper"><p class="src">Full message</p><p class="fullmsg">${esc(rd.msg.join(" "))}</p><p>${esc(rd.real)}</p><p class="eq"><b>Discuss</b> ${esc(rd.ask)}</p></div>` : ""}</section>`;
+    }).join("");
+    root.innerHTML = topbar() + `<main class="wrap"><button class="mini" id="bk">Back</button><h1 data-focus tabindex="-1">Decoder board</h1>
+      <p class="lede">Each round hides a five-part message. You hold one part of each. Decode classmates' Signal IDs from other roles to fill the rest. ${full} of 6 messages complete.</p>
+      <section class="decoder"><h2>Decode a Signal ID</h2>${decoderForm()}</section>
+      ${parsed.length ? `<section><h2>Decoded so far</h2><ul class="chiplist">${parsed.map((p) => `<li><button class="chipb" data-sig="${p.id}">${esc(p.id)} · ${esc(p.role.short)}</button></li>`).join("")}</ul></section>` : ""}
+      ${completion(b, parsed, full)}
+      ${rows}<p class="small"><button class="mini" id="clr">Clear decoded signals</button></p></main>`;
+    $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
+    bindDecoder();
+    $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); $("#dres").innerHTML = decodedCard(p); bindReply(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
+    const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), upd = () => { ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
+    $("#clr").addEventListener("click", () => { const b2 = board(); b2.sig = []; store.set("cb_board", b2); renderBoard(); bindGo(); });
+  }
+
+
+
+  const h = location.hash; view = h === "#board" ? "board" : "title"; render();
+})();
+
+(function () { if (matchMedia("(prefers-reduced-motion: reduce)").matches) return; let n = 0; setInterval(function () { n++; document.querySelectorAll("svg.portrait, svg.scene").forEach(function (sv) { const o = +sv.dataset.o || 0, t = n + o; sv.querySelectorAll(".pxa").forEach(function (g) { const k = g.dataset.s, p = +g.dataset.p, m = +g.dataset.n; const on = m ? Math.floor(t / (+g.dataset.h || 1)) % m === p : k === "b" ? t % 40 < 2 : k === "r" ? t % 24 >= 12 : t % 12 === p; const d = on ? "inline" : "none"; if (g.getAttribute("display") !== d) g.setAttribute("display", d); }); }); }, 1000 / 12); })();
+
+</script>
+</body></html>
