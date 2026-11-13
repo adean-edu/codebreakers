@@ -568,7 +568,7 @@ const ART = (function () {
     return c;
   };
   // ---- (built in from concepts/scene-r3-ul/advance.js, teacher's choice 2026-11-13)
-  // ---- January 1942: an Afrika Korps post watches the panzers roll out of a dust storm (truck and uniforms changed to German, 2026-11-13)
+  // ---- January 1942: an Afrika Korps post idles and watches the panzers roll out of a dust storm (truck and uniforms changed to German, 2026-11-13)
   CH.advance = { va: 24, vb: 4, vc: 8, vd: 4, ve: 2 };
   const BAY = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
   S.advance = (p) => {
@@ -607,14 +607,18 @@ const ART = (function () {
     [81, 114].forEach((x) => { c.e(x, 57, 4.2, 4.2, "K"); c.e(x, 57, 2.4, 2.4, "C"); c.p(x, 57, "H"); });                               // big wheels
     // Afrika Korps soldiers behind the sandbags, lit from the right: long-peaked olive field caps with goggles on the brim, sun-faded olive tropical tunics
     const man = (x, ty) => { c.r(x - 2, ty, x + 2, ty, "O"); c.r(x - 2, ty + 1, x + 2, ty + 1, "O"); c.r(x + 1, ty, x + 2, ty, "V");                    // field cap, lit side
-      c.r(x + 2, ty + 2, x + 5, ty + 2, "E");                                                                                                // the long peak, toward the light
+      c.r(x + 2, ty + 2, x + 3, ty + 2, "E");                                                                                                // the cap's peak, toward the light
       c.p(x - 1, ty, "g"); c.p(x, ty, "B"); c.p(x - 2, ty, "B");                                                                             // goggles pushed up on the cap
       c.r(x - 2, ty + 2, x + 1, ty + 4, "m"); c.r(x + 1, ty + 3, x + 2, ty + 4, "l"); c.p(x + 1, ty + 3, "E"); c.p(x - 2, ty + 4, "s");     // face in the shade of the peak, lit cheek
       c.r(x - 3, ty + 5, x + 3, ty + 16, "O"); c.r(x + 2, ty + 5, x + 3, ty + 16, "m"); c.r(x - 4, ty + 5, x - 4, ty + 16, "E");            // olive tunic, faded lit edge, shadow side
       c.r(x - 3, ty + 12, x + 3, ty + 12, "s"); c.r(x - 3, ty + 5, x + 3, ty + 5, "V"); c.p(x - 1, ty + 7, "s"); c.p(x + 1, ty + 7, "s"); };   // webbing belt, open collar, pocket flaps
-    man(11, 43); c.r(15, 37, 15, 46, "E"); c.p(15, 36, "H");                                                       // far man with rifle
-    man(28, 40); c.l(31, 46, 38, 42, "s"); c.p(39, 42, "l"); c.p(39, 41, "l");                                     // pointing
-    const by = -ve; man(46, 37); c.l(49, 44, 50, 41 + by, "s"); c.r(49, 39 + by, 53, 40 + by, "K"); c.p(54, 39 + by, "H"); c.p(54, 40 + by, "H"); c.p(51, 41 + by, "l");   // binoculars
+    // three men waiting and watching the column go by
+    man(11, 43); c.r(7, 49, 16, 50, "O"); c.r(8, 49, 15, 49, "s"); c.r(15, 49, 16, 50, "m");                       // leaning on the sandbags, forearms on top
+    c.l(21, 50, 24, 37, "E"); c.p(24, 36, "H"); c.p(22, 45, "s");                                                  // his rifle propped against the wall
+    man(28, 40); c.r(25, 47, 31, 48, "O"); c.r(25, 49, 31, 49, "s"); c.p(26, 47, "m"); c.p(30, 48, "m"); c.r(31, 47, 31, 48, "m");   // arms folded
+    man(46, 37);                                                                                                    // smoking, now and then lifting his cigarette
+    if (ve) { c.l(48, 45, 48, 43, "O"); c.p(48, 42, "m"); c.p(49, 41, "W"); c.p(50, 41, "A"); c.p(51, 39, "g"); c.p(52, 37, "g"); }
+    else { c.l(48, 44, 49, 47, "O"); c.p(49, 48, "m"); c.p(50, 48, "W"); c.p(51, 48, "R"); c.p(52, 46, "g"); c.p(52, 44, "g"); c.p(53, 42, "g"); }
     // sandbag wall
     for (let r = 0; r < 3; r++) for (let x0 = -4 + (r % 2) * 4; x0 < 66 + r * 2; x0 += 8) { const y = 51 + r * 4, x1 = Math.min(x0 + 7, 66 + r * 2);
       for (let x = Math.max(0, x0); x <= x1; x++) { c.r(x, y, x, y + 3, "m"); c.p(x, y, "l"); c.p(x, y + 3, "s"); } c.r(Math.max(0, x0), y, Math.max(0, x0), y + 3, "s"); c.p(x0 + 3, y + 1, "l"); }
