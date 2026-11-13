@@ -960,7 +960,16 @@ const ART = (function () {
   };
   // ---- Watching the safe house, Paris, 1942: from a dark room across the street, someone watches the meeting
   //      window. Shadows move behind its curtain (wn); a black car pulls up and the door opens on a figure (cr); rain (rn).
-  CH.leak = { rn: 4, wn: 6, cr: 12 };
+  // The car's whole visit as one seamless loop of [car x, door opening]: door open (the still), door closes, the car
+  // pulls away to the left, empty street, a car arrives from the right, parks, the door opens again.
+  // 72 states x 2 frames = 144 frames, a multiple of the rain (8) and window (36) loops, so the whole scene repeats every 12 s.
+  const LEAK_CAR = [].concat(
+    Array(12).fill([102, 9]), [[102, 6], [102, 3]], Array(6).fill([102, 0]),
+    [101, 99, 96, 92, 87, 81, 74, 66, 57, 47, 36, 24, 11, -3, -18, -34].map((x) => [x, 0]),
+    Array(12).fill([null, 0]),
+    [160, 150, 141, 133, 126, 120, 115, 111, 108, 106, 104, 103, 102].map((x) => [x, 0]),
+    Array(7).fill([102, 0]), [[102, 2], [102, 4], [102, 6], [102, 8]]);
+  CH.leak = { rn: 8, wn: 6, cr: LEAK_CAR.length };
   S.leak = (p) => {
     const c = Cv(160, 70, "K"), rn = p.rn || 0, wn = p.wn || 0, cr = p.cr || 0;
     c.sky(0, 12, [["K", 6], ["D", 13]]); stars(c, 6, 61);
@@ -990,10 +999,9 @@ const ART = (function () {
     // the meeting window: shadows behind the curtain
     const inWin = (x, y) => (x >= 73 && x <= 77 ? "s" : c.c[y][x]);
     const shadow = (x) => { c.r(x, 19, x, 20, inWin); c.r(x - 1, 21, x + 1, 24, inWin); };
-    [[75], [74], [74, 77], [75, 77], [76], []][wn].forEach(shadow);
-    // the car arrives, waits, and the door opens (state 0 is the moment that matters, so it is the still)
-    const XS = [102, 102, null, null, 160, 141, 125, 113, 106, 102, 102, 102], cx = XS[cr];
-    const door = cr <= 1 ? 9 : cr === 11 ? 3 : 0;
+    [[75], [74], [74, 77], [75, 77], [76, 77], [76]][wn].forEach(shadow);   // each step moves one pixel, and the last flows into the first
+    // the car's visit (state 0, door open on the man in the hat, is the moment that matters, so it is the still)
+    const [cx, door] = LEAK_CAR[cr];
     if (door) { c.r(80 - door + 1, 43, 80, 53, "A"); c.poly([[80 - door, 54], [81, 54], [84, 56], [80 - door - 2, 56]], "m");
       if (door > 5) { c.r(75, 45, 77, 53, "K"); c.e(76, 44, 1.6, 1.6, "K"); c.r(74, 42, 78, 42, "K"); c.r(75, 41, 77, 41, "K"); } }   // a man in a hat in the doorway
     if (cx !== null) {
@@ -1006,7 +1014,7 @@ const ART = (function () {
       [7, 26].forEach((w) => { c.e(x0 + w, 55, 2.6, 2.6, "D"); c.p(x0 + w, 55, "H"); });
       c.e(x0 + 2.5, 49, 1.4, 1.4, "A"); c.r(x0, 50, x0 + 1, 52, "C");
     }
-    for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + rn * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 63) c.p(x - (k >> 1), y0 + k, "H"); }   // rain beyond the glass
+    for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + rn * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 63)   /* 8 steps of 8 = 64, so the rain wraps without a jump */ c.p(x - (k >> 1), y0 + k, "H"); }   // rain beyond the glass
     // our side of the glass: curtains, the sill, and the watcher's head and shoulders
     c.r(0, 0, 159, 2, "r"); for (let x = 0; x < 160; x += 4) c.p(x, 2, "K");
     const curtain = (x0, x1, edge) => { for (let x = x0; x <= x1; x++) for (let y = 0; y < 70; y++) { const sway = Math.round(Math.sin(y / 9) * 1); c.p(x, y, (x + sway) % 3 === 0 ? "K" : x === edge ? "R" : "r"); } };
@@ -1063,7 +1071,7 @@ const ART = (function () {
     const a = -.15 + fl * .05; for (let t = 4; t < 44; t++) for (let s = -t / 6; s <= t / 6; s += 1) { const x = hx + 8 + Math.cos(a) * t - Math.sin(a) * s, y = hy - 5 + Math.sin(a) * t + Math.cos(a) * s * .6; if ((Math.round(x) + Math.round(y)) % 2 === 0) { const q = c.c[Math.round(y)] && c.c[Math.round(y)][Math.round(x)]; c.p(x, y, q === "H" ? "W" : q === "C" ? "g" : t < 24 ? "g" : "H"); } }   // flashlight beam
     return c;
   };
-  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 4, pl: 3, fm: 3, gl: 2 }, cacheS = {};
+  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 2, pl: 3, fm: 3, gl: 2 }, cacheS = {};
   // the panning background is rasterised once so the browser can slide a single image smoothly
   function intPan() {
     const g = intBG().c, H = g.length, W = g[0].length;
