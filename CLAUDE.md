@@ -57,7 +57,7 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 - **Replacing an image:** to replace one in the build, put the file in `img/` named after its slot (e.g. `img/r4-ul.png`), then run `python3 mkimg.py && node build.js`.
 - **Hosted override, no rebuild:** a file in the repo's `images/` folder named `<slot>.png` or `<slot>.jpg` replaces the built-in image on the live site. A file named `scene-<slot>.gif` or `scene-<slot>.png` replaces that round's pixel animation, and `scene-title.gif` replaces the one on the title screen. This only works over http(s), not file://.
 - **Style:** teacher-supplied images are vintage WWII briefing maps: aged cream paper, teal-grey sea with wave lines, tan land, navy serif labels, red accents, title box top-left, compass top-right, a "FROM THE RECORD • …" footer. New art should match this style. Pixel scenes must match the existing palette and grid.
-- **Size:** the built page is about 4.4 MB, mostly images. If it needs to load faster, lower `mkimg.py` to around 1100px and quality 65.
+- **Size:** the built page is about 4.9 MB (up from 4.4 MB after the November 2026 r5 maps), mostly images. If it needs to load faster, lower `mkimg.py` to around 1100px and quality 65.
 
 ## Padlet and assessment rules (teacher's decisions, keep them)
 
@@ -106,5 +106,11 @@ Going forward, use git tags for restore points.
   3. The "V-2 parts flown to Britain, July 1944" arrow goes straight west. In Operation Most III (Wildhorn III, 25–26 July 1944), an RAF Dakota picked up the parts at a field near Tarnów and flew them to Brindisi, Italy. They went on to London from there.
   - The other facts check out: Peenemünde bombed August 1943 (Operation Hydra), testing moved to Blizna, rocket recovered from the Bug River in May 1944.
   - To swap in a corrected image: replace `img/r5-fa.webp` (keep only one `img/r5-fa.*` file, since `mkimg.py` takes the first match), then run `python mkimg.py`, `node build.js`, copy `dist/test.html` → `index.html` and `dist/studio-test.html` → `studio.html`, and run `t.js` for all five roles.
+- **To fix: `r5-bp` and `r5-mi` "Operation Mincemeat" map** (teacher's new image, added 2026-11-12 as `img/r5-bp.webp` and `img/r5-mi.webp`, the same file in both slots). Flagged errors:
+  1. The navy "real target" arrow starts at Huelva, which suggests the Sicily invasion sailed from Spain. It actually sailed mainly from North Africa (Tunisia, Algeria) and Malta, with some convoys from Britain and the US. The arrow should start in North Africa.
+  2. The scale bar is wrong. It aligns 250 miles with 500 km (should be ~400 km), and the map reads about 1.7× too large: Huelva to Sicily is ~1,200 miles / ~1,900 km, but the bar reads it as ~2,000 miles.
+  3. Minor: the Sicily dot sits mid-island. The July 1943 landings were on the south and southeast coasts (Gela, Licata, near Syracuse).
+  - The other facts check out: the body was found off Huelva on 30 April 1943, the fake targets were Greece and Sardinia, and Sicily was invaded on 10 July 1943.
+  - To swap in a corrected image: replace both files (keep only one `img/<slot>.*` per slot), then rebuild as described for `r5-fa`.
 - **Plain-text pieces on the Padlet card image:** they still appear. Removing them was offered, but the teacher never answered.
 - **Padlet welcome post:** may need updating to match the current flow.
