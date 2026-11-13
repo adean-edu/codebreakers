@@ -99,5 +99,11 @@ Going forward, use git tags for restore points.
   - `r4-mi`: the scale bar is wrong, there are ~40 dots versus 27 agents, and the Lisbon 1941 period is skipped.
   - `r4-ul`: the strike planes fly from Tunisia, not Malta.
   - `r5`: the US fighters should come from Guadalcanal (southeast).
+- **To fix: `r5-fa` "The Rocket Secret" map** (teacher's new image, added 2026-11-12 as `img/r5-fa.webp`). These errors are flagged and still need fixing, either by editing the image or by asking the teacher for a corrected one:
+  1. "RUSSIA" is labelled north of Poland. In 1943–44 that land was East Prussia, part of Germany. It only became Russian (Kaliningrad) after 1945.
+  2. The scale bar is wrong. It aligns 100 miles with 250 km (should be ~160 km), and the map is drawn about 2.5× too large: Peenemünde to the Bug River crash site (near Sarnaki) is ~400 miles / ~650 km, but the bar reads it as ~1,000 miles.
+  3. The "V-2 parts flown to Britain, July 1944" arrow goes straight west. In Operation Most III (Wildhorn III, 25–26 July 1944), an RAF Dakota picked up the parts at a field near Tarnów and flew them to Brindisi, Italy. They went on to London from there.
+  - The other facts check out: Peenemünde bombed August 1943 (Operation Hydra), testing moved to Blizna, rocket recovered from the Bug River in May 1944.
+  - To swap in a corrected image: replace `img/r5-fa.webp` (keep only one `img/r5-fa.*` file, since `mkimg.py` takes the first match), then run `python mkimg.py`, `node build.js`, copy `dist/test.html` → `index.html` and `dist/studio-test.html` → `studio.html`, and run `t.js` for all five roles.
 - **Plain-text pieces on the Padlet card image:** they still appear. Removing them was offered, but the teacher never answered.
 - **Padlet welcome post:** may need updating to match the current flow.
