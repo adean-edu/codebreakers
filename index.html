@@ -1314,8 +1314,8 @@ const ART = (function () {
       c.r(x - 2, yb - 3, x + 2, yb - 3, "O");
       c.r(x - 2, yb - 2, x - 1, yb, "m"); c.r(x + 1, yb - 2, x + 2, yb, "s"); c.r(x - 2, yb, x - 1, yb, "H"); c.r(x + 1, yb, x + 2, yb, "H");   // bare legs, boots
       armF(x, yb); };
-    // mechanic left of the nose, waves the plane on
-    man(30, 66, "W", "m", (x, yb) => { c.r(x + 3, yb - 8, x + 3, yb - 5, "s"); if (mc) { c.l(x - 3, yb - 8, x - 6, yb - 14, "l"); c.p(x - 6, yb - 15, "l"); } else { c.r(x - 3, yb - 8, x - 3, yb - 5, "l"); } });
+    // mechanic left of the nose, arms at his sides (no wave, at the teacher's request)
+    man(30, 66, "W", "m", (x, yb) => { c.r(x + 3, yb - 8, x + 3, yb - 5, "s"); c.r(x - 3, yb - 8, x - 3, yb - 5, "l"); });
     // man in blue overalls by the tail with a clipboard
     man(128, 67, "Q", "N", (x, yb) => { c.r(x - 3, yb - 8, x - 3, yb - 6, "B"); c.r(x - 6, yb - 8 - md, x - 4, yb - 6 - md, "W"); c.p(x - 5, yb - 7 - md, "K"); c.r(x + 3, yb - 8, x + 3, yb - 5, "C"); });
     // man in a red shirt hauling the wheel chock rope under the nose
