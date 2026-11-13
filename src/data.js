@@ -259,7 +259,7 @@ const DATA = (function () {
       tl: { d: "1942", t: "Resistance networks hunt for traitors in their ranks", k: 1942.05 },
       sitrep: ["1942. Somewhere in your network, there is a leak. Twice now, the Germans have raided a safe house the day after a meeting was planned there.",
         "London has a plan to find the traitor: give different people slightly different stories, then watch which story the Germans act on. It is clever, and it is dangerous for everyone who carries the bait."] },
-    "MI-3": { title: "Garbo's Imaginary Spies", date: "1942", place: "London", scene: "garbo", word: "GARBO", img: "r4-mi",
+    "MI-3": { title: "Garbo's Imaginary Spies", date: "1942", place: "London", scene: "madrid", word: "GARBO", img: "r4-mi",
       tl: { d: "Apr 1942", t: "Garbo arrives in Britain to work for MI5", k: 1942.04 },
       sitrep: ["1942. A Spanish man named Juan Pujol García has fooled German intelligence for a year. He told them he was running a network of spies across Britain. Every one of those spies was invented.",
         "Now MI5 runs him, and Germany pays for the whole imaginary network. Each new fake agent makes the story bigger and more useful, and each one is something new that has to stay believable."] },
