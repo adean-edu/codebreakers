@@ -275,7 +275,7 @@ const DATA = (function () {
       tl: { d: "Apr 1943", t: "Operation Mincemeat: fake invasion plans wash ashore in Spain", k: 1943.04 },
       sitrep: ["April 1943. The Allies are about to invade Sicily, and Germany knows Sicily is the obvious target. Your team has planted a lie: a dead body, dressed as a British officer, carrying fake letters about invading Greece and Sardinia instead.",
         "You built every detail of this man's life, down to the theater tickets in his pocket. Now he has washed ashore in Spain, near German agents, and you have to decide how hard to push the story."] },
-    "FA-4": { title: "The Rocket Secret", date: "1943 to 1944", place: "Occupied Poland", scene: "rocket", word: "ROCKET", img: "r5-fa",
+    "FA-4": { title: "The Rocket Secret", date: "1943 to 1944", place: "Occupied Poland", scene: "bug", word: "ROCKET", img: "r5-fa",
       tl: { d: "1943", t: "Polish agents track Germany's secret rocket", k: 1943.06 },
       sitrep: ["1943. Polish Home Army agents keep hearing about a secret German weapon: a rocket that can fly hundreds of miles and fall without warning. Some of the clues point to a test range hidden in the Polish countryside.",
         "Your network has pieces of proof: scraps of metal, a hand-drawn map and the names of people who saw the launches. London needs that proof. The Germans want to find whoever has it."] }

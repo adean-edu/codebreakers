@@ -39,7 +39,7 @@
     "r4-ul": "The Mediterranean by day, 1942: a convoy of supply ships on blue water with smoke from their funnels, a far coastline, clouds, and a small British spotter plane crossing the sky.",
     "r5-bp": "A beach in southern Spain at dawn, April 1943: a red and gold sunrise, waves and foam on the sand, a fishing boat, gulls, and a briefcase with a chain lying on the sand.",
     "r5-mi": "A beach in southern Spain at dawn, April 1943: a red and gold sunrise, waves and foam on the sand, a fishing boat, gulls, and a briefcase with a chain lying on the sand.",
-    "r5-fa": "A pine forest in occupied Poland at night, 1943: a courier shining a flashlight on the twisted tail fin of a crashed rocket in a small crater, with a sack for the pieces."
+    "r5-fa": "Dusk on the bank of the Bug River near Sarnaki, occupied Poland, May 1944: a German V-2 test rocket in black-and-white paint lies almost intact in the reeds, nose in the mud, with the furrow it ploughed behind it. Three Home Army men in caps: one kneels by the fins, one points, one arrives with a coil of rope. The river glints and the reeds sway."
   };
   const SCENE_ID = { title: "enigma", r1: "enigma", r2: "convoy", r3: "silence", r4: "midway", r5: "intercept", r6: "decoy" };
   const roleName = (id) => D.ROLES.find((r) => r.id === id).name;
