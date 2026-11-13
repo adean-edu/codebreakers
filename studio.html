@@ -668,15 +668,25 @@ const ART = (function () {
   // door closes, the car pulls away to the left, empty street, a car arrives from the right, pauses at A, parks at B, door opens.
   // 72 states x 2 frames = 144 frames, a multiple of the rain (8) and window (36) loops, so the whole scene repeats every 12 s.
   const LEAK_CAR = [].concat(
-    Array(12).fill([60, 9]), [[60, 6], [60, 3]], Array(6).fill([60, 0]),
+    Array(16).fill([60, 9]), [[60, 6], [60, 3]], Array(2).fill([60, 0]),
     [59, 57, 54, 50, 45, 39, 32, 24, 15, 5, -6, -18, -31, -45].map((x) => [x, 0]),
     Array(7).fill([null, 0]),
     [160, 150, 141, 133, 126, 120, 115, 111, 109, 108, 108, 108, 106, 102, 96, 90, 84, 78, 73, 68, 64, 62, 61, 60].map((x) => [x, 0]),
     Array(3).fill([60, 0]), [[60, 2], [60, 4], [60, 6], [60, 8]]);
   CH.leak = { rn: 8, wn: 6, cr: LEAK_CAR.length };
-  // where the truck's four soldiers are at each state: 0 all in the back, 1 two climbing down / back up, 2 all down in the street.
-  // They jump down as the door opens, stand guard through the raid, and climb back in before the truck pulls away.
-  const LEAK_MEN = LEAK_CAR.map((s, i) => (i <= 11 || i >= 68 ? 2 : i <= 13 || i >= 66 ? 1 : 0));
+  // The truck's four soldiers, state by state: how many are still in the back, where the others stand in the street (x),
+  // and whether one is in the lit doorway. They jump down on the far side, come round the truck's nose to guard door B,
+  // then file into the house one by one. They never get back on: the truck leaves empty and a new load arrives next time.
+  const LEAK_TROOPS = LEAK_CAR.map((s, i) => {
+    const T = (bed, ground, inDoor) => ({ bed, ground, inDoor: !!inDoor });
+    if (i <= 7) return T(0, [40, 45, 58], 1);
+    if (i <= 9) return T(0, [40, 45, 56]);
+    if (i <= 11) return T(0, [40, 48]);
+    if (i <= 13) return T(0, [44]);
+    if (i <= 40) return T(0, []);
+    if (i <= 65) return T(4, []);
+    return [T(2, []), T(0, [58]), T(0, [52, 58]), T(0, [46, 52, 58]), T(0, [40, 47, 58], 1), T(0, [40, 45, 58], 1)][i - 66];
+  });
   S.leak = (p) => {
     const c = Cv(160, 70, "K"), rn = p.rn || 0, wn = p.wn || 0, cr = p.cr || 0;
     c.sky(0, 12, [["K", 6], ["D", 13]]); stars(c, 6, 61);
@@ -711,24 +721,26 @@ const ART = (function () {
     const shadow = (x) => { c.r(x, 19, x, 20, inWin); c.r(x - 1, 21, x + 1, 24, inWin); };
     [[75], [74], [74, 77], [75, 77], [76, 77], [76]][wn].forEach(shadow);   // each step moves one pixel, and the last flows into the first
     // the car's visit (state 0, door B open on the raid, is the moment that matters, so it is the still)
-    const [cx, door] = LEAK_CAR[cr], raid = cx === 60 && door >= 3, men = LEAK_MEN[cr];
+    const [cx, door] = LEAK_CAR[cr], raid = cx === 60 && door >= 3, troops = LEAK_TROOPS[cr];
     // raiders: plain-clothes police in long coats and hats, and a soldier in a steel helmet with a rifle; feet at yb
     const man = (x, yb, rim) => { c.r(x - 1, yb - 10, x + 1, yb - 10, "K"); c.r(x - 2, yb - 9, x + 2, yb - 9, "K"); c.r(x - 1, yb - 8, x + 1, yb - 7, "K");
       c.poly([[x - 1.5, yb - 6], [x + 2.5, yb - 6], [x + 3, yb - 1], [x - 2, yb - 1]], "K"); c.p(x - 1, yb, "K"); c.p(x + 1, yb, "K"); if (rim) { c.r(x + 2, yb - 5, x + 2, yb - 2, "C"); c.p(x + 2, yb - 9, "C"); } };
     const soldier = (x, yb) => { c.r(x - 1, yb - 10, x + 1, yb - 10, "K"); c.r(x - 2, yb - 9, x + 2, yb - 9, "K"); c.p(x - 2, yb - 8, "K"); c.p(x + 2, yb - 8, "K"); c.r(x - 1, yb - 8, x + 1, yb - 7, "K");
       c.r(x - 1, yb - 6, x + 1, yb - 2, "K"); c.r(x - 1, yb - 1, x - 1, yb, "K"); c.r(x + 1, yb - 1, x + 1, yb, "K"); c.l(x + 2, yb - 11, x + 2, yb - 3, "D"); c.p(x + 2, yb - 12, "E"); c.r(x + 2, yb - 9, x + 2, yb - 4, (xx, yy) => (yy % 2 ? "E" : "D")); };
     if (door) { const r = DB + 5; c.r(r - door + 1, 45, r, 53, "A"); c.poly([[r - door, 54], [r + 1, 54], [r + 4, 56], [r - door - 2, 56]], "m");
-      if (door > 5) [50, 55].forEach((x) => {                                                 // two men pushing in through the doorway, small against the light
-        c.r(x - 1, 45, x + 1, 45, "K"); c.r(x - 2, 46, x + 2, 46, "K"); c.r(x - 1, 47, x + 1, 48, "K"); c.poly([[x - 1.5, 49], [x + 2.5, 49], [x + 2.5, 53], [x - 1.5, 53]], "K"); }); }
+      if (door > 5) { const x = 50;                                                          // a man in a hat pushing in through the doorway, dark against the light
+        c.r(x - 1, 45, x + 1, 45, "K"); c.r(x - 2, 46, x + 2, 46, "K"); c.r(x - 1, 47, x + 1, 48, "K"); c.poly([[x - 1.5, 49], [x + 2.5, 49], [x + 2.5, 53], [x - 1.5, 53]], "K"); }
+      if (door > 5 && troops.inDoor) { const x = 55;                                          // a soldier going in beside him: grey helmet and tunic
+        c.r(x - 1, 45, x + 1, 45, "H"); c.r(x - 2, 46, x + 2, 46, "C"); c.r(x - 1, 47, x + 1, 47, "s"); c.r(x - 2, 48, x + 2, 52, "H"); c.r(x - 2, 50, x + 2, 50, "K"); c.p(x - 1, 53, "K"); c.p(x + 1, 53, "K"); } }
     // (the guard at door B is now one of the truck's soldiers, drawn after the truck)
     if (cx !== null) {   // a German Opel Blitz truck in field grey: upright grille, bonnet, square cab with the cross on the door, slatted cargo bed of soldiers
       const x0 = cx, q = (pts, a) => c.poly(pts.map(([x, y]) => [x0 + x, y]), a), beam = (x, y) => { const v = c.c[y] && c.c[y][x]; if (v && (x + y) % 2 === 0 && lighter[v]) c.c[y][x] = lighter[v]; };
       for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 49 + s);   // dimmed headlight on the street
       // soldiers in steel helmets sitting in the back, rifles upright, drawn first so the bed's side hides their bodies
-      [21, 26, 31, 36].forEach((x, i) => { const X = x0 + x, y = 42; if (men === 2 || (men === 1 && i < 2)) return;   // those who have jumped down
-        c.r(X - 1, y - 6, X + 1, y - 6, "K"); c.r(X - 2, y - 5, X + 2, y - 4, "K"); c.p(X - 3, y - 4, "K"); c.p(X + 3, y - 4, "K"); c.p(X + 1, y - 6, "g");   // dark steel helmet, flared rim, a glint of lamp light
+      [21, 26, 31, 36].forEach((x, i) => { const X = x0 + x, y = 42; if (i < 4 - troops.bed) return;   // those who have jumped down
+        c.r(X - 1, y - 6, X + 1, y - 6, "H"); c.r(X - 2, y - 5, X + 2, y - 5, "H"); c.r(X - 3, y - 4, X + 3, y - 4, "C"); c.p(X + 1, y - 6, "g");   // grey steel helmet, flared rim, a glint of lamp light
         c.r(X - 1, y - 3, X + 1, y - 2, "m"); c.p(X - 1, y - 3, "l");                                                                  // face under the helmet
-        c.r(X - 2, y - 1, X + 2, y, "E"); });                                                                                        // shoulders
+        c.r(X - 2, y - 1, X + 2, y, "H"); c.p(X + 2, y - 1, "g"); });                                                                // field-grey shoulders
       q([[1, 54], [2, 50], [5, 48.5], [10, 48.5], [13, 51], [13, 54]], "C"); c.r(x0 + 4, 48, x0 + 10, 48, "H");                    // front wing over the wheel
       c.r(x0 + 2, 45, x0 + 10, 51, "H"); c.r(x0 + 2, 45, x0 + 10, 45, "g"); for (let x = 4; x < 10; x += 2) c.r(x0 + x, 47, x0 + x, 50, "C");   // bonnet with side vents
       c.r(x0, 44, x0 + 2, 52, "C"); for (let y = 45; y < 52; y += 2) c.r(x0, y, x0 + 1, y, "K"); c.r(x0, 44, x0 + 2, 44, "g");     // tall upright grille
@@ -742,12 +754,12 @@ const ART = (function () {
       [7, 29].forEach((w) => { const X = x0 + w; c.e(X, 53.5, 4.2, 4.2, "K"); c.e(X, 53.5, 2.4, 2.4, "C"); c.p(X, 53, "H"); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => c.p(X + a, 53 + b, "E")); });   // big wheels, steel hubs
       c.p(x0 + 3, 47, "A"); c.p(x0 + 4, 47, "A"); c.r(x0 - 1, 52, x0, 52, "g");                                                        // masked headlamp, bumper
     }
-    if (cx === 60 && men) {   // the soldiers jump down into the street: field-grey uniforms, dark helmets, rifles, placed clear of the wheels
-      const trooper = (x, yb) => { c.r(x - 1, yb - 12, x + 1, yb - 12, "K"); c.r(x - 2, yb - 11, x + 2, yb - 10, "K"); c.p(x - 3, yb - 10, "K"); c.p(x + 3, yb - 10, "K"); c.p(x + 1, yb - 12, "g"); c.p(x + 2, yb - 11, "g");   // steel helmet, flared rim, glint
+    if (cx === 60 && troops.ground.length) {   // soldiers in the street, WWII German field grey: grey steel helmet, grey tunic, black belt and boots, rifle
+      const trooper = (x, yb) => { c.r(x - 1, yb - 12, x + 1, yb - 12, "H"); c.r(x - 2, yb - 11, x + 2, yb - 11, "H"); c.r(x - 3, yb - 10, x + 3, yb - 10, "C"); c.p(x + 1, yb - 12, "g"); c.p(x + 2, yb - 11, "g");   // helmet
         c.r(x - 1, yb - 9, x + 1, yb - 8, "m"); c.p(x - 1, yb - 9, "l");                                                                          // face
-        c.r(x - 1, yb - 7, x + 1, yb - 7, "O"); c.r(x - 2, yb - 6, x + 2, yb - 3, "O"); c.r(x + 2, yb - 6, x + 2, yb - 3, "H"); c.r(x - 2, yb - 4, x + 2, yb - 4, "K");   // tunic, lit edge, belt
-        c.r(x - 1, yb - 2, x + 1, yb - 1, "E"); c.p(x - 1, yb, "K"); c.p(x + 1, yb, "K"); c.l(x + 3, yb - 12, x + 3, yb - 3, "K"); };         // trousers, boots, rifle
-      (men === 2 ? [40, 45, 58, 101] : [99, 104]).forEach((x) => trooper(x, 61));   // two guard door B, one at the truck's nose, one at the tailgate; while climbing, two at the tailgate
+        c.r(x - 1, yb - 7, x + 1, yb - 7, "H"); c.r(x - 2, yb - 6, x + 2, yb - 3, "H"); c.r(x - 2, yb - 6, x - 2, yb - 3, "C"); c.r(x + 2, yb - 6, x + 2, yb - 3, "g"); c.r(x - 2, yb - 4, x + 2, yb - 4, "K");   // tunic: shaded and lit edges, belt
+        c.r(x - 1, yb - 2, x + 1, yb - 1, "C"); c.p(x - 1, yb, "K"); c.p(x + 1, yb, "K"); c.l(x + 3, yb - 12, x + 3, yb - 3, "K"); };       // trousers, jackboots, rifle
+      troops.ground.forEach((x) => trooper(x, 61));
     }
     for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + rn * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 63)   /* 8 steps of 8 = 64, so the rain wraps without a jump */ c.p(x - (k >> 1), y0 + k, "H"); }   // rain beyond the glass
     // our side of the glass: curtains, the sill, and the watcher's head and shoulders
@@ -1497,7 +1509,7 @@ const RECMAPS = (function () {
     "r1-mi": "A double agent's room in London at night, 1939: a suitcase radio transmitter open on a table, a hand tapping a Morse key, headphones, a bare bulb, and rain on a window showing the Big Ben clock tower.",
     "r3-fa": "A lane above the harbour of Brest on the dark night of 11 February 1942: a French Resistance courier with his bicycle against a stone wall and a folded note in his hand watches three unlit German warships slip out to sea under a low haze. The haze drifts, the water glints and a far lamp blinks.",
     "r3-ul": "Harsh desert daylight, January 1942: three British Eighth Army soldiers behind a sandbag wall, one with binoculars, one pointing, one crouching with a rifle, beside a radio aerial with a pennant and a stone-painted truck, as German tanks come out of the dust.",
-    "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A German Opel Blitz army truck in field grey, with a small black cross on its door and helmeted soldiers in the back, slows at door A, drives on, and stops at door B. The soldiers jump down and stand guard while two men in hats push in through the lit doorway, then climb back in before the truck pulls away. The leak runs through B.",
+    "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A German Opel Blitz army truck in field grey, with a small black cross on its door and helmeted soldiers in the back, slows at door A, drives on, and stops at door B. The soldiers, in grey German uniforms and steel helmets, jump down and stand guard while a man in a hat pushes in through the lit doorway, then file into the house one by one. The door closes and the truck drives away empty. The leak runs through B.",
     "r4-mi": "Garbo's desk in London, 1942: a typewriter typing a report, letters with a red seal, a desk lamp, and a wall map of Britain with pins marking imaginary agents.",
     "r4-ul": "Dawn on a Malta airfield, 1942, below limestone roofs, a dome and a bell tower: ground crew wave off a twin-engine RAF reconnaissance plane, propellers turning, while bombers wait behind a blast wall. The scout goes first so the enemy thinks it found the convoy by chance.",
     "r5-bp": "Night in a Bletchley Park hut, April 1943: an analyst at a lamp-lit table writes up a German decrypt beside a steaming mug, a teleprinter feeds paper, and the wall map shows German arrows moving toward Sardinia and Greece, the false targets Germany believed.",
