@@ -1,9 +1,8 @@
-  // ---- "Landfall", Huelva, 30 April 1943: one scene, one day. Night: HMS Seraph surfaces far out, the canister goes over the
-  //      side, the submarine slips away. Before dawn: a shape in a life jacket drifts in. Dawn: a Spanish fisherman hooks it and
-  //      brings it to the beach. Morning: Major Martin's briefcase lies on the sand on its chain; a Spanish officer picks it up
-  //      while a man in a trilby watches from the dunes through binoculars, then turns away. Dusk, and round again.
+  // ---- "Landfall", off Huelva, 30 April 1943: one scene, one day, all at sea. Night: HMS Seraph surfaces far out, the canister goes
+  //      over the side, the submarine slips away. Before dawn: a shape in a life jacket drifts in. Dawn: a Spanish fishing boat of the
+  //      1940s comes alongside and the fisherman hooks it aboard. Morning: the boat sails off along the coast toward Huelva. Dusk.
   //      Everything changes with the light, so it all runs on one channel (zt): 36 states x 6 = 216 ticks (18 s).
-  //      State 0 = morning: the officer bending to the briefcase, the watcher on the dune. HOLD: zt: 6
+  //      State 0 = morning: the fishing boat heading for port with the find aboard. HOLD: zt: 6
   CH.landfall = { zt: 36 };
   S.landfall = (p) => {
     const c = Cv(160, 70, "K"), s = p.zt || 0;
@@ -35,34 +34,20 @@
     // ---- before dawn and dawn: the shape in its life jacket drifting in; the fishing boat
     const jacket = (x, y) => { c.e(x, y, 2, 1, L >= 2 ? "A" : "m"); c.p(x - 2, y, L >= 2 ? "s" : "r"); };
     if (s >= 20 && s <= 30) { const k = Math.min(s, 28) - 20; jacket(60 + Math.round(k * 3.5), 36 + (k >> 1)); }
-    const boat = (bx, by, held) => { c.poly([[bx, by], [bx + 20, by], [bx + 17, by + 3], [bx + 3, by + 3]], "s"); c.l(bx, by, bx + 20, by, "m");
-      c.r(bx + 9, by - 9, bx + 9, by - 1, "s"); c.poly([[bx + 10, by - 8], [bx + 15, by - 2], [bx + 10, by - 2]], "W");
-      c.r(bx + 4, by - 4, bx + 5, by - 1, "E"); c.r(bx + 3, by - 5, bx + 6, by - 5, "W"); c.p(bx + 4, by - 6, "m");          // the fisherman
-      c.r(bx + 15, by - 3, bx + 16, by - 1, "C"); c.r(bx + 14, by - 4, bx + 17, by - 4, "s");                              // his mate
-      if (held) c.e(bx + 11, by - 1, 2, 1, "A"); };
-    if (s >= 28 && s <= 31) { const bx = [150, 124, 100, 92][s - 28]; boat(bx, 40, false); if (s === 31) c.l(bx + 5, 37, bx - 2, 39, "s"); }   // comes alongside; the boathook
-    if (s >= 32 && s <= 35) { const k = s - 32; boat([86, 80, 74, 70][k], [41, 43, 45, 47][k], true); }                 // brings it to the beach
-    // ---- morning: the boat drawn up, the briefcase on the sand, the Spanish officer, the watcher on the dune
-    if (s <= 7) {
-      boat(70, 47, true);
-      const caseOnSand = s <= 2;
-      const brief = (x, y) => { c.r(x, y, x + 6, y + 3, "K"); c.r(x, y, x + 6, y, "H"); c.r(x + 2, y - 1, x + 4, y - 1, "H"); c.p(x + 3, y + 1, "A"); c.r(x + 1, y - 2, x + 3, y - 1, "W"); c.p(x + 2, y - 2, "R"); };   // briefcase, a sealed letter showing
-      if (caseOnSand) { brief(83, 59); for (let k = 0; k < 6; k++) c.p(91 + k, 60 + (k % 2), "g"); }                // on the sand, on its chain
-      // the officer of the Guardia Civil: black tricorn hat, green uniform with a white cross-strap; kneels for the case, then carries it off
-      const ox = s <= 5 ? 98 : s === 6 ? 92 : 86, kneel = s <= 2, d = kneel ? 4 : 0;
-      c.r(ox - 4, 46 + d, ox + 4, 47 + d, "K"); c.r(ox - 2, 44 + d, ox + 2, 45 + d, "K"); c.p(ox + 4, 45 + d, "K"); c.p(ox - 4, 45 + d, "K");   // tricorn hat
-      c.r(ox - 2, 48 + d, ox + 1, 51 + d, "m"); c.r(ox - 2, 48 + d, ox - 1, 51 + d, "l"); c.p(ox - 2, 49 + d, "K");                          // face, lit side, eye
-      c.r(ox - 3, 52 + d, ox + 3, 59 + d, "O"); c.r(ox + 3, 52 + d, ox + 3, 59 + d, "E"); c.l(ox - 3, 52 + d, ox + 2, 57 + d, "W"); c.r(ox - 3, 58 + d, ox + 3, 58 + d, "K");   // tunic, shade, cross-strap, belt
-      if (kneel) { c.r(ox - 7, 61, ox - 1, 62, "E"); c.r(ox - 7, 63, ox - 6, 64, "E"); c.r(ox + 1, 62, ox + 4, 64, "E"); c.r(ox - 8, 64, ox - 6, 64, "K"); c.r(ox + 4, 64, ox + 5, 64, "K");   // one knee down
-        c.l(ox - 3, 56, ox - 7, 59, "O"); c.r(ox - 8, 59, ox - 7, 60, "l"); }                                                                  // reaching for the case
-      else { c.r(ox - 2, 60, ox - 1, 63, "E"); c.r(ox + 1, 60, ox + 2, 63, "E"); c.r(ox - 3, 64, ox - 1, 64, "K"); c.r(ox + 1, 64, ox + 3, 64, "K");
-        brief(ox - 10, 57); c.l(ox - 3, 54, ox - 4, 57, "O"); c.p(ox - 4, 57, "l"); }                                                         // standing, the case in his hand
-      // the watcher on the dune: trilby, light suit; binoculars up, then lowered as he turns away
-      const wx = 142, wy = 43, up = s <= 5;
-      c.r(wx - 2, wy - 12, wx + 2, wy - 1, "g"); c.r(wx - 2, wy - 12, wx - 2, wy - 1, "H"); c.r(wx - 1, wy, wx - 1, wy + 1, "E"); c.r(wx + 1, wy, wx + 1, wy + 1, "E");   // light suit, legs
-      c.r(wx - 1, wy - 16, wx + 1, wy - 13, "m"); c.r(wx - 3, wy - 17, wx + 3, wy - 17, "s"); c.r(wx - 1, wy - 19, wx + 1, wy - 18, "s");   // face, trilby
-      if (up) { c.r(wx - 5, wy - 16, wx - 2, wy - 15, "K"); c.p(wx - 6, wy - 16, s % 2 ? "W" : "C"); c.l(wx - 2, wy - 11, wx - 4, wy - 15, "g"); }   // binoculars on the beach below
-      else { c.l(wx + 2, wy - 11, wx + 3, wy - 6, "g"); c.r(wx + 3, wy - 6, wx + 4, wy - 5, "K"); }                       // lowered; he turns to go
-    }
+    const boat = (bx, by, held, hook) => {   // a 1940s inshore fishing boat: tarred hull, high bow, white strake, red waterline, wheelhouse, lateen yard, nets
+      const r = s % 2;
+      c.poly([[bx, by - 4 + r], [bx + 3, by - 1 + r], [bx + 29, by - 1 - r], [bx + 30, by - 3 - r], [bx + 30, by + 1 - r], [bx + 27, by + 3 - r], [bx + 4, by + 3 + r]], "E");   // hull
+      c.l(bx, by - 4 + r, bx + 3, by - 1 + r, "W"); c.l(bx + 3, by - 1 + r, bx + 29, by - 1 - r, "W"); c.l(bx + 4, by + 2 + r, bx + 27, by + 2 - r, "R");   // strake, waterline
+      c.r(bx + 18, by - 8 - r, bx + 24, by - 2 - r, "W"); c.r(bx + 17, by - 9 - r, bx + 25, by - 9 - r, "r"); c.r(bx + 19, by - 7 - r, bx + 21, by - 6 - r, "E");   // wheelhouse
+      c.l(bx + 11, by - 15, bx + 11, by - 2, "s"); c.l(bx + 4, by - 11, bx + 17, by - 16, "s"); c.l(bx + 5, by - 12, bx + 16, by - 16, "m");   // mast, lateen yard with the sail furled
+      c.r(bx + 26, by - 3 - r, bx + 29, by - 2 - r, "C"); c.p(bx + 27, by - 4 - r, "C");                                    // nets piled at the stern
+      c.r(bx + 5, by - 6 + r, bx + 6, by - 2 + r, "N"); c.r(bx + 5, by - 8 + r, bx + 6, by - 7 + r, "m"); c.r(bx + 4, by - 9 + r, bx + 7, by - 9 + r, "E");   // fisherman at the bow, flat cap
+      c.r(bx + 15, by - 6 - r, bx + 16, by - 2 - r, "W"); c.r(bx + 15, by - 8 - r, bx + 16, by - 7 - r, "m"); c.r(bx + 14, by - 9 - r, bx + 17, by - 9 - r, "E");   // his mate by the wheelhouse
+      if (hook) c.l(bx + 4, by - 5, bx - 4, by - 1, "s");                                                                    // the boathook
+      if (held) { c.e(bx + 10, by - 2, 2, 1, "A"); c.p(bx + 8, by - 2, "s"); } };                                       // the find, aboard
+    if (s >= 28 && s <= 31) { const bx = [150, 124, 100, 92][s - 28]; boat(bx, 40, false, s === 31); }                // comes alongside; the boathook
+    if (s >= 32 && s <= 35) { const k = s - 32; boat([84, 76, 68, 60][k], [41, 42, 43, 44][k], true, false); }          // the find aboard, turning for port
+    // ---- morning: the boat sails off along the coast toward Huelva and out of the picture
+    if (s <= 7) boat(54 - s * 12, 44, true, false);
     return c;
   };
