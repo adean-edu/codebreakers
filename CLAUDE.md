@@ -39,6 +39,8 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 | `style.css` | All styles. It's layered, and later rules override earlier ones. The current theme is the original dark look ("Stable 3" style). Desktop only: students play on computers, and mobile layout no longer matters. |
 | `studio.js`, `studio.css` | Asset Studio page. |
 
+**Redrawing a map image:** follow `maps/redraw/STEPS.md` (method, data sources, projection and scale math, house style, swap-in steps). `maps/redraw/assets/` has optional parchment textures.
+
 `maps/` holds a Node + Playwright renderer (`render.js`, `specs.js`, hand-traced `coast.js`) that drew the scenario maps in the teacher's vintage style. Run `node maps/go.js r3-fa` to render to `maps/out/`. Most scenario slots now use the teacher's own images instead.
 
 ## How a round works
