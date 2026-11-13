@@ -11,7 +11,8 @@
     const LX = 27, LY = 10;                                                                                        // the lamp
     // night sky over the rooftops: a barrage balloon, a searchlight
     c.sky(0, 13, [["D", 3], ["Q", 8], ["N", 14]]);   // deep night blue, so the blacked-out rooftops show against it stars(c, 6, 91);
-    const ang = [-.6, -.4, -.2, 0, .2, 0, -.2, -.4][sb]; for (let t = 0; t < 16; t++) { const x = 92 + Math.round(Math.sin(ang) * t * 2.2), y = 13 - t; if (y >= 0) { c.p(x, y, "C"); c.p(x + 1, y, "C"); } }
+    const ang = [-.6, -.4, -.2, 0, .2, 0, -.2, -.4][sb]; for (let t = 0; t < 16; t++) { const x = 92 + Math.round(Math.sin(ang) * t * 2.2), y = 13 - t, w = 1 + (t >> 2); if (y < 0) continue;   // a bright searchlight, widening as it climbs
+      for (let k = -w; k <= w + 1; k++) { const edge = k === -w || k === w + 1, core = Math.abs(k - .5) < 1.5; c.p(x + k, y, core ? (t < 9 ? "W" : "g") : edge ? ((x + k + y) % 2 ? "B" : "N") : "g"); } }
     c.e(128, 4, 7, 2.4, "H"); c.r(122, 3, 133, 3, "g"); c.poly([[134, 3], [138, 1], [138, 6], [134, 5]], "C"); c.l(127, 7, 125, 13, "C");   // barrage balloon on its cable
     // London beyond the wall, blacked out: terrace roofs with chimney pots, an office block, a church spire, a pitched roof
     const roofs = [[0, 15, 8], [34, 52, 4], [60, 75, 9], [142, 159, 7]];
