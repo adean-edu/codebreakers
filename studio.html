@@ -294,7 +294,7 @@ const DATA = (function () {
       tl: { d: "1942", t: "Resistance networks hunt for traitors in their ranks", k: 1942.05 },
       sitrep: ["1942. Somewhere in your network, there is a leak. Twice now, the Germans have raided a safe house the day after a meeting was planned there.",
         "London has a plan to find the traitor: give different people slightly different stories, then watch which story the Germans act on. It is clever, and it is dangerous for everyone who carries the bait."] },
-    "MI-3": { title: "Garbo's Imaginary Spies", date: "1942", place: "London", scene: "madrid", word: "GARBO", img: "r4-mi",
+    "MI-3": { title: "Garbo's Imaginary Spies", date: "1942", place: "London", scene: "shadows", word: "GARBO", img: "r4-mi",
       tl: { d: "Apr 1942", t: "Garbo arrives in Britain to work for MI5", k: 1942.04 },
       sitrep: ["1942. A Spanish man named Juan Pujol García has fooled German intelligence for a year. He told them he was running a network of spies across Britain. Every one of those spies was invented.",
         "Now MI5 runs him, and Germany pays for the whole imaginary network. Each new fake agent makes the story bigger and more useful, and each one is something new that has to stay believable."] },
@@ -1231,6 +1231,73 @@ const ART = (function () {
     else if (mt >= 22) { sheet(126, 39, false); stamp(130, 32); c.l(137, 34, 133, 29, "H"); }                         // laid down, the stamp raised
     return c;
   };
+  // ---- (built in from concepts/scene-r4-mi/shadows.block.js, teacher's choice 2026-11-13)
+  // ---- "One Man, Many Shadows", London, 1942: Garbo under a street lamp; on the brick wall behind him his shadow is joined,
+  //      one by one, by the shadows of his imaginary agents (a sailor, a soldier, a woman, a waiter, a workman), each with a small
+  //      move of its own, and last by a German officer looking back at them all: the Germans believed every one. Then they all
+  //      fade back into the one man who invented them. Rain, a barrage balloon, a searchlight.
+  //      Loop: sh 16x6, ra 8x1, lf 4x6, ce 2x12, sb 8x6 -> every period divides 96 ticks (8 s). State 0 = everyone on the wall.
+  //      HOLD: sh: 6, ra: 1, lf: 6, ce: 12, sb: 6
+  CH.shadows = { sh: 16, ra: 8, lf: 4, ce: 2, sb: 8 };
+  const SHADE = { l: "m", m: "s", s: "r", r: "E", A: "m", W: "g", g: "H", H: "C", C: "E", E: "D", D: "K", K: "K", R: "r", B: "N", N: "Q", Q: "K", O: "E", V: "O", G: "O" };
+  S.shadows = (p) => {
+    const c = Cv(160, 70, "K"), sh = p.sh || 0, ra = p.ra || 0, lf = p.lf || 0, ce = p.ce || 0, sb = p.sb || 0;
+    const LX = 27, LY = 10;                                                                                        // the lamp
+    // night sky over the rooftops: a barrage balloon, a searchlight
+    c.sky(0, 13, [["D", 3], ["Q", 8], ["N", 14]]);   // deep night blue, so the blacked-out rooftops show against it stars(c, 6, 91);
+    const ang = [-.6, -.4, -.2, 0, .2, 0, -.2, -.4][sb]; for (let t = 0; t < 16; t++) { const x = 92 + Math.round(Math.sin(ang) * t * 2.2), y = 13 - t, w = 1 + (t >> 2); if (y < 0) continue;   // a bright searchlight, widening as it climbs
+      for (let k = -w; k <= w + 1; k++) { const edge = k === -w || k === w + 1, core = Math.abs(k - .5) < 1.5; c.p(x + k, y, core ? (t < 9 ? "W" : "g") : edge ? ((x + k + y) % 2 ? "B" : "N") : "g"); } }
+    c.e(128, 4, 7, 2.4, "H"); c.r(122, 3, 133, 3, "g"); c.poly([[134, 3], [138, 1], [138, 6], [134, 5]], "C"); c.l(127, 7, 125, 13, "C");   // barrage balloon on its cable
+    // London beyond the wall, blacked out: terrace roofs with chimney pots, an office block, a church spire, a pitched roof
+    const roofs = [[0, 15, 8], [34, 52, 4], [60, 75, 9], [142, 159, 7]];
+    roofs.forEach(([a, b, top]) => c.r(a, top, b, 13, "K"));
+    [[3, 5], [10, 6], [146, 4], [153, 4]].forEach(([x, top]) => { c.r(x, top, x + 2, 8, "K"); c.p(x, top - 1, "K"); c.p(x + 2, top - 1, "K"); });   // chimney stacks and pots
+    c.r(34, 3, 52, 3, "D"); c.r(41, 1, 44, 3, "K"); [37, 42, 47].forEach((x) => c.r(x, 6, x + 2, 8, "D")); c.p(48, 10, "C");   // office block: parapet, lift housing, dark windows, one chink of light
+    c.poly([[60, 9], [67.5, 4], [75, 9]], "K"); c.r(66, 3, 68, 5, "K");                                                    // pitched roof with a chimney
+    c.r(99, 5, 105, 13, "K"); c.poly([[99, 5], [102, 0], [105, 5]], "K"); c.p(102, 0, "D"); c.r(101, 8, 103, 10, "D");      // church tower and spire, a dark louvre
+    c.r(106, 9, 118, 13, "K"); c.r(110, 7, 111, 9, "K");                                                                  // the church roof running back
+    // brick wall, lit from the lamp
+    const lvl = (x, y) => { const d = Math.hypot((x - LX) * .62, (y - LY) * 1.1); return d < 40 ? 2 : d < 82 ? 1 : 0; };   // the light reaches along the wall, where the shadows fall
+    for (let y = 14; y <= 58; y++) for (let x = 0; x < 160; x++) {
+      const row = (y - 14) >> 2, mortar = (y - 14) % 4 === 3 || (x + (row % 2) * 4) % 8 === 7, L = lvl(x, y);
+      c.p(x, y, mortar ? ["D", "s", "m"][L] : (y - 14) % 4 === 0 && L === 2 ? "m" : ["E", "r", "s"][L]); }
+    // pavement and kerb, the pool of lamp light
+    c.r(0, 59, 159, 69, (x, y) => (Math.abs(x - LX) < 22 - (y - 59) && (x + y) % 2 === 0 ? "H" : "C")); c.r(0, 59, 159, 59, "H");
+    for (let x = 6; x < 160; x += 14) c.r(x, 60, x, 69, "E"); c.r(0, 65, 159, 65, "E");
+    // the shadows on the wall: Garbo's own, then his imaginary agents, appearing one by one and fading back
+    const dk = (x, y) => { const v = c.c[y] && c.c[y][x]; if (v) c.c[y][x] = SHADE[SHADE[v]] || "K"; };
+    const R = (x0, y0, x1, y1) => { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) dk(x, y); };
+    const yb = 58, KINDS = {
+      man: (x) => { R(x - 3, yb - 27, x + 3, yb - 27); R(x - 2, yb - 29, x + 2, yb - 28); R(x - 2, yb - 26, x + 1, yb - 23); R(x - 3, yb - 22, x + 3, yb - 6); R(x - 4, yb - 12, x + 4, yb - 6); R(x - 2, yb - 5, x - 1, yb); R(x + 1, yb - 5, x + 2, yb); },   // hat and overcoat
+      sailor: (x, q) => { R(x - 3, yb - 28, x + 3, yb - 27); R(x - 2, yb - 26, x + 1, yb - 23); R(x - 4, yb - 22, x + 4, yb - 20); R(x - 3, yb - 19, x + 3, yb - 11); R(x - 3, yb - 10, x - 1, yb); R(x + 1, yb - 10, x + 3, yb); R(x - 4, yb - 2, x - 1, yb); R(x + 1, yb - 2, x + 4, yb);
+        if (q) { R(x + 4, yb - 27, x + 5, yb - 21); dk(x + 3, yb - 28); } },                                          // flat cap, collar, bell-bottoms; touches his cap
+      soldier: (x, q) => { R(x - 4, yb - 26, x + 4, yb - 26); R(x - 2, yb - 28, x + 2, yb - 27); R(x - 2, yb - 25, x + 1, yb - 22); R(x - 3, yb - 21, x + 3, yb - 8); R(x - 2, yb - 7, x - 1, yb); R(x + 1, yb - 7, x + 2, yb);
+        for (let k = 0; k < 12; k++) dk(x + 4 + (q ? k >> 3 : k >> 2), yb - 19 - k); },                              // tin hat; shifts the rifle on his shoulder
+      woman: (x, q) => { R(x - 4, yb - 26, x + 4, yb - 26); R(x - 2, yb - 28, x + 2, yb - 27); R(x - 2, yb - 25, x + 1, yb - 22); R(x - 2, yb - 21, x + 2, yb - 14); R(x - 3, yb - 13, x + 3, yb - 8); R(x - 4, yb - 7, x + 4, yb - 5);
+        for (let y = yb - 4; y <= yb; y++) { dk(x - 1, y); dk(x + 1, y); } R(x + 4, yb - 14, x + 6, yb - 11); if (q) R(x - 6, yb - 18, x - 3, yb - 17); else R(x - 3, yb - 20, x - 3, yb - 14); },   // wide-brimmed hat, skirt, handbag; checks her watch
+      waiter: (x, q) => { const t = q ? 2 : 0; R(x - 2, yb - 27, x + 1, yb - 22); R(x - 3, yb - 21, x + 3, yb - 11); R(x - 2, yb - 10, x - 1, yb); R(x + 1, yb - 10, x + 2, yb); R(x + 4, yb - 26 - t, x + 4, yb - 19); R(x + 2, yb - 27 - t, x + 8, yb - 27 - t); dk(x + 5, yb - 29 - t); dk(x + 6, yb - 29 - t); dk(x + 5, yb - 28 - t); },   // lifts his tray
+      worker: (x, q) => { R(x - 2, yb - 27, x + 2, yb - 26); R(x - 4, yb - 26, x - 3, yb - 26); R(x - 2, yb - 25, x + 1, yb - 22); R(x - 3, yb - 21, x + 3, yb - 9); R(x - 2, yb - 8, x - 1, yb); R(x + 1, yb - 8, x + 2, yb);
+        if (q) { R(x + 5, yb - 21, x + 8, yb - 18); dk(x + 4, yb - 21); dk(x + 4, yb - 20); } else { R(x + 4, yb - 18, x + 7, yb - 15); dk(x + 4, yb - 19); } },   // flat cap with peak; swings his tool bag
+      officer: (x) => { R(x - 3, yb - 29, x + 2, yb - 28); dk(x - 3, yb - 30); dk(x - 2, yb - 30); R(x - 3, yb - 27, x + 2, yb - 27); R(x - 6, yb - 26, x - 3, yb - 26); R(x - 2, yb - 26, x + 1, yb - 22);   // peaked cap, visor toward the others
+        R(x - 3, yb - 21, x + 3, yb - 8); R(x - 4, yb - 7, x + 4, yb - 3); R(x + 3, yb - 17, x + 4, yb - 13); R(x - 2, yb - 2, x - 1, yb); R(x + 1, yb - 2, x + 2, yb); } };   // long greatcoat, hands behind his back, boots
+    const PEOPLE = [["man", 55], ["sailor", 66], ["soldier", 77], ["woman", 89], ["waiter", 99], ["worker", 111], ["officer", 126]];
+    const vis = [6, 6, 6, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5][sh];                                        // up one at a time, all of them together, then down
+    PEOPLE.forEach(([k, x], i) => { if (i <= vis) KINDS[k](x, (sh + i) % 2); });
+    // the lamp post and its lantern, flickering a little
+    c.r(26, 14, 28, 62, "K"); c.r(27, 14, 27, 62, "E"); c.r(24, 60, 30, 63, "K"); c.r(22, 13, 32, 13, "K");
+    c.poly([[23, 5], [31, 5], [30, 12], [24, 12]], "K"); c.r(25, 6, 29, 11, lf === 2 ? "m" : "A"); c.r(26, 7, 28, 10, lf === 1 ? "A" : "W"); c.r(24, 3, 30, 4, "K"); c.p(27, 2, "K");
+    // Garbo, under the lamp: hat, overcoat with the collar up, smoking; lit from the left
+    const gx = 42, gy = 66;
+    c.r(gx - 4, gy - 25, gx + 4, gy - 25, "K"); c.r(gx - 2, gy - 28, gx + 2, gy - 26, "K"); c.r(gx - 2, gy - 26, gx + 2, gy - 26, "E");   // fedora with its band
+    c.r(gx - 2, gy - 24, gx + 2, gy - 20, "m"); c.r(gx - 2, gy - 24, gx - 1, gy - 20, "l"); c.p(gx + 1, gy - 22, "K"); c.r(gx - 1, gy - 20, gx + 1, gy - 20, "s");   // face, lit side, eye, moustache
+    c.r(gx - 4, gy - 19, gx + 4, gy - 4, "C"); c.r(gx - 4, gy - 19, gx - 3, gy - 4, "H"); c.r(gx + 3, gy - 19, gx + 4, gy - 4, "E");   // overcoat, lit and shaded edges
+    c.r(gx - 3, gy - 19, gx - 2, gy - 17, "E"); c.r(gx + 2, gy - 19, gx + 3, gy - 17, "E"); c.r(gx - 4, gy - 11, gx + 4, gy - 11, "E");   // turned-up collar, belt
+    c.r(gx - 2, gy - 3, gx - 1, gy, "E"); c.r(gx + 1, gy - 3, gx + 2, gy, "E"); c.r(gx - 3, gy, gx - 1, gy, "K"); c.r(gx + 1, gy, gx + 3, gy, "K");   // legs, shoes
+    c.r(gx + 3, gy - 21, gx + 5, gy - 21, "W"); c.p(gx + 6, gy - 21, ce ? "A" : "R"); if (ce) { c.p(gx + 7, gy - 23, "H"); c.p(gx + 8, gy - 25, "C"); }   // cigarette, ember glowing on each draw
+    // rain over everything
+    for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + ra * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 69) c.p(x - (k >> 1), y0 + k, lvl(x, y0) === 2 ? "g" : "H"); }
+    return c;
+  };
   // ---- The Mediterranean by day, 1942: a supply convoy, and a spotter plane that gives the strike its cover story
   CH.medconvoy = { pl: 10, w: 4, sm: 4 };
   S.medconvoy = (p) => {
@@ -1276,7 +1343,7 @@ const ART = (function () {
     const a = -.15 + fl * .05; for (let t = 4; t < 44; t++) for (let s = -t / 6; s <= t / 6; s += 1) { const x = hx + 8 + Math.cos(a) * t - Math.sin(a) * s, y = hy - 5 + Math.sin(a) * t + Math.cos(a) * s * .6; if ((Math.round(x) + Math.round(y)) % 2 === 0) { const q = c.c[Math.round(y)] && c.c[Math.round(y)][Math.round(x)]; c.p(x, y, q === "H" ? "W" : q === "C" ? "g" : t < 24 ? "g" : "H"); } }   // flashlight beam
     return c;
   };
-  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 2, rv: 4, rd: 6, lt: 2, pl: 3, fm: 3, gl: 2, sk: 6, ws: 8, ll: 12, pa: 12, st: 8, va: 4, vb: 6, vc: 6, vd: 12, ve: 24, ma: 2, mb: 4, mc: 12, md: 12, ba: 6, bb: 8, bc: 6, bd: 8, be: 6, bf: 12, xa: 12, xb: 6, xc: 8, mt: 4, lw: 6, mf: 6 }, cacheS = {};
+  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 2, rv: 4, rd: 6, lt: 2, pl: 3, fm: 3, gl: 2, sk: 6, ws: 8, ll: 12, pa: 12, st: 8, va: 4, vb: 6, vc: 6, vd: 12, ve: 24, ma: 2, mb: 4, mc: 12, md: 12, ba: 6, bb: 8, bc: 6, bd: 8, be: 6, bf: 12, xa: 12, xb: 6, xc: 8, mt: 4, lw: 6, mf: 6, sh: 6, ra: 1, lf: 6, ce: 12, sb: 6 }, cacheS = {};
   // the panning background is rasterised once so the browser can slide a single image smoothly
   function intPan() {
     const g = intBG().c, H = g.length, W = g[0].length;
@@ -1590,7 +1657,7 @@ const RECMAPS = (function () {
     "r3-fa": "A lane above the harbour of Brest on the dark night of 11 February 1942: a French Resistance courier with his bicycle against a stone wall and a folded note in his hand watches three unlit German warships slip out to sea under a low haze. The haze drifts, the water glints and a far lamp blinks.",
     "r3-ul": "Harsh desert daylight, January 1942: three Afrika Korps soldiers in long-peaked field caps with goggles and olive tropical tunics wait behind a sandbag wall watching the column go by: one leans on the sandbags with his rifle propped beside him, one stands with his arms folded, one smokes, beside a radio aerial with a pennant and a German Opel Blitz truck in sand and grey-green camouflage, as a column of German tanks in the same sand and grey-green camouflage rolls out of the dust.",
     "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A German Opel Blitz army truck in field grey, with a small black cross on its door and helmeted soldiers in the back, slows at door A, drives on, and stops at door B. The soldiers, in grey German uniforms and steel helmets, jump down and stand guard while a man in a hat pushes in through the lit doorway, then file into the house one by one. The door closes and the truck drives away empty. The leak runs through B.",
-    "r4-mi": "A split screen, 1942. Left, LONDON at night: Garbo seals a letter at his desk, with the clock tower and a searchlight in the window, and slides it out of the frame. Right, MADRID, in a warm wood-panelled office: the same letter arrives on a German intelligence officer's desk. He reads it, stamps it and files it in a folder marked ARABEL (the Germans' code name for Garbo), and another pin lights up on his map of Britain.",
+    "r4-mi": "A London street at night, 1942, below blacked-out rooftops, a church spire, a barrage balloon and a sweeping searchlight. Garbo stands smoking under a street lamp in hat and overcoat. On the lit brick wall behind him his shadow is joined one by one by the shadows of his imaginary agents (a sailor, a soldier, a woman with a handbag, a waiter, a workman), each with a small move of its own, and last by a German officer looking back at them all. Then they fade back to his alone. Rain falls.",
     "r4-ul": "Dawn on a Malta airfield, 1942, below limestone roofs, a dome and a bell tower: ground crew wave off a twin-engine RAF reconnaissance plane, propellers turning, while bombers wait behind a blast wall. The scout goes first so the enemy thinks it found the convoy by chance.",
     "r5-bp": "Night in a Bletchley Park hut, April 1943: an analyst at a lamp-lit table writes up a German decrypt beside a steaming mug, a teleprinter feeds paper, and the wall map shows German arrows moving toward Sardinia and Greece, the false targets Germany believed.",
     "r5-mi": "A lamp-lit desk at night, April 1943, where the planners build the fake officer \"Major Martin\": the briefcase and its chain, forged letters, a photo of his \"fiancée\" Pam, theatre ticket stubs, keys and coins. A hand writes and cigarette smoke curls.",
