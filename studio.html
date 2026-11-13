@@ -911,11 +911,16 @@ const ART = (function () {
       for (let k = -1; k < 4; k++) for (let j = 0; j < len; j++) c.p(x0 + 48 * k - 6 * vc + j, y, t); }
     // German tanks, a column at long range moving left (period 12 px)
     const fade = (x, y, col) => { if (BAY[y & 3][x & 3] / 16 < Math.max(0, Math.min(1, (x - 14) / 20))) c.p(x, y, col); };
-    const tank = (x, y) => { for (let i = -4; i <= 9; i++) { if (i <= 1) fade(x + i, y + 1, "H");
-        if (i >= 2 && i <= 6) { fade(x + i, y + 1, "C"); if (i >= 3 && i <= 5) fade(x + i, y, "H"); }
-        if (i >= 1) fade(x + i, y + 2, "C"); if (i >= 0) fade(x + i, y + 3, i % 2 ? "H" : "E"); }
-      fade(x + 1, y + 2, "H"); fade(x + 9, y + 2, "H"); };
-    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 36); tank(24 * k + 20 - va, 31); }
+    // panzers in Afrika Korps sand with grey-green patches, like the truck; columns -6..12 from x, rows y..y+5; gun pointing the way they roll
+    const TANK = [
+      "         sssss       ",
+      "EEEEEEEEsmlOmms      ",
+      "        smmmOOs      ",
+      "     smmmOOOmmmmlmmms",
+      "     sssssssssOOssss ",
+      "      EKEKEKEKEKEKE  "];
+    const tank = (x, y) => TANK.forEach((row, r) => { for (let i = 0; i < row.length; i++) if (row[i] !== " ") fade(x + i - 6, y + r, row[i]); });
+    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 34); tank(24 * k + 20 - va, 29); }
     // the dust wall: thin on the left, solid on the right, billowing on top
     for (let y = 0; y <= 40; y++) for (let x = 0; x < 160; x++) {
       const a = Math.max(0, Math.min(1, (x - 92) / 44)); let top = 12 + (1 - a) * 18; if (top < 26) top += Math.round(1.6 * Math.sin(x / 6 + vd * Math.PI / 2));
@@ -1522,7 +1527,7 @@ const RECMAPS = (function () {
     "r1-nv": "A US Navy codebreaking office in Washington at night, 1939: a punch-card sorting machine with cards running through it, stacks of red code books, a blackboard of five-digit number groups, and the Capitol dome through the window.",
     "r1-mi": "A double agent's room in London at night, 1939: a suitcase radio transmitter open on a table, a hand tapping a Morse key, headphones, a bare bulb, and rain on a window showing the Big Ben clock tower.",
     "r3-fa": "A lane above the harbour of Brest on the dark night of 11 February 1942: a French Resistance courier with his bicycle against a stone wall and a folded note in his hand watches three unlit German warships slip out to sea under a low haze. The haze drifts, the water glints and a far lamp blinks.",
-    "r3-ul": "Harsh desert daylight, January 1942: three Afrika Korps soldiers in long-peaked field caps with goggles and olive tropical tunics wait behind a sandbag wall watching the column go by: one leans on the sandbags with his rifle propped beside him, one stands with his arms folded, one smokes, beside a radio aerial with a pennant and a German Opel Blitz truck in sand and grey-green camouflage, as a column of German tanks rolls out of the dust.",
+    "r3-ul": "Harsh desert daylight, January 1942: three Afrika Korps soldiers in long-peaked field caps with goggles and olive tropical tunics wait behind a sandbag wall watching the column go by: one leans on the sandbags with his rifle propped beside him, one stands with his arms folded, one smokes, beside a radio aerial with a pennant and a German Opel Blitz truck in sand and grey-green camouflage, as a column of German tanks in the same sand and grey-green camouflage rolls out of the dust.",
     "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A German Opel Blitz army truck in field grey, with a small black cross on its door and helmeted soldiers in the back, slows at door A, drives on, and stops at door B. The soldiers, in grey German uniforms and steel helmets, jump down and stand guard while a man in a hat pushes in through the lit doorway, then file into the house one by one. The door closes and the truck drives away empty. The leak runs through B.",
     "r4-mi": "Garbo's desk in London, 1942: a typewriter typing a report, letters with a red seal, a desk lamp, and a wall map of Britain with pins marking imaginary agents.",
     "r4-ul": "Dawn on a Malta airfield, 1942, below limestone roofs, a dome and a bell tower: ground crew wave off a twin-engine RAF reconnaissance plane, propellers turning, while bombers wait behind a blast wall. The scout goes first so the enemy thinks it found the convoy by chance.",

@@ -1208,11 +1208,16 @@ const ART = (function () {
       for (let k = -1; k < 4; k++) for (let j = 0; j < len; j++) c.p(x0 + 48 * k - 6 * vc + j, y, t); }
     // German tanks, a column at long range moving left (period 12 px)
     const fade = (x, y, col) => { if (BAY[y & 3][x & 3] / 16 < Math.max(0, Math.min(1, (x - 14) / 20))) c.p(x, y, col); };
-    const tank = (x, y) => { for (let i = -4; i <= 9; i++) { if (i <= 1) fade(x + i, y + 1, "H");
-        if (i >= 2 && i <= 6) { fade(x + i, y + 1, "C"); if (i >= 3 && i <= 5) fade(x + i, y, "H"); }
-        if (i >= 1) fade(x + i, y + 2, "C"); if (i >= 0) fade(x + i, y + 3, i % 2 ? "H" : "E"); }
-      fade(x + 1, y + 2, "H"); fade(x + 9, y + 2, "H"); };
-    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 36); tank(24 * k + 20 - va, 31); }
+    // panzers in Afrika Korps sand with grey-green patches, like the truck; columns -6..12 from x, rows y..y+5; gun pointing the way they roll
+    const TANK = [
+      "         sssss       ",
+      "EEEEEEEEsmlOmms      ",
+      "        smmmOOs      ",
+      "     smmmOOOmmmmlmmms",
+      "     sssssssssOOssss ",
+      "      EKEKEKEKEKEKE  "];
+    const tank = (x, y) => TANK.forEach((row, r) => { for (let i = 0; i < row.length; i++) if (row[i] !== " ") fade(x + i - 6, y + r, row[i]); });
+    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 34); tank(24 * k + 20 - va, 29); }
     // the dust wall: thin on the left, solid on the right, billowing on top
     for (let y = 0; y <= 40; y++) for (let x = 0; x < 160; x++) {
       const a = Math.max(0, Math.min(1, (x - 92) / 44)); let top = 12 + (1 - a) * 18; if (top < 26) top += Math.round(1.6 * Math.sin(x / 6 + vd * Math.PI / 2));
