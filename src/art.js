@@ -569,7 +569,7 @@ const ART = (function () {
   };
   // ---- (built in from concepts/scene-r3-ul/advance.js, teacher's choice 2026-11-13)
   // ---- January 1942: an Afrika Korps post idles and watches the panzers roll out of a dust storm (truck and uniforms changed to German, 2026-11-13)
-  CH.advance = { va: 24, vb: 4, vc: 8, vd: 4, ve: 2 };
+  CH.advance = { va: 36, vb: 4, vc: 8, vd: 4, ve: 2 };
   const BAY = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
   S.advance = (p) => {
     const c = Cv(160, 70, "K"), va = p.va || 0, vb = p.vb || 0, vc = p.vc || 0, vd = p.vd || 0, ve = p.ve || 0;
@@ -584,13 +584,13 @@ const ART = (function () {
     // panzers in Afrika Korps sand with grey-green patches, like the truck; columns -6..12 from x, rows y..y+5; gun pointing the way they roll
     const TANK = [
       "         sssss       ",
-      "EEEEEEEEsmlOmms      ",
+      "   EEEEEsmlOmms      ",
       "        smmmOOs      ",
       "     smmmOOOmmmmlmmms",
       "     sssssssssOOssss ",
       "      EKEKEKEKEKEKE  "];
     const tank = (x, y) => TANK.forEach((row, r) => { for (let i = 0; i < row.length; i++) if (row[i] !== " ") fade(x + i - 6, y + r, row[i]); });
-    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 34); tank(24 * k + 20 - va, 29); }
+    for (let k = -1; k < 6; k++) { tank(36 * k + 10 - va, 34); tank(36 * k + 28 - va, 29); }   // 36 px apart, rows staggered by 18
     // the dust wall: thin on the left, solid on the right, billowing on top
     for (let y = 0; y <= 40; y++) for (let x = 0; x < 160; x++) {
       const a = Math.max(0, Math.min(1, (x - 92) / 44)); let top = 12 + (1 - a) * 18; if (top < 26) top += Math.round(1.6 * Math.sin(x / 6 + vd * Math.PI / 2));
