@@ -91,15 +91,53 @@ Going forward, use git tags for restore points.
 ## Known open items
 
 - **History to proofread:** all `SCEN` sitreps, `ROLE_HIST`, `ECHO`, `REALCALL` and `REC` text. Flagged earlier: the "about five weeks" Pyry timing; HYPO's "June 4, ~175 miles"; Nimitz approving the Yamamoto mission; Patton as paper commander of FUSAG.
-- **Teacher images with known inaccuracies, left as is at the teacher's choice:**
-  - `r1`: Pyry is placed west of Warsaw, and the scale bar is wrong.
-  - `r1-mi`: London sits in the Midlands, and the scale bar is wrong.
-  - `r2`: the HX-84 labels are wrong, and the U-110 capture is placed off Spain.
-  - `r3-fa`: the route runs through the Bristol Channel, Calais and Dunkirk are drawn inside Belgium, and the scale bar is wrong.
-  - `r4-fa`: the raid is shown as bombers rather than a safe-house raid.
-  - `r4-mi`: the scale bar is wrong, there are ~40 dots versus 27 agents, and the Lisbon 1941 period is skipped.
-  - `r4-ul`: the strike planes fly from Tunisia, not Malta.
-  - `r5`: the US fighters should come from Guadalcanal (southeast).
+- **Real History image audit (all 16 slots, checked 2026-11-12).** Items marked *(earlier)* were flagged in claude.ai chat and left as is at the teacher's choice. Everything else is newly found and still needs a decision or a fix. Scale checks compare a known real distance with what the map's own scale bar gives.
+  - `r1` Pyry Forest meeting:
+    - *(earlier)* Pyry is drawn ~90 miles west of Warsaw. It is in the Kabaty woods, just south of Warsaw (~10 miles).
+    - *(earlier)* The scale bar is wrong: 100 miles is aligned with 250 km (should be ~160 km).
+    - Poland is drawn with its post-1945 borders: a wide Baltic coast across Pomerania. In July 1939 Poland had only the narrow "Polish Corridor" to the sea (around Gdynia), and Pomerania was German. East Prussia (top right, around the lagoon) is unlabelled and shaded like Poland, but it was German.
+  - `r1-nv` Japanese naval code (JN-25):
+    - The scale bar is wrong: 1,000 miles is aligned with 2,000 km (should be ~1,600 km), and the map reads ~2× too large. Tokyo to Hawaii is ~3,900 miles, but the bar reads it as ~8,000.
+    - The text box says the new code increased "the difficulty of interception". Interception (picking up the radio signal) wasn't harder. Decryption was.
+    - Minor: only the home islands are shaded as Japan. In 1939 Korea and Taiwan were also Japanese territory.
+    - The facts check out: JN-25 introduced June 1939, five-digit groups, US Navy units at Pearl Harbor (HYPO) and near Manila (CAST).
+  - `r1-mi` Agent SNOW:
+    - *(earlier)* London is drawn in the Midlands, and the scale bar is wrong (100 miles aligned with 250 km).
+    - The facts check out: Owens sent messages to the Abwehr in Hamburg, and MI5 ran him from September 1939.
+  - `r2` The Atlantic (different style from the rest: no title box, date, footer or scale bar):
+    - *(earlier)* The HX-84 labels are wrong, and the U-110 capture is placed off Spain. U-110 was captured on 9 May 1941 south of Iceland, between Greenland and Iceland.
+    - HX-84 was a November 1940 convoy, sunk in part by the warship *Admiral Scheer*, not U-boats. It doesn't fit a spring 1941 U-boat round.
+    - The convoys are drawn as submarine silhouettes.
+    - The blue route goes around the north of Scotland. HX convoys from Halifax ran into Liverpool through the North Channel.
+    - The "evade path" arrows into Norway and the Baltic, the "broken periscope" off Spain, and the red cross have no real-history meaning.
+  - `r3` When the Signals Stop (Pearl Harbor):
+    - The footer says "Sketch map, not to scale", but the map has a scale bar. The bar makes the Hawaiian chain ~2× too long: Kauai to the Big Island is ~300 miles, but it reads ~570.
+    - The "possible Japanese fleet" circle sits west of Hawaii. The real carrier force came from the north and launched about 230 miles north of Oahu. The "location unknown" label is fine, but the placement could mislead students.
+  - `r3-fa` Channel Dash:
+    - *(earlier)* The route runs through the Bristol Channel, Calais and Dunkirk are drawn inside Belgium (they are in France), and the scale bar is wrong.
+    - Only Scharnhorst arrived at Wilhelmshaven. Gneisenau and Prinz Eugen went into the Elbe (Brunsbüttel), and Gneisenau continued to Kiel.
+  - `r3-ul` Rommel strikes back: **no errors found.** The dates (21 Jan attack, Benghazi 29 Jan, Gazala line early Feb, 5 Jan Tripoli tank convoy), the places and the scale bar all check out.
+  - `r4` Midway:
+    - Five carriers are drawn in the Japanese force. The Kido Butai had four (Akagi, Kaga, Soryu, Hiryu).
+    - The "~175 miles from Midway" arrow is drawn ~800 miles long by the map's own scale bar. The US carriers (Point Luck) were ~325 miles northeast of Midway. The map shows them due east and farther out.
+    - The "175 miles, June 4" estimate itself is historically right: Layton (Nimitz's intelligence officer) predicted contact at bearing 325°, 175 miles, early on June 4, based on HYPO's work.
+  - `r4-fa` Finding a leak:
+    - *(earlier)* The raid is shown as bombers rather than a safe-house raid.
+    - It is a flowchart rather than a map, but it has a north arrow. The "From the record" footer suggests one documented case, but the scene shows a general technique rather than a specific event.
+  - `r4-mi` Garbo:
+    - *(earlier)* The scale bar is wrong, there are ~40 agent dots versus Garbo's 27 invented agents, and his 1941 Lisbon period is skipped.
+    - The scale bar also disagrees with itself: 1,000 miles lines up with 2,000 km (should be ~1,600 km). London to Madrid is ~785 miles, but the bar reads it as ~2,300.
+    - Minor: ARABEL was his German (Abwehr) code name. GARBO was the British one.
+  - `r4-ul` Convoys to Africa:
+    - *(earlier)* The strike planes fly from Tunisia, not Malta. Tunisia was Vichy French and neutral until November 1942, so British planes could not fly from there.
+    - Minor: the north–south distances are short. Naples to Tripoli is ~550 miles, but it reads ~410. The scale bar itself is consistent.
+  - `r5` Yamamoto (Operation Vengeance):
+    - *(earlier)* The US fighters should come from Guadalcanal (southeast). They flew from Henderson Field.
+    - The fighters are drawn as single-engine planes. The P-38 Lightning was a twin-engine, twin-boom fighter.
+    - The scale bar is wrong: 250 miles is aligned with 500 km (should be ~400 km), and Bougainville reads ~800 miles long (it is ~125 miles).
+    - Minor: the intercept is marked mid-island. The shootdown was over southern Bougainville, near Buin.
+  - `r5-fa`, `r5-bp`, `r5-mi`: see the separate "To fix" entries below.
+  - `r6` Operation Fortitude: **no errors found.** The beach order, the towns, Patton as FUSAG's (notional) commander, and the scale (Portsmouth to the beaches ~100 miles, Normandy to Calais ~160) all check out.
 - **To fix: `r5-fa` "The Rocket Secret" map** (teacher's new image, added 2026-11-12 as `img/r5-fa.webp`). These errors are flagged and still need fixing, either by editing the image or by asking the teacher for a corrected one:
   1. "RUSSIA" is labelled north of Poland. In 1943–44 that land was East Prussia, part of Germany. It only became Russian (Kaliningrad) after 1945.
   2. The scale bar is wrong. It aligns 100 miles with 250 km (should be ~160 km), and the map is drawn about 2.5× too large: Peenemünde to the Bug River crash site (near Sarnaki) is ~400 miles / ~650 km, but the bar reads it as ~1,000 miles.
