@@ -668,11 +668,11 @@ const ART = (function () {
   // door closes, the car pulls away to the left, empty street, a car arrives from the right, pauses at A, parks at B, door opens.
   // 72 states x 2 frames = 144 frames, a multiple of the rain (8) and window (36) loops, so the whole scene repeats every 12 s.
   const LEAK_CAR = [].concat(
-    Array(12).fill([66, 9]), [[66, 6], [66, 3]], Array(6).fill([66, 0]),
-    [65, 63, 60, 56, 51, 45, 38, 30, 21, 11, 0, -12, -25, -39].map((x) => [x, 0]),
+    Array(12).fill([60, 9]), [[60, 6], [60, 3]], Array(6).fill([60, 0]),
+    [59, 57, 54, 50, 45, 39, 32, 24, 15, 5, -6, -18, -31, -45].map((x) => [x, 0]),
     Array(7).fill([null, 0]),
-    [160, 150, 141, 133, 126, 120, 115, 111, 109, 108, 108, 108, 106, 103, 98, 93, 88, 83, 78, 74, 71, 68, 67, 66].map((x) => [x, 0]),
-    Array(3).fill([66, 0]), [[66, 2], [66, 4], [66, 6], [66, 8]]);
+    [160, 150, 141, 133, 126, 120, 115, 111, 109, 108, 108, 108, 106, 102, 96, 90, 84, 78, 73, 68, 64, 62, 61, 60].map((x) => [x, 0]),
+    Array(3).fill([60, 0]), [[60, 2], [60, 4], [60, 6], [60, 8]]);
   CH.leak = { rn: 8, wn: 6, cr: LEAK_CAR.length };
   S.leak = (p) => {
     const c = Cv(160, 70, "K"), rn = p.rn || 0, wn = p.wn || 0, cr = p.cr || 0;
@@ -708,7 +708,7 @@ const ART = (function () {
     const shadow = (x) => { c.r(x, 19, x, 20, inWin); c.r(x - 1, 21, x + 1, 24, inWin); };
     [[75], [74], [74, 77], [75, 77], [76, 77], [76]][wn].forEach(shadow);   // each step moves one pixel, and the last flows into the first
     // the car's visit (state 0, door B open on the raid, is the moment that matters, so it is the still)
-    const [cx, door] = LEAK_CAR[cr], raid = cx === 66 && door >= 3;
+    const [cx, door] = LEAK_CAR[cr], raid = cx === 60 && door >= 3;
     // raiders: plain-clothes police in long coats and hats, and a soldier in a steel helmet with a rifle; feet at yb
     const man = (x, yb, rim) => { c.r(x - 1, yb - 10, x + 1, yb - 10, "K"); c.r(x - 2, yb - 9, x + 2, yb - 9, "K"); c.r(x - 1, yb - 8, x + 1, yb - 7, "K");
       c.poly([[x - 1.5, yb - 6], [x + 2.5, yb - 6], [x + 3, yb - 1], [x - 2, yb - 1]], "K"); c.p(x - 1, yb, "K"); c.p(x + 1, yb, "K"); if (rim) { c.r(x + 2, yb - 5, x + 2, yb - 2, "C"); c.p(x + 2, yb - 9, "C"); } };
@@ -718,22 +718,27 @@ const ART = (function () {
       if (door > 5) [50, 55].forEach((x) => {                                                 // two men pushing in through the doorway, small against the light
         c.r(x - 1, 45, x + 1, 45, "K"); c.r(x - 2, 46, x + 2, 46, "K"); c.r(x - 1, 47, x + 1, 48, "K"); c.poly([[x - 1.5, 49], [x + 2.5, 49], [x + 2.5, 53], [x - 1.5, 53]], "K"); }); }
     if (raid) { soldier(43, 54); c.p(44, 45, "C"); c.p(45, 46, "C"); }                       // a soldier keeps watch by the door, his helmet catching the light
-    if (cx !== null) {   // a black Citroën Traction Avant, the car the German police used in Paris: long bonnet, separate wings, running boards, fastback
+    if (cx !== null) {   // a German Opel Blitz truck in field grey: upright grille, bonnet, square cab with the cross on the door, slatted cargo bed of soldiers
       const x0 = cx, q = (pts, a) => c.poly(pts.map(([x, y]) => [x0 + x, y]), a), beam = (x, y) => { const v = c.c[y] && c.c[y][x]; if (v && (x + y) % 2 === 0 && lighter[v]) c.c[y][x] = lighter[v]; };
-      for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 49 + s);   // headlight beam on the street
-      q([[0, 54], [1, 50], [4, 48], [9, 48], [12, 50], [13, 54]], "K"); q([[20, 54], [22, 50], [25, 48], [30, 48], [33, 50], [34, 54]], "K");   // front and rear wings
-      q([[2, 45.5], [14, 45], [14, 51], [2, 51]], "K"); c.r(x0 + 10, 46, x0 + 31, 53, "K");                                                // bonnet and body
-      q([[13, 46], [16.5, 41], [19, 40], [27, 40], [30, 42], [33, 46], [33, 51], [13, 51]], "K");                                         // low cabin with a sloping fastback
-      q([[17, 42], [21, 42], [21, 45], [16, 45]], "E"); q([[23, 42], [27, 42], [29.5, 45], [23, 45]], "E"); c.p(x0 + 18, 43, "H");         // side windows
-      c.r(x0 + 22, 46, x0 + 22, 52, "E"); c.r(x0 + 14, 46, x0 + 14, 52, "E"); c.p(x0 + 20, 48, "H");                                    // door lines and handle
-      c.r(x0 + 12, 53, x0 + 21, 53, "C");                                                                                              // running board
-      c.r(x0 + 19, 40, x0 + 27, 40, "C"); c.r(x0 + 3, 45, x0 + 13, 45, "C"); c.r(x0 + 4, 48, x0 + 9, 48, "C"); c.r(x0 + 25, 48, x0 + 30, 48, "C");   // lamp light on roof, bonnet and wings
-      c.r(x0 + 1, 46, x0 + 2, 51, "E"); c.p(x0 + 1, 47, "H"); c.p(x0 + 2, 48, "H");                                                  // upright grille with the chevrons
-      c.e(x0 + 3, 46.5, 1.4, 1.4, "K"); c.p(x0 + 2, 46, "A"); c.p(x0 + 3, 46, "A"); c.p(x0 + 2, 47, "A");                             // a round headlamp beside the bonnet
-      c.r(x0 - 1, 52, x0 + 1, 52, "H");                                                                                                // bumper
-      [7, 27].forEach((w) => { c.e(x0 + w, 54.5, 3, 3, "D"); c.e(x0 + w, 54.5, 1.6, 1.6, "C"); c.p(x0 + w, 54, "H"); });            // wheels
+      for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 49 + s);   // dimmed headlight on the street
+      // soldiers in steel helmets sitting in the back, rifles upright, drawn first so the bed's side hides their bodies
+      [21, 26, 31, 36].forEach((x, i) => { const X = x0 + x, y = 42;
+        c.r(X - 1, y - 6, X + 1, y - 6, "K"); c.r(X - 2, y - 5, X + 2, y - 4, "K"); c.p(X - 3, y - 4, "K"); c.p(X + 3, y - 4, "K"); c.p(X + 1, y - 6, "g");   // dark steel helmet, flared rim, a glint of lamp light
+        c.r(X - 1, y - 3, X + 1, y - 2, "m"); c.p(X - 1, y - 3, "l");                                                                  // face under the helmet
+        c.r(X - 2, y - 1, X + 2, y, "E"); if (i % 2 === 0) c.l(X + 3, y - 9, X + 3, y - 1, "K"); });                                // shoulders, rifle upright
+      q([[1, 54], [2, 50], [5, 48.5], [10, 48.5], [13, 51], [13, 54]], "C"); c.r(x0 + 4, 48, x0 + 10, 48, "H");                    // front wing over the wheel
+      c.r(x0 + 2, 45, x0 + 10, 51, "H"); c.r(x0 + 2, 45, x0 + 10, 45, "g"); for (let x = 4; x < 10; x += 2) c.r(x0 + x, 47, x0 + x, 50, "C");   // bonnet with side vents
+      c.r(x0, 44, x0 + 2, 52, "C"); for (let y = 45; y < 52; y += 2) c.r(x0, y, x0 + 1, y, "K"); c.r(x0, 44, x0 + 2, 44, "g");     // tall upright grille
+      c.r(x0 + 10, 38, x0 + 18, 52, "H"); c.r(x0 + 10, 38, x0 + 18, 38, "g"); c.r(x0 + 10, 39, x0 + 10, 44, "C");                     // square cab, roof catching the lamp
+      c.r(x0 + 11, 39, x0 + 17, 43, "E"); c.p(x0 + 16, 40, "g"); c.r(x0 + 11, 44, x0 + 17, 44, "C");                                  // side window
+      c.r(x0 + 11, 46, x0 + 17, 48, "W"); c.r(x0 + 13, 44, x0 + 15, 50, "W"); c.r(x0 + 12, 47, x0 + 16, 47, "K"); c.r(x0 + 14, 45, x0 + 14, 49, "K");   // Balkenkreuz: black cross edged in white
+      c.r(x0 + 19, 43, x0 + 38, 52, "H"); c.r(x0 + 19, 43, x0 + 38, 43, "g"); [46, 49].forEach((y) => c.r(x0 + 19, y, x0 + 38, y, "C"));   // slatted cargo bed
+      [19, 26, 32, 38].forEach((x) => c.r(x0 + x, 43, x0 + x, 52, "C"));                                                               // stakes
+      c.r(x0 + 1, 52, x0 + 38, 53, "K"); c.r(x0 + 14, 53, x0 + 18, 53, "C");                                                           // chassis and step
+      q([[22, 54], [24, 50.5], [27, 49.5], [32, 49.5], [35, 50.5], [37, 54]], "C");                                                    // rear wing
+      [7, 29].forEach((w) => { c.e(x0 + w, 54.5, 3, 3, "K"); c.e(x0 + w, 54.5, 1.7, 1.7, "C"); c.p(x0 + w, 54, "H"); });            // wheels
+      c.p(x0 + 3, 47, "A"); c.p(x0 + 4, 47, "A"); c.r(x0 - 1, 52, x0, 52, "g");                                                        // masked headlamp, bumper
     }
-    if (raid) man(61, 54, 1);                                                                 // another man waits by the car
     for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + rn * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 63)   /* 8 steps of 8 = 64, so the rain wraps without a jump */ c.p(x - (k >> 1), y0 + k, "H"); }   // rain beyond the glass
     // our side of the glass: curtains, the sill, and the watcher's head and shoulders
     c.r(0, 0, 159, 2, "r"); for (let x = 0; x < 160; x += 4) c.p(x, 2, "K");
@@ -1482,7 +1487,7 @@ const RECMAPS = (function () {
     "r1-mi": "A double agent's room in London at night, 1939: a suitcase radio transmitter open on a table, a hand tapping a Morse key, headphones, a bare bulb, and rain on a window showing the Big Ben clock tower.",
     "r3-fa": "A lane above the harbour of Brest on the dark night of 11 February 1942: a French Resistance courier with his bicycle against a stone wall and a folded note in his hand watches three unlit German warships slip out to sea under a low haze. The haze drifts, the water glints and a far lamp blinks.",
     "r3-ul": "Harsh desert daylight, January 1942: three British Eighth Army soldiers behind a sandbag wall, one with binoculars, one pointing, one crouching with a rifle, beside a radio aerial with a pennant and a stone-painted truck, as German tanks come out of the dust.",
-    "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A black Citroën Traction Avant slows at door A, drives on, and stops at door B. The raid begins: two men in hats push in through the lit doorway, another waits by the car, and a soldier in a steel helmet stands guard. The leak runs through B.",
+    "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at two blue safe-house doors chalked A and B. A German Opel Blitz army truck in field grey, with the black cross on its door and helmeted soldiers in the back, slows at door A, drives on, and stops at door B. The raid begins: two men in hats push in through the lit doorway while a soldier stands guard. The leak runs through B.",
     "r4-mi": "Garbo's desk in London, 1942: a typewriter typing a report, letters with a red seal, a desk lamp, and a wall map of Britain with pins marking imaginary agents.",
     "r4-ul": "Dawn on a Malta airfield, 1942, below limestone roofs, a dome and a bell tower: ground crew wave off a twin-engine RAF reconnaissance plane, propellers turning, while bombers wait behind a blast wall. The scout goes first so the enemy thinks it found the convoy by chance.",
     "r5-bp": "Night in a Bletchley Park hut, April 1943: an analyst at a lamp-lit table writes up a German decrypt beside a steaming mug, a teleprinter feeds paper, and the wall map shows German arrows moving toward Sardinia and Greece, the false targets Germany believed.",
