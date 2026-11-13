@@ -1,8 +1,7 @@
   // ---- "One Man, Many Shadows", London, 1942: Garbo under a street lamp; on the brick wall behind him his shadow is joined,
   //      one by one, by the shadows of his imaginary agents (a sailor, a soldier, a woman, a waiter, a workman), each with a small
-  //      move of its own, and last by a German officer looking back at them all: the Germans believed every one. A chalk tally
-  //      on the wall counts the network up to 27, then they all fade back into the one man who invented them.
-  //      A 1942 "KEEP MUM" poster, rain, a barrage balloon.
+  //      move of its own, and last by a German officer looking back at them all: the Germans believed every one. Then they all
+  //      fade back into the one man who invented them. Rain, a barrage balloon, a searchlight.
   //      Loop: sh 16x6, ra 8x1, lf 4x6, ce 2x12, sb 8x6 -> every period divides 96 ticks (8 s). State 0 = everyone on the wall.
   //      HOLD: sh: 6, ra: 1, lf: 6, ce: 12, sb: 6
   CH.shadows = { sh: 16, ra: 8, lf: 4, ce: 2, sb: 8 };
@@ -19,10 +18,6 @@
     for (let y = 14; y <= 58; y++) for (let x = 0; x < 160; x++) {
       const row = (y - 14) >> 2, mortar = (y - 14) % 4 === 3 || (x + (row % 2) * 4) % 8 === 7, L = lvl(x, y);
       c.p(x, y, mortar ? ["D", "s", "m"][L] : (y - 14) % 4 === 0 && L === 2 ? "m" : ["E", "r", "s"][L]); }
-    // a 1942 KEEP MUM poster on the wall
-    c.r(134, 20, 156, 44, "R"); c.r(135, 21, 155, 43, "g"); c.r(135, 21, 155, 21, "W");
-    const word = (t, x, y, col) => t.split("").forEach((ch, i) => { const g = FONT[ch]; for (let k = 0; k < 15; k++) if (g[k] === "1") c.p(x + i * 4 + (k % 3), y + ((k / 3) | 0), col); });
-    word("KEEP", 138, 24, "R"); word("MUM", 140, 31, "K"); c.e(145, 40, 3, 2, "s"); c.r(143, 38, 147, 38, "K");      // the words, a small figure
     // pavement and kerb, the pool of lamp light
     c.r(0, 59, 159, 69, (x, y) => (Math.abs(x - LX) < 22 - (y - 59) && (x + y) % 2 === 0 ? "H" : "C")); c.r(0, 59, 159, 59, "H");
     for (let x = 6; x < 160; x += 14) c.r(x, 60, x, 69, "E"); c.r(0, 65, 159, 65, "E");
@@ -45,10 +40,6 @@
     const PEOPLE = [["man", 55], ["sailor", 66], ["soldier", 77], ["woman", 89], ["waiter", 99], ["worker", 111], ["officer", 126]];
     const vis = [6, 6, 6, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5][sh];                                        // up one at a time, all of them together, then down
     PEOPLE.forEach(([k, x], i) => { if (i <= vis) KINDS[k](x, (sh + i) % 2); });
-    // the chalk tally: each agent adds marks, five agents make 27, the size of Garbo's invented network
-    const marks = [0, 5, 10, 16, 21, 27][Math.min(vis, 5)];
-    for (let m = 0; m < marks; m++) { const g = (m / 5) | 0, j = m % 5, gx0 = 56 + g * 10;
-      if (j < 4) c.r(gx0 + j * 2, 17, gx0 + j * 2, 21, "W"); else c.l(gx0 - 1, 21, gx0 + 7, 17, "W"); }
     // the lamp post and its lantern, flickering a little
     c.r(26, 14, 28, 62, "K"); c.r(27, 14, 27, 62, "E"); c.r(24, 60, 30, 63, "K"); c.r(22, 13, 32, 13, "K");
     c.poly([[23, 5], [31, 5], [30, 12], [24, 12]], "K"); c.r(25, 6, 29, 11, lf === 2 ? "m" : "A"); c.r(26, 7, 28, 10, lf === 1 ? "A" : "W"); c.r(24, 3, 30, 4, "K"); c.p(27, 2, "K");
