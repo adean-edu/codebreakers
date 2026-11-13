@@ -331,17 +331,18 @@ const ART = (function () {
     for (let i = 0; i < 14; i++) { const x = (i * 23 + sd * 9) % 170 - 5, y = 50 + (i * 7) % 18; c.p(x, y, "l"); c.p(x + 1, y, "m"); }   // drifting sand
     return c;
   };
-  // ---- Watching the safe house, Paris, 1942: from a dark room across the street, someone watches the meeting
-  //      window. Shadows move behind its curtain (wn); a black car pulls up and the door opens on a figure (cr); rain (rn).
-  // The car's whole visit as one seamless loop of [car x, door opening]: door open (the still), door closes, the car
-  // pulls away to the left, empty street, a car arrives from the right, parks, the door opens again.
+  // ---- The bait test, Paris, 1942: from a dark room across the street, someone watches two safe-house doors chalked
+  //      A and B. Contact A was told one story, Contact B another. Every time, the black car slows at A, drives on and
+  //      raids B, so the leak runs through B. Shadows in a lit window (wn), the car and door B (cr), rain (rn).
+  // The car's whole visit as one seamless loop of [car x, door B opening]: door B open on a man in a hat (the still),
+  // door closes, the car pulls away to the left, empty street, a car arrives from the right, pauses at A, parks at B, door opens.
   // 72 states x 2 frames = 144 frames, a multiple of the rain (8) and window (36) loops, so the whole scene repeats every 12 s.
   const LEAK_CAR = [].concat(
-    Array(12).fill([102, 9]), [[102, 6], [102, 3]], Array(6).fill([102, 0]),
-    [101, 99, 96, 92, 87, 81, 74, 66, 57, 47, 36, 24, 11, -3, -18, -34].map((x) => [x, 0]),
-    Array(12).fill([null, 0]),
-    [160, 150, 141, 133, 126, 120, 115, 111, 108, 106, 104, 103, 102].map((x) => [x, 0]),
-    Array(7).fill([102, 0]), [[102, 2], [102, 4], [102, 6], [102, 8]]);
+    Array(12).fill([62, 9]), [[62, 6], [62, 3]], Array(6).fill([62, 0]),
+    [61, 59, 56, 52, 47, 41, 34, 26, 17, 7, -4, -16, -29, -43].map((x) => [x, 0]),
+    Array(7).fill([null, 0]),
+    [160, 150, 141, 133, 126, 120, 115, 111, 109, 108, 108, 108, 106, 102, 96, 90, 84, 79, 74, 70, 67, 64, 63, 62].map((x) => [x, 0]),
+    Array(3).fill([62, 0]), [[62, 2], [62, 4], [62, 6], [62, 8]]);
   CH.leak = { rn: 8, wn: 6, cr: LEAK_CAR.length };
   S.leak = (p) => {
     const c = Cv(160, 70, "K"), rn = p.rn || 0, wn = p.wn || 0, cr = p.cr || 0;
@@ -360,10 +361,13 @@ const ART = (function () {
       c.r(wx, wy, wx + 6, wy + 8, lit ? "A" : dim ? "m" : "D"); if (lit) { c.r(wx, wy, wx, wy + 8, "m"); c.r(wx + 6, wy, wx + 6, wy + 8, "m"); }
       if (!lit && !dim) c.r(wx + 3, wy, wx + 3, wy + 8, "E"); }));
     [25, 37].forEach((y) => { c.r(40, y, 118, y, "H"); for (let x = 40; x <= 118; x += 2) c.p(x, y + 1, "E"); });   // iron balconies
-    // ground floor: shuttered shops either side of a blue door
-    [[42, 66], [84, 116]].forEach(([x0, x1]) => { c.r(x0, 41, x1, 53, "H"); for (let y = 42; y < 53; y += 2) c.r(x0, y, x1, y, "C"); c.r(x0, 40, x1, 40, "E"); });
-    c.r(69, 42, 81, 53, "N"); c.e(75, 42, 6.5, 3.5, "N"); c.r(70, 43, 80, 53, "Q"); c.e(75, 43, 5, 2.5, "Q"); c.r(75, 41, 75, 53, "N"); c.p(73, 48, "A"); c.p(77, 48, "A");
-    c.r(74, 38, 76, 39, "A");                                                                 // the lamp over the door
+    // ground floor: shuttered shops around two blue doors, chalked A (right) and B (left)
+    [[40, 44], [60, 96], [112, 118]].forEach(([x0, x1]) => { c.r(x0, 41, x1, 53, "H"); for (let y = 42; y < 53; y += 2) c.r(x0, y, x1, y, "C"); c.r(x0, 40, x1, 40, "E"); });
+    const DB = 52, DA = 104;
+    [[DB, "B"], [DA, "A"]].forEach(([dx, ch]) => {
+      c.r(dx - 6, 42, dx + 6, 53, "N"); c.e(dx, 42, 6.5, 3.5, "N"); c.r(dx - 5, 43, dx + 5, 53, "Q"); c.e(dx, 43, 5, 2.5, "Q"); c.r(dx, 47, dx, 53, "N"); c.p(dx - 2, 50, "A"); c.p(dx + 2, 50, "A");
+      const g = FONT[ch]; for (let k = 0; k < 15; k++) if (g[k] === "1") c.p(dx - 1 + (k % 3), 40 + ((k / 3) | 0), "W");   // chalk letter
+      c.r(dx - 1, 38, dx + 1, 38, "A"); });                                                  // lamp over each door
     // pavement, kerb, cobbled street
     c.r(0, 54, 159, 55, "H"); c.r(0, 55, 159, 55, "g"); c.r(0, 56, 159, 62, "E"); for (let y = 57; y < 63; y += 2) for (let x = (y % 4); x < 160; x += 4) c.p(x, y, "C");
     // street lamp and its pool of light
@@ -373,10 +377,10 @@ const ART = (function () {
     const inWin = (x, y) => (x >= 73 && x <= 77 ? "s" : c.c[y][x]);
     const shadow = (x) => { c.r(x, 19, x, 20, inWin); c.r(x - 1, 21, x + 1, 24, inWin); };
     [[75], [74], [74, 77], [75, 77], [76, 77], [76]][wn].forEach(shadow);   // each step moves one pixel, and the last flows into the first
-    // the car's visit (state 0, door open on the man in the hat, is the moment that matters, so it is the still)
+    // the car's visit (state 0, door B open on the man in the hat, is the moment that matters, so it is the still)
     const [cx, door] = LEAK_CAR[cr];
-    if (door) { c.r(80 - door + 1, 43, 80, 53, "A"); c.poly([[80 - door, 54], [81, 54], [84, 56], [80 - door - 2, 56]], "m");
-      if (door > 5) { c.r(75, 45, 77, 53, "K"); c.e(76, 44, 1.6, 1.6, "K"); c.r(74, 42, 78, 42, "K"); c.r(75, 41, 77, 41, "K"); } }   // a man in a hat in the doorway
+    if (door) { const r = DB + 5; c.r(r - door + 1, 46, r, 53, "A"); c.poly([[r - door, 54], [r + 1, 54], [r + 4, 56], [r - door - 2, 56]], "m");
+      if (door > 5) { c.r(DB - 1, 46, DB + 1, 46, "K"); c.r(DB - 2, 47, DB + 2, 47, "K"); c.r(DB - 1, 48, DB + 1, 49, "K"); c.r(DB - 2, 50, DB + 2, 53, "K"); } }   // a man in a hat in the doorway
     if (cx !== null) {
       const x0 = cx, beam = (x, y) => { const q = c.c[y] && c.c[y][x]; if (q && (x + y) % 2 === 0 && lighter[q]) c.c[y][x] = lighter[q]; };
       for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 50 + s);   // headlight beam on the street
