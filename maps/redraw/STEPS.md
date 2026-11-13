@@ -1,8 +1,10 @@
 # How the map images were redrawn (r5-fa, r5-bp/r5-mi, r1-nv, r3, r4)
 
 These are the steps used for the redrawn Real History maps. Follow them for the remaining
-redraws (`r1`, `r1-mi`, `r2`, `r3-fa`, `r4-mi`, `r4-ul`, `r5`; `r4-fa` waits on the teacher's
-choice of case). The scripts that drew them are not in this repo. Write your own equivalent
+redraws (`r1`, `r1-mi`, `r2`, `r3-fa`, `r4-mi`, `r4-ul`, `r5`). `r4-fa` is done: the teacher chose
+a clean flowchart, not a map, drawn by `maps/r4fa-flowchart.js` (SVG in Playwright, no map data).
+It uses the older `render.js` palette and Lora, not the colours and Georgia below, so it may need a
+restyle to match. The scripts that drew the maps are not in this repo. Write your own equivalent
 from these steps. Python with Pillow, NumPy and SciPy is enough.
 
 `assets/paper_1.png` to `paper_3.png` are blank aged-parchment textures, made once with Stable
