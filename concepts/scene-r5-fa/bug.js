@@ -21,20 +21,20 @@ const S = {}, CH = {}, HOLD = { rv: 4, rd: 6, lt: 2 };
 CH.bug = { rv: 3, rd: 2, lt: 4 };
 S.bug = (p) => {
   const c = Cv(160, 70, "K"), rv = p.rv || 0, rd = p.rd || 0, lt = p.lt || 0;
-  c.sky(0, 30, [["K", 6], ["D", 14], ["E", 24], ["C", 28], ["s", 31]]); stars(c, 9, 41);
-  for (let x = 0; x < 160; x++) if ((x * 7) % 11 < 4) c.p(x, 22, "C");                                        // a thin cloud bank in the afterglow
+  c.sky(0, 30, [["D", 5], ["E", 12], ["C", 20], ["H", 25], ["s", 28], ["m", 31]]); stars(c, 7, 41); 
+  for (let x = 0; x < 160; x++) if ((x * 7) % 11 < 4) c.p(x, 22, "g");                                        // a thin cloud bank in the afterglow
   // far bank: low trees and a few willows
   for (let x = 0; x < 160; x++) { const top = 26 + Math.round(1.8 * Math.sin(x / 5) + 1.4 * Math.sin(x / 1.7) + hs(x, 2, 7) * 1.2); c.r(x, top, x, 32, "K"); }
   [[18, 20], [63, 21], [121, 19]].forEach(([x, top]) => c.e(x, top + 5, 5, 6, "K"));
   // the river: dark water, the afterglow reflected in broken streaks
-  c.r(0, 33, 159, 45, (x, y) => (y < 37 ? "N" : y < 41 ? "Q" : "E"));
-  for (let y = 33; y <= 45; y++) for (let x = 0; x < 160; x++) { const k = (x + y * 7 + rv * 3) % 13; if (y % 2 === 0 && k < 3) c.p(x, y, y < 37 ? "m" : y < 41 ? "B" : "N"); if (y % 3 === 1 && (x * 3 + y + rv * 5) % 17 === 0) c.p(x, y, "N"); }
+  c.r(0, 33, 159, 45, (x, y) => (y < 37 ? "B" : y < 41 ? "N" : "Q"));
+  for (let y = 33; y <= 45; y++) for (let x = 0; x < 160; x++) { const k = (x + y * 7 + rv * 3) % 13; if (y % 2 === 0 && k < 3) c.p(x, y, y < 37 ? "l" : y < 41 ? "m" : "B"); if (y % 3 === 1 && (x * 3 + y + rv * 5) % 17 === 0) c.p(x, y, "N"); }
   // near bank: grass and mud
-  c.poly([[0, 46], [40, 44], [100, 45], [160, 44], [160, 69], [0, 69]], (x, y) => (hs(x, y, 13) > .9 ? "O" : hs(x, y, 4) > .55 ? "E" : hs(x, y, 6) > .5 ? "C" : "E"));
+  c.poly([[0, 46], [40, 44], [100, 45], [160, 44], [160, 69], [0, 69]], (x, y) => { const n = hs(x >> 2, y >> 1, 4); return hs(x, y, 13) > .97 ? "V" : n > .78 ? "E" : (n > .62 && (x + y) % 2) ? "E" : "O"; });
   c.l(0, 46, 40, 44, "s"); c.l(40, 44, 100, 45, "s"); c.l(100, 45, 159, 44, "s");                              // mud line at the water
   // reeds along the edge, leaning with the breeze
-  for (let i = 0; i < 40; i++) { const x = 2 + i * 4 + (i % 3), h = 6 + (i * 5) % 6, lean = rd ? 1 : 0; if (x > 30 && x < 48) continue;
-    for (let k = 0; k < h; k++) c.p(x + (k > h / 2 ? lean : 0), 46 - k, k > h - 2 ? "s" : i % 4 ? "O" : "V"); }
+  for (let i = 0; i < 27; i++) { const x = 2 + i * 6 + (i % 3), h = 6 + (i * 5) % 6, lean = rd ? 1 : 0; if (x > 30 && x < 48) continue;
+    for (let k = 0; k < h; k++) c.p(x + (k > h / 2 ? lean : 0), 46 - k, k > h - 2 ? "m" : i % 4 ? "V" : "G"); }
   // ---- the V-2, lying on the bank, nose in the mud by the reeds, black-and-white test paint
   const RY = 52, X0 = 34, X1 = 98;                                                                               // nose tip .. tail end
   const radius = (x) => { const t = (x - X0) / (X1 - X0); return t < .18 ? 3.6 * Math.sqrt(t / .18) : t > .9 ? 3.6 - (t - .9) * 8 : 3.6; };
@@ -50,19 +50,27 @@ S.bug = (p) => {
   c.e(34, 54, 5, 2.4, "s"); c.r(30, 55, 40, 56, "E"); c.p(29, 53, "s"); c.p(39, 57, "s");
   // furrow it ploughed in the bank
   for (let x = 100; x < 124; x++) c.p(x, 54 + ((x * 3) % 2), x % 3 ? "s" : "E");
-  // three Home Army men: one kneels by the fins with a lantern, one points, one brings a rope
-  const man = (x, yb, cap) => { c.r(x - 1, yb - 10, x + 1, yb - 8, "K"); if (cap) c.r(x - 2, yb - 10, x + 1, yb - 10, "K");
-    c.poly([[x - 2, yb - 7], [x + 2, yb - 7], [x + 2, yb - 2], [x - 2, yb - 2]], "K"); c.l(x - 1, yb - 1, x - 1, yb, "K"); c.l(x + 1, yb - 1, x + 1, yb, "K"); };
-  // kneeling man (left of the tail), lantern on the ground in front of him
-  c.r(104, 50, 106, 52, "K"); c.r(103, 53, 107, 57, "K"); c.r(101, 57, 107, 58, "K"); c.l(102, 54, 99, 55, "K");
-  const LX = 99, LY = 57; c.r(LX - 1, LY - 2, LX + 1, LY, "C"); c.p(LX, LY - 3, "K");
-  c.p(LX, LY - 1, ["A", "A", "m", "A"][lt]); c.p(LX - 1, LY - 1, lt === 2 ? "s" : "m"); c.p(LX + 1, LY - 1, lt === 1 ? "s" : "m");
-  const glow = [5, 6, 4, 6][lt];
-  for (let dy = -glow; dy <= glow; dy++) for (let dx = -glow * 2; dx <= glow * 2; dx++) { const d = (dx * dx) / (4 * glow * glow) + (dy * dy) / (glow * glow); const x = LX + dx, y = LY - 1 + dy;
-    if (d <= 1 && d > .08 && (x + y) % 2 === 0) { const q = c.c[y] && c.c[y][x]; if (q === "K" && y > 46 && (x < 96 || x > 107)) continue; if (q === "W") c.p(x, y, "l"); else if (q === "g") c.p(x, y, "W"); else if (q === "D" || q === "E") c.p(x, y, "s"); else if (q === "C") c.p(x, y, "m"); } }
-  man(116, 60, 1); c.l(114, 52, 109, 49, "K"); c.p(108, 49, "K"); for (let y = 51; y < 58; y++) c.p(114, y, "m"); c.p(115, 50, "m");                                               // pointing at the rocket
-  man(136, 63, 0); c.e(140, 57, 2.5, 2, "s"); c.e(140, 57, 1.2, .8, "K"); for (let y = 54; y < 61; y++) c.p(134, y, "C");
-  c.r(103, 50, 103, 52, "m"); c.r(102, 53, 102, 57, "m"); c.p(104, 49, "m");                                        // lantern light on the kneeling man                                         // rope coil on his shoulder
+  // three Home Army men, lit from the lantern on their left: caps, faces, olive and brown coats
+  const person = (x, yb, coat, armL, armR) => {
+    c.r(x - 1, yb - 13, x + 1, yb - 13, "K"); c.r(x - 2, yb - 12, x + 1, yb - 12, "K");                          // cap and peak (peak to the left)
+    c.r(x - 1, yb - 11, x + 1, yb - 10, "m"); c.p(x - 1, yb - 11, "l"); c.p(x - 1, yb - 10, "l"); c.p(x + 1, yb - 10, "s");   // face, lit side left
+    c.r(x - 2, yb - 9, x + 2, yb - 5, coat); c.r(x + 2, yb - 9, x + 2, yb - 5, "E"); c.r(x - 2, yb - 9, x - 2, yb - 5, coat === "H" ? "g" : "m");   // coat with lit and shaded edges
+    c.r(x - 2, yb - 4, x + 2, yb - 4, "K");                                                                        // belt
+    c.r(x - 2, yb - 3, x - 1, yb - 1, "E"); c.r(x + 1, yb - 3, x + 2, yb - 1, "E"); c.r(x - 2, yb, x - 1, yb, "K"); c.r(x + 1, yb, x + 2, yb, "K");   // legs, boots
+    if (armL) armL(x, yb); if (armR) armR(x, yb); };
+  // kneeling man by the tail, reaching toward the lantern
+  { const x = 106, yb = 58;
+    c.r(x - 1, yb - 12, x + 1, yb - 12, "K"); c.r(x - 2, yb - 11, x + 1, yb - 11, "K");
+    c.r(x - 1, yb - 10, x + 1, yb - 9, "m"); c.p(x - 1, yb - 10, "l"); c.p(x - 1, yb - 9, "l");
+    c.r(x - 2, yb - 8, x + 2, yb - 4, "s"); c.r(x - 2, yb - 8, x - 2, yb - 4, "m"); c.r(x + 2, yb - 8, x + 2, yb - 4, "E");
+    c.r(x - 5, yb - 3, x + 1, yb - 2, "E"); c.r(x - 5, yb - 1, x - 4, yb, "E");                                     // thigh forward, shin down to the ground
+    c.r(x + 1, yb - 3, x + 3, yb, "E"); c.r(x + 2, yb, x + 5, yb, "K");                                              // other knee down, boot behind
+    c.l(x - 2, yb - 7, x - 6, yb - 3, "s"); c.p(x - 7, yb - 2, "l"); }                                                // arm to the lantern, lit hand
+  // standing man pointing at the rocket
+  person(118, 59, "H", (x, yb) => { c.l(x - 3, yb - 8, x - 8, yb - 10, "g"); c.p(x - 9, yb - 10, "l"); }, (x, yb) => c.r(x + 3, yb - 8, x + 3, yb - 5, "E"));
+  // man arriving with a coil of rope over his shoulder
+  person(138, 62, "s", (x, yb) => c.r(x - 3, yb - 8, x - 3, yb - 5, "m"), (x, yb) => c.r(x + 3, yb - 8, x + 3, yb - 5, "E"));
+  c.e(141, 55, 2.4, 2.2, "m"); c.e(141, 55, 1.2, 1, "s"); c.p(141, 55, "E");
   return c;
 };
 
