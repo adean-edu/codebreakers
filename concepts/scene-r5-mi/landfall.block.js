@@ -1,6 +1,6 @@
   // ---- "Landfall", off Huelva, 30 April 1943: one scene, one day, all at sea. Night: HMS Seraph surfaces far out, the canister goes
   //      over the side, the submarine slips away. Before dawn: a shape in a life jacket drifts in. Dawn: a Spanish fishing boat of the
-  //      1940s comes alongside and the fisherman hooks it aboard. Morning: the boat sails off along the coast toward Huelva. Dusk.
+  //      1940s comes alongside and the fisherman hooks it aboard. Morning: the boat sails off toward Huelva. Open sea, a sliver of sand. Dusk.
   //      Everything changes with the light, so it all runs on one channel (zt): 36 states x 6 = 216 ticks (18 s).
   //      State 0 = morning: the fishing boat heading for port with the find aboard. HOLD: zt: 6
   CH.landfall = { zt: 36 };
@@ -15,14 +15,12 @@
     if (L === 3) { c.e(120, 13, 4, 4, "A"); c.e(120, 13, 2, 2, "W"); }
     // the sea, with waves moving on every state
     const SEA = [["Q", "D"], ["Q", "N"], ["N", "B"], ["B", "N"]][L];
-    c.r(0, 34, 159, 49, (x, y) => (y < 40 ? SEA[1] : SEA[0]));
-    for (let y = 35; y <= 49; y += 2) for (let x = 0; x < 160; x++) if ((x + y * 7 + s * 3) % 13 < 2) c.p(x, y, L === 0 ? "N" : L === 1 ? "B" : L === 2 && Math.abs(x - 120) < 3 + (y - 34) ? "A" : "g");
-    // the beach, the surf, the dunes
+    c.r(0, 34, 159, 66, (x, y) => (y < 40 ? SEA[1] : SEA[0]));
+    for (let y = 35; y <= 65; y += 2) for (let x = 0; x < 160; x++) if ((x + y * 7 + s * 3) % 13 < 2) c.p(x, y, L === 0 ? "N" : L === 1 ? "B" : L === 2 && Math.abs(x - 120) < 3 + (y - 34) ? "A" : "g");
+    // just a thin sliver of sand along the bottom edge, the surf running up it
     const SAND = [["C", "E"], ["H", "C"], ["m", "s"], ["l", "m"]][L];
-    c.r(0, 50, 159, 69, (x, y) => (hs(x, y, 41) > .9 ? SAND[1] : SAND[0]));
-    for (let x = 0; x < 160; x++) { const y = 49 + ((x + s * 4) % 9 < 3 ? 0 : 1); if ((x + s) % 4) c.p(x, y, L === 0 ? "H" : "W"); }
-    c.poly([[112, 69], [120, 52], [132, 45], [146, 43], [159, 46], [159, 69]], SAND[1]); c.l(120, 52, 132, 45, SAND[0]); c.l(132, 45, 146, 43, SAND[0]);
-    for (let x = 122; x < 160; x += 5) { const y = 46 + Math.round(Math.abs(x - 146) / 6); c.p(x, y - 1, L ? "O" : "E"); c.p(x + 1, y - 2, L ? "V" : "E"); c.p(x - 1, y - 2, L ? "O" : "E"); }   // marram grass on the dunes
+    c.r(0, 67, 159, 69, (x, y) => (hs(x, y, 41) > .9 ? SAND[1] : SAND[0]));
+    for (let x = 0; x < 160; x++) { const y = 66 + ((x + s * 4) % 9 < 3 ? 0 : 1); if ((x + s) % 4) c.p(x, y, L === 0 ? "H" : "W"); }
     // ---- night: HMS Seraph far out, the canister over the side, then she dives
     if (s >= 12 && s <= 19) {
       const dive = s === 18 ? 2 : s === 19 ? 4 : 0;
