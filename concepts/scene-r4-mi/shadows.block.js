@@ -10,9 +10,17 @@
     const c = Cv(160, 70, "K"), sh = p.sh || 0, ra = p.ra || 0, lf = p.lf || 0, ce = p.ce || 0, sb = p.sb || 0;
     const LX = 27, LY = 10;                                                                                        // the lamp
     // night sky over the rooftops: a barrage balloon, a searchlight
-    c.sky(0, 13, [["K", 4], ["D", 9], ["E", 14]]); stars(c, 6, 91);
+    c.sky(0, 13, [["D", 3], ["Q", 8], ["N", 14]]);   // deep night blue, so the blacked-out rooftops show against it stars(c, 6, 91);
     const ang = [-.6, -.4, -.2, 0, .2, 0, -.2, -.4][sb]; for (let t = 0; t < 16; t++) { const x = 92 + Math.round(Math.sin(ang) * t * 2.2), y = 13 - t; if (y >= 0) { c.p(x, y, "C"); c.p(x + 1, y, "C"); } }
     c.e(128, 4, 7, 2.4, "H"); c.r(122, 3, 133, 3, "g"); c.poly([[134, 3], [138, 1], [138, 6], [134, 5]], "C"); c.l(127, 7, 125, 13, "C");   // barrage balloon on its cable
+    // London beyond the wall, blacked out: terrace roofs with chimney pots, an office block, a church spire, a pitched roof
+    const roofs = [[0, 15, 8], [34, 52, 4], [60, 75, 9], [142, 159, 7]];
+    roofs.forEach(([a, b, top]) => c.r(a, top, b, 13, "K"));
+    [[3, 5], [10, 6], [146, 4], [153, 4]].forEach(([x, top]) => { c.r(x, top, x + 2, 8, "K"); c.p(x, top - 1, "K"); c.p(x + 2, top - 1, "K"); });   // chimney stacks and pots
+    c.r(34, 3, 52, 3, "D"); c.r(41, 1, 44, 3, "K"); [37, 42, 47].forEach((x) => c.r(x, 6, x + 2, 8, "D")); c.p(48, 10, "C");   // office block: parapet, lift housing, dark windows, one chink of light
+    c.poly([[60, 9], [67.5, 4], [75, 9]], "K"); c.r(66, 3, 68, 5, "K");                                                    // pitched roof with a chimney
+    c.r(99, 5, 105, 13, "K"); c.poly([[99, 5], [102, 0], [105, 5]], "K"); c.p(102, 0, "D"); c.r(101, 8, 103, 10, "D");      // church tower and spire, a dark louvre
+    c.r(106, 9, 118, 13, "K"); c.r(110, 7, 111, 9, "K");                                                                  // the church roof running back
     // brick wall, lit from the lamp
     const lvl = (x, y) => { const d = Math.hypot((x - LX) * .62, (y - LY) * 1.1); return d < 40 ? 2 : d < 82 ? 1 : 0; };   // the light reaches along the wall, where the shadows fall
     for (let y = 14; y <= 58; y++) for (let x = 0; x < 160; x++) {
