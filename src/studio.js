@@ -34,7 +34,7 @@
     "r1-mi": "A double agent's room in London at night, 1939: a suitcase radio transmitter open on a table, a hand tapping a Morse key, headphones, a bare bulb, and rain on a window showing the Big Ben clock tower.",
     "r3-fa": "Brest harbor at night, February 1942: three German warships in silhouette leaving port, harbor cranes on the shore, mist on the water, and a searchlight sweeping the sky.",
     "r3-ul": "The North African desert at night, January 1942: a command tent with a lamp glowing inside, a radio aerial, tanks resting on the dunes, stars, and sand drifting on the wind.",
-    "r4-fa": "A street in occupied Paris at night, 1942: tall apartment buildings with some windows lit, a poster on the wall, rain, and a figure in a trench coat and hat waiting under a street lamp.",
+    "r4-fa": "Occupied Paris at night, 1942, seen from a dark room between red curtains: a watcher in a hat looks across a rainy street at a safe house. Shadows move behind its one lit window, a black car pulls up under a street lamp, and the blue front door opens on a man in a hat.",
     "r4-mi": "Garbo's desk in London, 1942: a typewriter typing a report, letters with a red seal, a desk lamp, and a wall map of Britain with pins marking imaginary agents.",
     "r4-ul": "The Mediterranean by day, 1942: a convoy of supply ships on blue water with smoke from their funnels, a far coastline, clouds, and a small British spotter plane crossing the sky.",
     "r5-bp": "A beach in southern Spain at dawn, April 1943: a red and gold sunrise, waves and foam on the sand, a fishing boat, gulls, and a briefcase with a chain lying on the sand.",

@@ -958,22 +958,64 @@ const ART = (function () {
     for (let i = 0; i < 14; i++) { const x = (i * 23 + sd * 9) % 170 - 5, y = 50 + (i * 7) % 18; c.p(x, y, "l"); c.p(x + 1, y, "m"); }   // drifting sand
     return c;
   };
-  // ---- A Paris street at night, 1942: rain, a lamp, someone waiting
-  CH.leak = { rn: 4, wn: 4 };
+  // ---- Watching the safe house, Paris, 1942: from a dark room across the street, someone watches the meeting
+  //      window. Shadows move behind its curtain (wn); a black car pulls up and the door opens on a figure (cr); rain (rn).
+  CH.leak = { rn: 4, wn: 6, cr: 12 };
   S.leak = (p) => {
-    const c = Cv(160, 70, "D"), rn = p.rn || 0, wn = p.wn || 0;
-    c.r(0, 0, 159, 69, "K"); c.sky(0, 20, [["K", 8], ["D", 21]]);
-    [[0, 34, 12], [34, 30, 6], [64, 40, 10], [104, 30, 4], [134, 26, 9]].forEach(([x, w, top], b) => {
-      c.r(x, top + 6, x + w - 1, 56, "E"); c.poly([[x - 1, top + 6], [x + 3, top], [x + w - 4, top], [x + w, top + 6]], "C");   // mansard roof
-      for (let r = 0; r < 4; r++) for (let k = 0; k < Math.floor(w / 7); k++) { const wx = x + 3 + k * 7, wy = top + 9 + r * 10; const lit = hs(wx, wy, 6) > .7 || (b * 4 + k) % 7 === wn; c.r(wx, wy, wx + 3, wy + 5, lit ? "A" : "D"); if (lit) c.r(wx, wy + 5, wx + 3, wy + 5, "m"); } });
-    c.r(0, 56, 159, 69, "E"); for (let y = 57; y < 70; y += 2) for (let x = (y % 4); x < 160; x += 4) c.p(x, y, "C");
-    c.r(56, 30, 64, 42, "W"); c.r(57, 31, 63, 33, "R"); c.r(58, 35, 62, 40, "g");          // a poster on the wall
-    c.r(112, 18, 113, 60, "K"); c.r(109, 16, 116, 18, "K"); c.r(110, 19, 115, 20, "A");    // street lamp
-    c.poly([[110, 21], [115, 21], [124, 62], [101, 62]], (x, y) => ((x + y) % 2 || hs(x, y, 12) > .55 ? c.c[y][x] : (c.c[y][x] === "K" || c.c[y][x] === "D" || c.c[y][x] === "E" ? "C" : c.c[y][x])));
-    c.e(112.5, 62, 12, 2, (x, y) => ((x + y) % 2 ? "H" : "C"));
-    const fx = 100; c.r(fx, 44, fx + 6, 60, "s"); c.r(fx, 44, fx + 6, 45, "m"); c.r(fx + 1, 60, fx + 2, 63, "K"); c.r(fx + 4, 60, fx + 5, 63, "K");   // figure in a coat
-    c.e(fx + 3, 41, 2.2, 2.4, "l"); c.r(fx - 1, 38, fx + 7, 39, "K"); c.r(fx + 1, 36, fx + 5, 38, "K");   // face and hat
-    for (let x = 2; x < 160; x += 7) { const y0 = (x * 11 + rn * 9) % 66; for (let k = 0; k < 3; k++) c.p(x - (k >> 1), y0 + k, "C"); }   // rain
+    const c = Cv(160, 70, "K"), rn = p.rn || 0, wn = p.wn || 0, cr = p.cr || 0;
+    c.sky(0, 12, [["K", 6], ["D", 13]]); stars(c, 6, 61);
+    // neighbouring buildings, darker, a few dim windows
+    [[0, 38, 9], [120, 40, 7]].forEach(([x, w, top]) => { c.r(x, top, x + w - 1, 53, "E"); c.poly([[x - 1, top], [x + 3, top - 5], [x + w - 4, top - 5], [x + w, top]], "D");
+      for (let r = 0; r < 3; r++) for (let k = 0; k < Math.floor(w / 9); k++) { const wx = x + 4 + k * 9, wy = top + 5 + r * 12; c.r(wx, wy, wx + 4, wy + 7, hs(wx, wy, 8) > .8 ? "m" : "D"); } });
+    // the safe-house building: mansard roof with dormers, two floors of tall windows with shutters and balconies
+    c.poly([[37, 14], [42, 5], [116, 5], [121, 14]], "C"); c.r(42, 5, 116, 5, "H"); c.r(98, 1, 102, 5, "C"); c.r(97, 1, 103, 1, "H");
+    [52, 76, 100].forEach((x) => { c.r(x, 7, x + 5, 13, "E"); c.r(x + 1, 9, x + 4, 13, "D"); c.poly([[x - 1, 8], [x + 2.5, 5], [x + 6, 8]], "H"); });
+    c.r(38, 14, 120, 53, (x, y) => ((y - 14) % 6 === 5 && (x + (((y / 6) | 0) % 2) * 6) % 12 ? "E" : "C"));   // stone courses
+    const WX = [44, 58, 72, 86, 100];
+    [16, 28].forEach((wy, f) => WX.forEach((wx, i) => {
+      c.r(wx - 2, wy, wx - 1, wy + 8, "E"); c.r(wx + 7, wy, wx + 8, wy + 8, "E"); for (let y = wy + 1; y < wy + 8; y += 2) { c.p(wx - 2, y, "D"); c.p(wx + 8, y, "D"); }   // shutters
+      const lit = f === 0 && i === 2, dim = f === 1 && i === 4;
+      c.r(wx, wy, wx + 6, wy + 8, lit ? "A" : dim ? "m" : "D"); if (lit) { c.r(wx, wy, wx, wy + 8, "m"); c.r(wx + 6, wy, wx + 6, wy + 8, "m"); }
+      if (!lit && !dim) c.r(wx + 3, wy, wx + 3, wy + 8, "E"); }));
+    [25, 37].forEach((y) => { c.r(40, y, 118, y, "H"); for (let x = 40; x <= 118; x += 2) c.p(x, y + 1, "E"); });   // iron balconies
+    // ground floor: shuttered shops either side of a blue door
+    [[42, 66], [84, 116]].forEach(([x0, x1]) => { c.r(x0, 41, x1, 53, "H"); for (let y = 42; y < 53; y += 2) c.r(x0, y, x1, y, "C"); c.r(x0, 40, x1, 40, "E"); });
+    c.r(69, 42, 81, 53, "N"); c.e(75, 42, 6.5, 3.5, "N"); c.r(70, 43, 80, 53, "Q"); c.e(75, 43, 5, 2.5, "Q"); c.r(75, 41, 75, 53, "N"); c.p(73, 48, "A"); c.p(77, 48, "A");
+    c.r(74, 38, 76, 39, "A");                                                                 // the lamp over the door
+    // pavement, kerb, cobbled street
+    c.r(0, 54, 159, 55, "H"); c.r(0, 55, 159, 55, "g"); c.r(0, 56, 159, 62, "E"); for (let y = 57; y < 63; y += 2) for (let x = (y % 4); x < 160; x += 4) c.p(x, y, "C");
+    // street lamp and its pool of light
+    c.r(134, 22, 134, 54, "K"); c.r(131, 17, 137, 18, "K"); c.r(132, 19, 136, 21, "A"); c.r(133, 15, 135, 16, "K");
+    for (let y = 53; y < 62; y++) for (let x = 118; x < 151; x++) { const u = (x - 134) / 16, q = (y - 57) / 4.5; if (u * u + q * q <= 1 && (x + y) % 2 === 0 && lighter[c.c[y][x]]) c.c[y][x] = lighter[c.c[y][x]]; }
+    // the meeting window: shadows behind the curtain
+    const inWin = (x, y) => (x >= 73 && x <= 77 ? "s" : c.c[y][x]);
+    const shadow = (x) => { c.r(x, 19, x, 20, inWin); c.r(x - 1, 21, x + 1, 24, inWin); };
+    [[75], [74], [74, 77], [75, 77], [76], []][wn].forEach(shadow);
+    // the car arrives, waits, and the door opens (state 0 is the moment that matters, so it is the still)
+    const XS = [102, 102, null, null, 160, 141, 125, 113, 106, 102, 102, 102], cx = XS[cr];
+    const door = cr <= 1 ? 9 : cr === 11 ? 3 : 0;
+    if (door) { c.r(80 - door + 1, 43, 80, 53, "A"); c.poly([[80 - door, 54], [81, 54], [84, 56], [80 - door - 2, 56]], "m");
+      if (door > 5) { c.r(75, 45, 77, 53, "K"); c.e(76, 44, 1.6, 1.6, "K"); c.r(74, 42, 78, 42, "K"); c.r(75, 41, 77, 41, "K"); } }   // a man in a hat in the doorway
+    if (cx !== null) {
+      const x0 = cx, beam = (x, y) => { const q = c.c[y] && c.c[y][x]; if (q && (x + y) % 2 === 0 && lighter[q]) c.c[y][x] = lighter[q]; };
+      for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 50 + s);   // headlight beam on the street
+      c.poly([[x0, 51], [x0 + 2, 47], [x0 + 12, 46], [x0 + 15, 41], [x0 + 26, 41], [x0 + 31, 46], [x0 + 32, 53], [x0 + 1, 53]], "K");   // body
+      c.e(x0 + 7, 52, 6, 3, "K"); c.e(x0 + 26, 52, 6, 3, "K"); c.r(x0 + 12, 53, x0 + 20, 54, "C");                                  // wings, running board
+      c.poly([[x0 + 16, 43], [x0 + 20, 43], [x0 + 20, 46], [x0 + 14, 46]], "E"); c.poly([[x0 + 22, 43], [x0 + 26, 43], [x0 + 28, 46], [x0 + 22, 46]], "E"); c.p(x0 + 17, 44, "H");
+      c.r(x0 + 15, 41, x0 + 26, 41, "C"); c.r(x0 + 3, 47, x0 + 11, 47, "C");                                                      // roof and bonnet catching the lamp
+      [7, 26].forEach((w) => { c.e(x0 + w, 55, 2.6, 2.6, "D"); c.p(x0 + w, 55, "H"); });
+      c.e(x0 + 2.5, 49, 1.4, 1.4, "A"); c.r(x0, 50, x0 + 1, 52, "C");
+    }
+    for (let x = 3; x < 160; x += 6) { const y0 = (x * 13 + rn * 8) % 64; for (let k = 0; k < 3; k++) if (y0 + k < 63) c.p(x - (k >> 1), y0 + k, "H"); }   // rain beyond the glass
+    // our side of the glass: curtains, the sill, and the watcher's head and shoulders
+    c.r(0, 0, 159, 2, "r"); for (let x = 0; x < 160; x += 4) c.p(x, 2, "K");
+    const curtain = (x0, x1, edge) => { for (let x = x0; x <= x1; x++) for (let y = 0; y < 70; y++) { const sway = Math.round(Math.sin(y / 9) * 1); c.p(x, y, (x + sway) % 3 === 0 ? "K" : x === edge ? "R" : "r"); } };
+    curtain(0, 9, 9); curtain(150, 159, 150);
+    c.r(0, 63, 159, 69, "s"); c.r(0, 63, 159, 63, "m"); c.r(0, 64, 159, 64, "l");
+    c.e(28, 71, 25, 12, "K"); c.r(23, 55, 32, 60, "K");                                                     // the watcher's shoulders and neck, from behind
+    c.e(27.5, 51, 5.5, 6.5, "K"); c.r(17, 45, 38, 46, "K"); c.e(27.5, 45, 11, 1.6, "K"); c.r(21, 39, 34, 45, "K"); c.e(27.5, 39.5, 6.5, 1.5, "K"); c.r(21, 43, 34, 43, "E");   // head and hat
+    for (let y = 47; y < 57; y++) c.p(33 - Math.abs(y - 51.5) * .45, y, "C"); c.r(34, 39, 34, 42, "C"); c.r(35, 45, 38, 45, "C");   // rim light from the street lamp
+    for (let a = -1.4; a < -.2; a += .04) c.p(28 + Math.cos(a) * 25, 71 + Math.sin(a) * 12, "C");
     return c;
   };
   // ---- The Mediterranean by day, 1942: a supply convoy, and a spotter plane that gives the strike its cover story
@@ -1021,7 +1063,7 @@ const ART = (function () {
     const a = -.15 + fl * .05; for (let t = 4; t < 44; t++) for (let s = -t / 6; s <= t / 6; s += 1) { const x = hx + 8 + Math.cos(a) * t - Math.sin(a) * s, y = hy - 5 + Math.sin(a) * t + Math.cos(a) * s * .6; if ((Math.round(x) + Math.round(y)) % 2 === 0) { const q = c.c[Math.round(y)] && c.c[Math.round(y)][Math.round(x)]; c.p(x, y, q === "H" ? "W" : q === "C" ? "g" : t < 24 ? "g" : "H"); } }   // flashlight beam
     return c;
   };
-  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, pl: 3, fm: 3, gl: 2 }, cacheS = {};
+  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 4, pl: 3, fm: 3, gl: 2 }, cacheS = {};
   // the panning background is rasterised once so the browser can slide a single image smoothly
   function intPan() {
     const g = intBG().c, H = g.length, W = g[0].length;
