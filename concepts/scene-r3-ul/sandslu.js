@@ -32,7 +32,7 @@ S.sandslu = (p) => {
   c.poly([[0, 42], [50, 40], [110, 42], [160, 39], [160, 41], [110, 44], [50, 42], [0, 44]], "l");
   c.r(0, 66, 159, 69, "s");                                                                                       // darker sand in the foreground
   // wind-blown sand: low streaks drifting right (drawn before the objects so they stay behind them)
-  for (let i = 0; i < 40; i++) { const y = 46 + ((i * 7) % 21), len = 3 + (i % 3), x0 = (i * 37 + ub * 4) % 160, t = (y < 58 ? "l" : "s"); for (let k = 0; k < len; k++) c.p((x0 + k) % 160, y, t); }
+  for (let i = 0; i < 8; i++) { const y = 46 + ((i * 7) % 21), len = 3 + (i % 3), x0 = (i * 11 + 3) % 24, t = (y < 58 ? "l" : "s"); for (let k = -1; k < 8; k++) for (let j = 0; j < len; j++) c.p(x0 + 24 * k + 4 * ub + j, y, t); }
   // ground shadow of the truck
   c.r(76, 58, 140, 62, "s");
   // aerial wire to a pole on the left
