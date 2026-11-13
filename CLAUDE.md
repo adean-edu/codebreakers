@@ -71,6 +71,7 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 
 - **Sounds:** quiet and pleasant, never harsh, bright or loud. The teacher supplies real sound files when synthesized ones fall short. Volumes have been tuned by ear, so don't raise them.
 - **Accuracy:** real history matters. Flag factual or geographic errors (wrong locations, wrong scale bars) and don't silently invent facts. The teacher proofreads history text before class.
+- **Pushing:** the teacher has said changes can be pushed to `main` (which updates the live game) without asking each time. Run `t.js` for all five roles first, and say what was pushed and how to undo it.
 - **Restore points:** when the teacher asks to "save this version", make a named restore point. In git, that's a tag (e.g. `stable-7`).
 - **Visuals:** keep the dark theme. Light themes (War Room, Wartime Poster) were tried and rejected.
 - **Communication:** explain changes plainly, keep replies short, and always mention how to undo a change.
