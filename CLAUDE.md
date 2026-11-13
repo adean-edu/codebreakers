@@ -93,12 +93,12 @@ Going forward, use git tags for restore points.
 ## To-do
 
 - **Replace six scenario animations (teacher, 2026-11-13: "I do not like these and would like to see other options").** These are the built-in pixel scenes in `src/art.js`. The file names are the Asset Studio's slot names: a GIF at `images/scene-<slot>.gif` would override them, but there's no `images/` folder yet. For each one, show the teacher **two or three different concepts** (a still or a short GIF preview of each) before building one in. Keep the house rules for animations: the 160×70 grid, the `PAL` palette, the dark theme, quiet motion, a seamless loop (all channel loop lengths divide one shared period), and state 0 as the strongest still. Test only the role that sees each slot.
-  - [ ] `scene-r3-fa`: Channel Dash, FA round 3. Scene `brest` (Brest harbour at night, three warships under a searchlight).
-  - [ ] `scene-r3-ul`: Rommel Strikes Back, UL round 3. Scene `desert` (command tent and tanks at night).
-  - [ ] `scene-r4-ul`: Convoys to Africa, UL round 4. Scene `medconvoy` (a convoy by day, a spotter plane).
-  - [ ] `scene-r5-bp`: Operation Mincemeat, BP round 5. Scene `mincemeat` (a briefcase on a beach at dawn), **shared with `r5-mi`**. Consider giving BP and MI different scenes: BP sees the story through German messages at Bletchley, MI built the deception.
-  - [ ] `scene-r5-mi`: Operation Mincemeat, MI round 5. Same `mincemeat` scene as `r5-bp`.
-  - [ ] `scene-r5-fa`: The Rocket Secret, FA round 5. Scene `rocket` (a courier's flashlight on a crashed rocket in a forest).
+  - [ ] `scene-r3-fa`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** Channel Dash, FA round 3. Scene `brest` (Brest harbour at night, three warships under a searchlight).
+  - [ ] `scene-r3-ul`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** Rommel Strikes Back, UL round 3. Scene `desert` (command tent and tanks at night).
+  - [ ] `scene-r4-ul`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** Convoys to Africa, UL round 4. Scene `medconvoy` (a convoy by day, a spotter plane).
+  - [ ] `scene-r5-bp`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** Operation Mincemeat, BP round 5. Scene `mincemeat` (a briefcase on a beach at dawn), **shared with `r5-mi`**. Consider giving BP and MI different scenes: BP sees the story through German messages at Bletchley, MI built the deception.
+  - [ ] `scene-r5-mi`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** Operation Mincemeat, MI round 5. Same `mincemeat` scene as `r5-bp`.
+  - [ ] `scene-r5-fa`: **CONCEPTS IN PROGRESS (Logan's Claude, 2026-11-13): don't start this one.** The Rocket Secret, FA round 5. Scene `rocket` (a courier's flashlight on a crashed rocket in a forest).
   - Done for reference: `scene-r4-fa` (`leak`) was rebuilt on 2026-11-13 as the A/B bait-test scene. Use it as the quality bar.
 
 ## Known open items
