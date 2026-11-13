@@ -251,7 +251,7 @@ const DATA = (function () {
       tl: { d: "Feb 1942", t: "German warships escape from Brest up the English Channel", k: 1942.02 },
       sitrep: ["February 1942. For almost a year, three of Germany's biggest warships have sat in the harbor at Brest, on the coast of occupied France. British bombers attack them again and again.",
         "Now the dock workers are talking. Crews are loading supplies, and some say the ships will sail soon. Nobody knows where to, or when. Your network is one of the few sets of eyes London has inside the port."] },
-    "UL-2": { title: "Rommel Strikes Back", date: "January 1942", place: "Libya, North Africa", scene: "agheila", word: "ROMMEL", img: "r3-ul",
+    "UL-2": { title: "Rommel Strikes Back", date: "January 1942", place: "Libya, North Africa", scene: "advance", word: "ROMMEL", img: "r3-ul",
       tl: { d: "Jan 1942", t: "Rommel counterattacks in North Africa", k: 1942.01 },
       sitrep: ["January 1942. In the North African desert, British forces have pushed General Rommel's army back hundreds of miles. Everyone is tired, supplies are stretched, and the generals believe the enemy is beaten for now.",
         "You are the officer who carries Ultra to one of those generals. A new decrypt hints that Rommel has received fresh tanks and fuel. It is not proof, and your general has heard false alarms before."] },

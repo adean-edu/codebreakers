@@ -515,7 +515,7 @@ const DATA = (function () {
       tl: { d: "Feb 1942", t: "German warships escape from Brest up the English Channel", k: 1942.02 },
       sitrep: ["February 1942. For almost a year, three of Germany's biggest warships have sat in the harbor at Brest, on the coast of occupied France. British bombers attack them again and again.",
         "Now the dock workers are talking. Crews are loading supplies, and some say the ships will sail soon. Nobody knows where to, or when. Your network is one of the few sets of eyes London has inside the port."] },
-    "UL-2": { title: "Rommel Strikes Back", date: "January 1942", place: "Libya, North Africa", scene: "agheila", word: "ROMMEL", img: "r3-ul",
+    "UL-2": { title: "Rommel Strikes Back", date: "January 1942", place: "Libya, North Africa", scene: "advance", word: "ROMMEL", img: "r3-ul",
       tl: { d: "Jan 1942", t: "Rommel counterattacks in North Africa", k: 1942.01 },
       sitrep: ["January 1942. In the North African desert, British forces have pushed General Rommel's army back hundreds of miles. Everyone is tired, supplies are stretched, and the generals believe the enemy is beaten for now.",
         "You are the officer who carries Ultra to one of those generals. A new decrypt hints that Rommel has received fresh tanks and fuel. It is not proof, and your general has heard false alarms before."] },
@@ -1195,7 +1195,7 @@ const ART = (function () {
     return c;
   };
   // ---- (built in from concepts/scene-r3-ul/advance.js, teacher's choice 2026-11-13)
-  // ---- January 1942: a forward post sees German tanks emerge from a dust storm
+  // ---- January 1942: an Afrika Korps post watches the panzers roll out of a dust storm (truck and uniforms changed to German, 2026-11-13)
   CH.advance = { va: 24, vb: 4, vc: 8, vd: 4, ve: 2 };
   const BAY = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
   S.advance = (p) => {
@@ -1218,17 +1218,27 @@ const ART = (function () {
       const a = Math.max(0, Math.min(1, (x - 92) / 44)); let top = 12 + (1 - a) * 18; if (top < 26) top += Math.round(1.6 * Math.sin(x / 6 + vd * Math.PI / 2));
       if (y < top) continue; const d = a * Math.max(0, Math.min(1, .45 + (y - top) * .09));
       if (BAY[y & 3][x & 3] / 16 < d) c.p(x, y, y < top + 4 ? "s" : y < top + 9 ? "m" : "l"); }
-    // truck parked beyond the post
-    c.r(76, 58, 124, 61, "s");
-    c.r(93, 41, 122, 47, "l"); for (let x = 96; x < 122; x += 6) c.r(x, 41, x, 47, "m"); c.r(93, 41, 122, 41, "E");   // stone-coloured canvas tilt
-    c.r(93, 48, 122, 55, "m"); c.r(100, 49, 108, 53, "s"); c.r(112, 48, 120, 51, "s"); c.r(82, 46, 93, 55, "m"); c.r(85, 51, 91, 55, "s");   // sand body, darker disruptive patches
-    c.r(82, 46, 93, 46, "E"); c.r(82, 46, 82, 55, "E"); c.r(93, 41, 93, 55, "E"); c.r(122, 41, 122, 55, "E"); c.r(82, 55, 122, 55, "E"); c.r(93, 48, 122, 48, "E");
-    c.r(83, 47, 86, 50, "B"); c.r(83, 47, 86, 47, "W");
-    [[88, 57], [100, 57], [114, 57]].forEach(([x, y]) => { c.e(x, y, 3.2, 3.2, "K"); c.p(x, y, "H"); });
-    // soldiers behind the sandbags, lit from the right: tin hats, lit faces, green jackets
-    const man = (x, ty) => { c.r(x - 2, ty, x + 2, ty, "H"); c.r(x, ty, x + 1, ty, "g"); c.r(x - 4, ty + 1, x + 4, ty + 1, "C"); c.r(x + 1, ty + 1, x + 4, ty + 1, "H");   // Brodie helmet with wide brim
-      c.r(x - 2, ty + 2, x + 2, ty + 4, "m"); c.r(x + 1, ty + 2, x + 2, ty + 4, "l"); c.p(x + 1, ty + 3, "E"); c.p(x - 2, ty + 4, "s");
-      c.r(x - 3, ty + 5, x + 3, ty + 16, "s"); c.r(x + 2, ty + 5, x + 3, ty + 16, "m"); c.r(x - 4, ty + 5, x - 4, ty + 16, "E"); c.r(x - 3, ty + 12, x + 3, ty + 12, "E"); c.r(x - 3, ty + 5, x + 3, ty + 5, "m"); };
+    // a German Opel Blitz parked beyond the post, in Afrika Korps colours: sand-brown with grey-green patches, small cross on the door
+    c.r(74, 58, 126, 61, "s");                                                                                       // its shadow
+    c.poly([[96, 47], [97, 42], [100, 40], [119, 40], [122, 42], [123, 47]], "l"); for (let x = 101; x < 121; x += 5) c.r(x, 41, x, 47, "m");   // canvas tilt over the cargo bed, hoops showing
+    c.l(97, 42, 100, 40, "E"); c.r(100, 40, 119, 40, "E"); c.l(119, 40, 122, 42, "E");
+    c.r(96, 47, 123, 55, "l"); [50, 53].forEach((y) => c.r(96, y, 123, y, "m")); c.r(104, 48, 111, 51, "O"); c.r(115, 52, 121, 54, "O");   // slatted bed, grey-green patches
+    c.r(96, 47, 123, 47, "E"); c.r(96, 47, 96, 55, "E"); c.r(123, 47, 123, 55, "E");
+    c.r(86, 42, 95, 55, "l"); c.r(88, 43, 94, 46, "E"); c.p(93, 44, "g"); c.r(86, 52, 95, 54, "m"); c.r(87, 51, 89, 54, "O");               // square cab with its window
+    c.r(86, 41, 95, 41, "E"); c.r(86, 41, 86, 55, "E"); c.r(95, 41, 95, 47, "E");
+    { const X = 91, Y = 49; [[-2, 0], [2, 0], [0, -2], [0, 2], [-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => c.p(X + a, Y + b, "W")); c.r(X - 1, Y, X + 1, Y, "K"); c.r(X, Y - 1, X, Y + 1, "K"); }   // Balkenkreuz
+    c.r(77, 47, 86, 54, "l"); c.r(77, 46, 86, 46, "E"); for (let x = 79; x < 86; x += 2) c.r(x, 49, x, 52, "m"); c.r(80, 48, 83, 49, "O"); c.r(77, 53, 86, 54, "m");   // bonnet with side vents
+    c.r(74, 46, 76, 55, "s"); for (let y = 47; y < 55; y += 2) c.r(74, y, 75, y, "E"); c.r(74, 46, 76, 46, "m");                           // tall upright grille
+    c.poly([[75, 57], [76, 53], [79, 51.5], [85, 51.5], [88, 54], [88, 57]], "m"); c.poly([[106, 57], [108, 53.5], [111, 52.5], [117, 52.5], [120, 53.5], [122, 57]], "m"); c.l(76, 53, 79, 51, "E"); c.r(79, 51, 85, 51, "E"); c.l(108, 53, 111, 52, "E"); c.r(111, 52, 117, 52, "E");   // wings over the wheels
+    c.r(74, 55, 123, 56, "E"); c.p(77, 49, "A"); c.r(73, 55, 74, 55, "m");                                                                    // chassis, masked headlamp, bumper
+    [81, 114].forEach((x) => { c.e(x, 57, 4.2, 4.2, "K"); c.e(x, 57, 2.4, 2.4, "C"); c.p(x, 57, "H"); });                               // big wheels
+    // Afrika Korps soldiers behind the sandbags, lit from the right: long-peaked olive field caps with goggles on the brim, sun-faded olive tropical tunics
+    const man = (x, ty) => { c.r(x - 2, ty, x + 2, ty, "O"); c.r(x - 2, ty + 1, x + 2, ty + 1, "O"); c.r(x + 1, ty, x + 2, ty, "V");                    // field cap, lit side
+      c.r(x + 2, ty + 2, x + 5, ty + 2, "E");                                                                                                // the long peak, toward the light
+      c.p(x - 1, ty, "g"); c.p(x, ty, "B"); c.p(x - 2, ty, "B");                                                                             // goggles pushed up on the cap
+      c.r(x - 2, ty + 2, x + 1, ty + 4, "m"); c.r(x + 1, ty + 3, x + 2, ty + 4, "l"); c.p(x + 1, ty + 3, "E"); c.p(x - 2, ty + 4, "s");     // face in the shade of the peak, lit cheek
+      c.r(x - 3, ty + 5, x + 3, ty + 16, "O"); c.r(x + 2, ty + 5, x + 3, ty + 16, "m"); c.r(x - 4, ty + 5, x - 4, ty + 16, "E");            // olive tunic, faded lit edge, shadow side
+      c.r(x - 3, ty + 12, x + 3, ty + 12, "s"); c.r(x - 3, ty + 5, x + 3, ty + 5, "V"); c.p(x - 1, ty + 7, "s"); c.p(x + 1, ty + 7, "s"); };   // webbing belt, open collar, pocket flaps
     man(11, 43); c.r(15, 37, 15, 46, "E"); c.p(15, 36, "H");                                                       // far man with rifle
     man(28, 40); c.l(31, 46, 38, 42, "s"); c.p(39, 42, "l"); c.p(39, 41, "l");                                     // pointing
     const by = -ve; man(46, 37); c.l(49, 44, 50, 41 + by, "s"); c.r(49, 39 + by, 53, 40 + by, "K"); c.p(54, 39 + by, "H"); c.p(54, 40 + by, "H"); c.p(51, 41 + by, "l");   // binoculars
@@ -1242,57 +1252,6 @@ const ART = (function () {
     const tx = 63 - bend; c.p(tx, 11, "W");
     const fl = [[[0, 0], [1, 0], [2, 0], [3, 0], [4, 1], [1, 1], [2, 1]], [[0, 0], [1, 0], [2, 1], [3, 1], [4, 2], [1, 1], [2, 2]], [[0, 0], [1, 0], [2, 0], [3, -1], [4, -1], [1, 1], [2, 1]], [[0, 0], [1, 0], [2, 1], [3, 1], [4, 1], [1, 1], [2, 2]]][vb];
     fl.forEach(([k, o]) => c.p(tx - 1 - k, 12 + o, k < 2 ? "W" : "l"));
-    return c;
-  };
-  // ---- Dawn, 21 January 1942: Rommel's tanks roll across the skyline toward Benghazi while a British bivouac brews its
-  //      morning tea, backs to the horizon. The tank column is the one from S.advance (same sprite, same speed, channel va).
-  //      Loop: va 24x4, fb 4x2, kt 6x4, mg 2x24 -> all divide 96 ticks (8 s). State 0 is the still.
-  CH.agheila = { va: 24, fb: 4, kt: 6, mg: 2 };
-  S.agheila = (p) => {
-    const c = Cv(160, 70, "K"), va = p.va || 0, fb = p.fb || 0, kt = p.kt || 0, mg = p.mg || 0;
-    // dawn sky, the last stars fading, the sun just clearing the horizon
-    c.sky(0, 35, [["Q", 6], ["N", 11], ["B", 16], ["g", 21], ["m", 26], ["l", 31], ["A", 36]]);
-    for (let y = 0; y < 9; y++) for (let x = 0; x < 90; x++) if (hs(x, y, 77) > .988) c.p(x, y, y < 5 ? "W" : "g");
-    c.e(138, 35, 6, 6, "A"); c.e(138, 35, 4, 4, "W");
-    // the desert: lit flats on the skyline, darker ground toward us
-    c.r(0, 35, 159, 69, (x, y) => (y < 38 ? "l" : y < 45 ? "m" : y < 52 ? (hs(x, y, 5) > .9 ? "s" : "m") : y < 58 ? ((x + y) % 2 && hs(x, y, 4) > .3 ? "s" : "m") : (hs(x, y, 6) > .93 ? "m" : "s")));
-    for (let x = 0; x < 160; x++) c.p(x, 35, x > 124 && x < 152 ? "W" : "l");                                            // the sun's glare along the horizon
-    // the German tank column on the skyline, moving left (same sprite and motion as S.advance), dust trailing behind each tank
-    const fade = (x, y, col) => { if (BAY[y & 3][x & 3] / 16 < Math.max(0, Math.min(1, (x - 14) / 20))) c.p(x, y, col); };
-    const tank = (x, y) => { for (let i = -4; i <= 9; i++) { if (i <= 1) fade(x + i, y + 1, "H");
-        if (i >= 2 && i <= 6) { fade(x + i, y + 1, "C"); if (i >= 3 && i <= 5) fade(x + i, y, "H"); }
-        if (i >= 1) fade(x + i, y + 2, "C"); if (i >= 0) fade(x + i, y + 3, i % 2 ? "H" : "E"); }
-      fade(x + 1, y + 2, "H"); fade(x + 9, y + 2, "H"); };
-    const dust = (x, y) => { for (let j = 10; j < 19; j++) for (let k = 1; k < 4; k++) if (BAY[(y + k) & 3][(x + j) & 3] / 16 < .42 - (j - 10) * .045 - (k === 1 ? .12 : 0)) fade(x + j, y + k, "l"); };
-    for (let k = -1; k < 8; k++) { dust(24 * k + 20 - va, 31); dust(24 * k + 8 - va, 36); }
-    for (let k = -1; k < 8; k++) { tank(24 * k + 8 - va, 36); tank(24 * k + 20 - va, 31); }
-    // the road sign: BENGHAZI, the way the tanks are going
-    c.r(126, 42, 127, 66, "s"); c.r(128, 42, 128, 66, "E");
-    c.poly([[100, 44], [104, 41], [150, 41], [150, 48], [104, 48]], "l"); c.l(104, 48, 150, 48, "s"); c.l(150, 41, 150, 48, "s");
-    let tx = 106; "BENGHAZI".split("").forEach((ch) => { const g = FONT[ch]; for (let k = 0; k < 15; k++) if (g[k] === "1") c.p(tx + (k % 3), 43 + ((k / 3) | 0), "E"); tx += 4; });
-    c.l(139, 44, 147, 44, "E"); c.l(139, 45, 147, 45, "E"); c.p(140, 43, "E"); c.p(140, 46, "E");                    // arrow back toward the word
-    // scrub and stones on the near ground
-    for (let i = 0; i < 26; i++) { const x = (i * 37 + 11) % 160, y = 52 + (i * 13) % 16; if (x > 4 && x < 70 && y < 64) continue;
-      c.p(x, y, "O"); c.p(x + 1, y - 1, "O"); c.p(x - 1, y - 1, "V"); if (i % 3 === 0) c.r(x + 3, y, x + 4, y, "m"); }
-    // the British bivouac: a ridge tent, lit on the side facing the sun
-    c.poly([[6, 62], [22, 44], [38, 62]], "l"); c.poly([[6, 62], [22, 44], [14, 62]], "m"); c.poly([[17, 62], [22, 52], [26, 62]], "E");   // canvas: lit face, shaded end, open flap
-    c.l(6, 62, 22, 44, "s"); c.l(22, 44, 38, 62, "s"); c.r(6, 62, 38, 62, "s"); c.l(22, 44, 22, 40, "E");                          // seams, ridge pole
-    c.l(6, 62, 1, 65, "E"); c.l(38, 62, 44, 65, "E"); c.l(22, 41, 46, 64, "E"); c.p(46, 64, "s"); c.p(1, 65, "s");                      // guy ropes and pegs
-    c.r(4, 63, 40, 63, "E");                                                                                                         // its shadow on the sand
-    // the Benghazi burner: a sand-filled petrol tin with flames, a blackened kettle, steam rising
-    c.r(48, 58, 54, 63, "H"); c.r(48, 58, 54, 58, "g"); c.r(49, 60, 53, 60, "C");
-    const fl = [[0, 2, 1], [1, 0, 2], [2, 1, 0], [1, 2, 1]][fb]; [49, 51, 53].forEach((x, i) => { c.r(x, 56 - fl[i], x, 57, i === 1 ? "A" : "R"); c.p(x, 57, "A"); });
-    c.r(49, 52, 53, 55, "K"); c.r(50, 51, 52, 51, "K"); c.l(54, 53, 56, 51, "K"); c.p(51, 50, "C");                     // kettle on the flames
-    for (let k = 0; k < 3; k++) { const ph = (kt + k * 2) % 6, y = 49 - ph * 2, x = 56 + Math.round(Math.sin((ph + k) * 1.3) * 1.2) + (ph >> 1);
-      if (ph < 5) { c.p(x, y, ph < 2 ? "W" : "g"); if (ph < 3) c.p(x + 1, y - 1, "g"); } }
-    // a British soldier sitting by the fire in his greatcoat, back to the horizon, cradling a mug
-    const sx = 64, sy = 62;
-    c.r(sx - 5, sy - 3, sx + 4, sy, "O"); c.r(sx - 5, sy - 3, sx - 2, sy - 3, "V"); c.r(sx - 7, sy - 1, sx - 5, sy, "K");   // knees drawn up, boots toward the fire
-    c.poly([[sx - 1, sy - 12], [sx + 4, sy - 12], [sx + 6, sy - 3], [sx - 2, sy - 3]], "O"); c.l(sx + 4, sy - 12, sx + 6, sy - 3, "E"); c.l(sx - 1, sy - 12, sx - 2, sy - 4, "V");   // greatcoat, shaded back, firelit front
-    c.r(sx, sy - 16, sx + 3, sy - 13, "m"); c.p(sx, sy - 15, "l"); c.p(sx, sy - 14, "l"); c.p(sx + 3, sy - 13, "s");                      // face, lit by the fire
-    c.r(sx, sy - 17, sx + 4, sy - 17, "O"); c.r(sx + 1, sy - 18, sx + 3, sy - 18, "O"); c.p(sx + 4, sy - 16, "E");                       // side cap
-    const my = mg ? -3 : 0; c.l(sx, sy - 10, sx - 3, sy - 8 + my, "O"); c.r(sx - 6, sy - 10 + my, sx - 4, sy - 7 + my, "g"); c.p(sx - 5, sy - 10 + my, "W"); c.p(sx - 3, sy - 9 + my, "m");   // arm and tin mug, lifted now and then
-    c.r(sx - 8, sy + 1, sx + 6, sy + 1, "r");                                                                            // his shadow, long in the low sun
     return c;
   };
   // ---- (built in from concepts/scene-r4-ul/maltadawn.js, teacher's choice 2026-11-13)
@@ -1544,7 +1503,7 @@ const ART = (function () {
     const a = -.15 + fl * .05; for (let t = 4; t < 44; t++) for (let s = -t / 6; s <= t / 6; s += 1) { const x = hx + 8 + Math.cos(a) * t - Math.sin(a) * s, y = hy - 5 + Math.sin(a) * t + Math.cos(a) * s * .6; if ((Math.round(x) + Math.round(y)) % 2 === 0) { const q = c.c[Math.round(y)] && c.c[Math.round(y)][Math.round(x)]; c.p(x, y, q === "H" ? "W" : q === "C" ? "g" : t < 24 ? "g" : "H"); } }   // flashlight beam
     return c;
   };
-  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 2, rv: 4, rd: 6, lt: 2, pl: 3, fm: 3, gl: 2, sk: 6, ws: 8, ll: 12, pa: 12, st: 8, va: 4, vb: 6, vc: 6, vd: 12, ve: 24, ma: 2, mb: 4, mc: 12, md: 12, ba: 6, bb: 8, bc: 6, bd: 8, be: 6, bf: 12, xa: 12, xb: 6, xc: 8, fb: 2, kt: 4, mg: 24 }, cacheS = {};
+  const HOLD = { wv: 9, ib: 8, w: 5, sm: 3, wk: 5, k: 6, ro: 4, wh: 2, nd: 2, sw: 2, kb: 6, lp: 6, tp: 3, pm: 8, fl: 2, sp: 3, cl: 4, rw: 3, cd: 2, lb: 3, dg: 5, kp: 3, rn: 1, ty: 2, pn: 4, sl: 3, sd: 2, wn: 6, cr: 2, rv: 4, rd: 6, lt: 2, pl: 3, fm: 3, gl: 2, sk: 6, ws: 8, ll: 12, pa: 12, st: 8, va: 4, vb: 6, vc: 6, vd: 12, ve: 24, ma: 2, mb: 4, mc: 12, md: 12, ba: 6, bb: 8, bc: 6, bd: 8, be: 6, bf: 12, xa: 12, xb: 6, xc: 8 }, cacheS = {};
   // the panning background is rasterised once so the browser can slide a single image smoothly
   function intPan() {
     const g = intBG().c, H = g.length, W = g[0].length;
