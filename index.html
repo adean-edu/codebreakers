@@ -1028,14 +1028,14 @@ const ART = (function () {
       if (door > 5) { const x = 50;                                                          // a man in a hat pushing in through the doorway, dark against the light
         c.r(x - 1, 45, x + 1, 45, "K"); c.r(x - 2, 46, x + 2, 46, "K"); c.r(x - 1, 47, x + 1, 48, "K"); c.poly([[x - 1.5, 49], [x + 2.5, 49], [x + 2.5, 53], [x - 1.5, 53]], "K"); }
       if (door > 5 && troops.inDoor) { const x = 55;                                          // a soldier going in beside him: grey helmet and tunic
-        c.r(x - 1, 45, x + 1, 45, "H"); c.r(x - 2, 46, x + 2, 46, "C"); c.r(x - 1, 47, x + 1, 47, "s"); c.r(x - 2, 48, x + 2, 52, "H"); c.r(x - 2, 50, x + 2, 50, "K"); c.p(x - 1, 53, "K"); c.p(x + 1, 53, "K"); } }
+        c.r(x - 1, 45, x + 1, 45, "C"); c.r(x - 2, 46, x + 2, 46, "E"); c.r(x - 1, 47, x + 1, 47, "s"); c.r(x - 2, 48, x + 2, 52, "H"); c.r(x - 2, 50, x + 2, 50, "K"); c.p(x - 1, 53, "K"); c.p(x + 1, 53, "K"); } }
     // (the guard at door B is now one of the truck's soldiers, drawn after the truck)
     if (cx !== null) {   // a German Opel Blitz truck in field grey: upright grille, bonnet, square cab with the cross on the door, slatted cargo bed of soldiers
       const x0 = cx, q = (pts, a) => c.poly(pts.map(([x, y]) => [x0 + x, y]), a), beam = (x, y) => { const v = c.c[y] && c.c[y][x]; if (v && (x + y) % 2 === 0 && lighter[v]) c.c[y][x] = lighter[v]; };
       for (let t = 1; t < 34; t++) for (let s = -Math.floor(t / 5); s <= Math.floor(t / 4); s++) beam(x0 + 1 - t, 49 + s);   // dimmed headlight on the street
       // soldiers in steel helmets sitting in the back, rifles upright, drawn first so the bed's side hides their bodies
       [21, 26, 31, 36].forEach((x, i) => { const X = x0 + x, y = 42; if (i < 4 - troops.bed) return;   // those who have jumped down
-        c.r(X - 1, y - 6, X + 1, y - 6, "H"); c.r(X - 2, y - 5, X + 2, y - 5, "H"); c.r(X - 3, y - 4, X + 3, y - 4, "C"); c.p(X + 1, y - 6, "g");   // grey steel helmet, flared rim, a glint of lamp light
+        c.r(X - 1, y - 6, X + 1, y - 6, "H"); c.r(X - 2, y - 5, X + 2, y - 5, "C"); c.r(X - 3, y - 4, X + 3, y - 4, "E"); c.p(X + 1, y - 6, "g");   // grey steel helmet, flared rim, a glint of lamp light
         c.r(X - 1, y - 3, X + 1, y - 2, "m"); c.p(X - 1, y - 3, "l");                                                                  // face under the helmet
         c.r(X - 2, y - 1, X + 2, y, "H"); c.p(X + 2, y - 1, "g"); });                                                                // field-grey shoulders
       q([[1, 54], [2, 50], [5, 48.5], [10, 48.5], [13, 51], [13, 54]], "C"); c.r(x0 + 4, 48, x0 + 10, 48, "H");                    // front wing over the wheel
@@ -1052,7 +1052,7 @@ const ART = (function () {
       c.p(x0 + 3, 47, "A"); c.p(x0 + 4, 47, "A"); c.r(x0 - 1, 52, x0, 52, "g");                                                        // masked headlamp, bumper
     }
     if (cx === 60 && troops.ground.length) {   // soldiers in the street, WWII German field grey: grey steel helmet, grey tunic, black belt and boots, rifle
-      const trooper = (x, yb) => { c.r(x - 1, yb - 12, x + 1, yb - 12, "H"); c.r(x - 2, yb - 11, x + 2, yb - 11, "H"); c.r(x - 3, yb - 10, x + 3, yb - 10, "C"); c.p(x + 1, yb - 12, "g"); c.p(x + 2, yb - 11, "g");   // helmet
+      const trooper = (x, yb) => { c.r(x - 1, yb - 12, x + 1, yb - 12, "H"); c.r(x - 2, yb - 11, x + 2, yb - 11, "C"); c.r(x - 3, yb - 10, x + 3, yb - 10, "E"); c.p(x + 1, yb - 12, "g");   // helmet
         c.r(x - 1, yb - 9, x + 1, yb - 8, "m"); c.p(x - 1, yb - 9, "l");                                                                          // face
         c.r(x - 1, yb - 7, x + 1, yb - 7, "H"); c.r(x - 2, yb - 6, x + 2, yb - 3, "H"); c.r(x - 2, yb - 6, x - 2, yb - 3, "C"); c.r(x + 2, yb - 6, x + 2, yb - 3, "g"); c.r(x - 2, yb - 4, x + 2, yb - 4, "K");   // tunic: shaded and lit edges, belt
         c.r(x - 1, yb - 2, x + 1, yb - 1, "C"); c.p(x - 1, yb, "K"); c.p(x + 1, yb, "K"); c.l(x + 3, yb - 12, x + 3, yb - 3, "K"); };       // trousers, jackboots, rifle
