@@ -1,4 +1,4 @@
-  // ---- "The Watcher in Huelva", 30 April 1943: dawn on a balcony above the white rooftops of Huelva. A German agent in a light
+  // ---- "The Watcher in Huelva", 30 April 1943: dawn on a balcony right above the beach at Huelva. A German agent in a light
   //      suit watches the shore through binoculars as a fishing boat comes in. The plan needed the Germans' man here to see.
   //      Loop: hw 4x6 (sea and surf), hb 4x12 (the boat rocking), hg 2x24 (glint on the binoculars), hq 8x6 (gulls)
   //      -> every period divides 48 ticks (4 s). State 0 = the still. HOLD: hw: 6, hb: 12, hg: 24, hq: 6
@@ -11,19 +11,16 @@
     c.r(0, 31, 159, 42, (x, y) => (y < 34 ? "B" : y < 38 ? "N" : "Q"));
     for (let y = 31; y <= 42; y++) for (let x = 0; x < 160; x++) { const k = (x + y * 5 + hw * 3) % 11; if (y % 2 === 1 && k < 2) c.p(x, y, Math.abs(x - 126) < 4 + (y - 31) ? "A" : "B"); }
     for (let y = 31; y <= 42; y += 2) for (let x = 122 - (y - 31); x <= 130 + (y - 31); x++) if ((x + hw + y) % 3 === 0) c.p(x, y, "W");
-    // the beach, the surf breaking
-    c.r(60, 43, 159, 46, "l"); c.r(60, 46, 159, 46, "m");
-    for (let x = 60; x < 160; x++) { const y = 43 + ((x + hw * 4) % 8 < 3 ? 0 : 1); if ((x + hw) % 5) c.p(x, y, "W"); }
-    // a fishing boat coming in, rocking, two fishermen
-    { const r = [0, 1, 0, -1][hb], bx = 110, by = 38;
-      c.poly([[bx, by + r], [bx + 16, by - r], [bx + 13, by + 3 - r], [bx + 3, by + 3 + r]], "s"); c.l(bx, by + r, bx + 16, by - r, "m");
-      c.r(bx + 6, by - 7, bx + 6, by - 1, "s"); c.p(bx + 7, by - 6, "W"); c.p(bx + 7, by - 5, "W");
-      [[bx + 4, "E"], [bx + 11, "C"]].forEach(([x, col]) => { c.r(x, by - 4, x + 1, by - 1, col); c.p(x, by - 5, "m"); c.p(x + 1, by - 5, "m"); }); }
-    // the white town below the balcony: walls, terracotta roofs, small dark windows
-    [[30, 52, 14], [46, 50, 13], [62, 49, 12], [76, 47, 14], [92, 50, 10], [104, 48, 16], [122, 50, 12], [136, 47, 14], [152, 49, 10]].forEach(([x, top, w], i) => {
-      c.r(x, top, x + w - 1, 60, i % 2 ? "W" : "g"); c.poly([[x - 1, top], [x + w / 2, top - 4], [x + w, top]], i % 3 ? "R" : "r");
-      for (let k = 0; k < Math.floor(w / 5); k++) c.r(x + 2 + k * 5, top + 4, x + 3 + k * 5, top + 6, "E"); });
-    c.r(30, 61, 159, 69, "m");
+    // the beach right below the balcony: wet sand at the waterline, dry sand toward the house, a beached rowing boat and nets
+    c.r(30, 43, 159, 69, (x, y) => (y < 47 ? ((x + y) % 2 ? "s" : "m") : hs(x, y, 31) > .9 ? "m" : "l"));
+    for (let x = 30; x < 160; x++) { const y = 43 + ((x + hw * 4) % 8 < 3 ? 0 : 1); if ((x + hw) % 5) c.p(x, y, "W"); if ((x * 3 + hw * 5) % 13 === 0) c.p(x, y + 2, "W"); }   // surf running up the sand
+    c.poly([[96, 58], [118, 58], [115, 62], [99, 62]], "Q"); c.l(96, 58, 118, 58, "B"); c.r(106, 55, 107, 58, "s"); c.r(100, 60, 113, 60, "N");   // a rowing boat drawn up on the sand
+    for (let x = 122; x < 146; x++) if ((x + (x >> 2)) % 3 === 0) { c.p(x, 60 + (x % 2), "s"); c.p(x + 1, 61, "s"); }   // fishing nets drying
+    // a fishing boat just off the beach, rocking, two fishermen
+    { const r = [0, 1, 0, -1][hb], bx = 104, by = 40;
+      c.poly([[bx, by + r], [bx + 22, by - r], [bx + 18, by + 4 - r], [bx + 4, by + 4 + r]], "s"); c.l(bx, by + r, bx + 22, by - r, "m"); c.l(bx + 4, by + 3 + r, bx + 18, by + 3 - r, "r");
+      c.r(bx + 9, by - 10, bx + 9, by - 1, "s"); c.poly([[bx + 10, by - 9], [bx + 15, by - 3], [bx + 10, by - 3]], "W"); c.l(bx + 10, by - 9, bx + 10, by - 3, "g");
+      [[bx + 5, "E", "m"], [bx + 16, "C", "l"]].forEach(([x, col, cap]) => { c.r(x, by - 5, x + 1, by - 1, col); c.r(x, by - 7, x + 1, by - 6, "m"); c.r(x - 1, by - 8, x + 2, by - 8, cap); }); }
     // gulls
     for (let i = 0; i < 2; i++) { const gx = (60 + hq * 14 + i * 40) % 110 + 50, gy = 10 + i * 6, f = (hq + i) % 2;
       c.p(gx, gy, "W"); c.p(gx - 1, gy - f, "W"); c.p(gx - 2, gy - 1 + f, "W"); c.p(gx + 1, gy - f, "W"); c.p(gx + 2, gy - 1 + f, "W"); }
