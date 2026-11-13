@@ -271,7 +271,7 @@ const DATA = (function () {
       tl: { d: "Apr 1943", t: "Operation Mincemeat: fake invasion plans wash ashore in Spain", k: 1943.04 },
       sitrep: ["April 1943. The Allies are about to invade Sicily, and Germany knows Sicily is the obvious target. So British intelligence has planted a lie: a dead body, dressed as a British officer, carrying fake letters about invading Greece and Sardinia instead.",
         "The body has washed ashore in Spain, where German agents are watching. Did Germany believe it? Only the German messages your hut reads can tell."] },
-    "MI-4": { title: "Operation Mincemeat", date: "April 1943", place: "Huelva, Spain", scene: "mincedesk", word: "SPAIN", img: "r5-mi",
+    "MI-4": { title: "Operation Mincemeat", date: "April 1943", place: "Huelva, Spain", scene: "landfall", word: "SPAIN", img: "r5-mi",
       tl: { d: "Apr 1943", t: "Operation Mincemeat: fake invasion plans wash ashore in Spain", k: 1943.04 },
       sitrep: ["April 1943. The Allies are about to invade Sicily, and Germany knows Sicily is the obvious target. Your team has planted a lie: a dead body, dressed as a British officer, carrying fake letters about invading Greece and Sardinia instead.",
         "You built every detail of this man's life, down to the theater tickets in his pocket. Now he has washed ashore in Spain, near German agents, and you have to decide how hard to push the story."] },
