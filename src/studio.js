@@ -18,8 +18,8 @@
     "r4-fa": "A diagram drawn on old paper: London sends two slightly different versions of a story to Contact A (meeting on Tuesday) and Contact B (meeting on Thursday); a German raid on Thursday shows the leak runs through B.",
     "r4-mi": "Map of Britain, France and Spain in 1942 showing Garbo in London with red dots for his imaginary agents around Britain, and a dashed red line of made-up reports to his German handlers in Madrid.",
     "r4-ul": "Map of the central Mediterranean in 1942 showing Italy, Sicily, Sardinia, Malta, Tunisia and Libya, the Axis supply route from Naples to Tripoli, a British spotter plane from Malta finding the convoy, and the strike that follows.",
-    "r5-bp": "Map of Spain and the Mediterranean in April 1943 showing Huelva in southwest Spain where the body washed ashore, red dashed arrows to the fake targets Sardinia and Greece, and a navy arrow to the real target, Sicily (July 1943).",
-    "r5-mi": "Map of Spain and the Mediterranean in April 1943 showing Huelva in southwest Spain where the body washed ashore, red dashed arrows to the fake targets Sardinia and Greece, and a navy arrow to the real target, Sicily (July 1943).",
+    "r5-bp": "Map of Spain and the Mediterranean in April 1943 showing Huelva in southwest Spain, where a fisherman brought the body ashore, red dashed arrows to the fake targets Sardinia and Greece, and a navy arrow to the real target, Sicily (July 1943).",
+    "r5-mi": "Map of Spain and the Mediterranean in April 1943 showing Huelva in southwest Spain, where a fisherman brought the body ashore, red dashed arrows to the fake targets Sardinia and Greece, and a navy arrow to the real target, Sicily (July 1943).",
     "r5-fa": "Map of the Baltic coast and occupied Poland in 1943 to 1944 showing Peenemünde (rocket base, bombed August 1943), Warsaw, the Blizna rocket test range in southeast Poland, and a route showing V-2 rocket parts flown to Britain in July 1944."
   };
   const SC = {
