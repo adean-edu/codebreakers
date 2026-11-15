@@ -38,7 +38,9 @@ First full pass: 2026-11-15. It covers all student-facing text in `src/data.js` 
 
 ---
 
-## 2. NEEDS TEACHER REVIEW
+## 2. Teacher review items: ALL APPLIED 2026-11-15
+
+The teacher said "Yes, apply all". Each suggested wording below is now in `src/data.js` (R3 uses "Purple machines", in both the history text and its real call; R4 uses the new source line). All five roles were tested. Kept here for the record.
 
 | # | Where | Claim | The issue | Suggested wording |
 |---|---|---|---|---|
