@@ -1,4 +1,4 @@
-/* CODEBREAKERS: THE SILENT SERVICE: a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
+/* OPERATION CHICKEN FEED: LIES THAT SAVED LIVES (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
 const DATA = (function () {
   const KINDS = {
     cover: { s: 4, i: 6, t: 2, p: 20 }, share: { s: 1, i: 5, t: 5, p: 20 },
@@ -141,7 +141,7 @@ const DATA = (function () {
     { id: "gambler", title: "The Gambler", tag: "High impact, high risk", bonus: 8, desc: "You changed events, over and over. The price was that more people knew and more risks piled up. Some gambles paid off, but you will never know how many close calls there were.", ask: "How many risks are too many to take with a secret you do not own?" },
     { id: "steady", title: "The Steady Hand", tag: "A balanced professional", bonus: 12, desc: "You did your job without drama. Some intelligence was used, some was held back, and the war went on. Nobody remembers your best decisions, which is how it was supposed to work.", ask: "How do you know if you made the best choice when you can't see the alternative?" }
   ];
-  const RANKS = [{ min: 0, title: "Trainee" }, { min: 85, title: "Analyst" }, { min: 115, title: "Section Head" }, { min: 140, title: "Senior Analyst" }, { min: 165, title: "Master of the Silent Service" }];
+  const RANKS = [{ min: 0, title: "Trainee" }, { min: 85, title: "Analyst" }, { min: 115, title: "Section Head" }, { min: 140, title: "Senior Analyst" }, { min: 165, title: "Master of Tradecraft" }];
   /* Real-history timeline; entries with r are the six rounds of the game. Proofread before class. */
   const TIMELINE = [
     { k: 1939.07, d: "Jul 1939", t: "Poland shares its Enigma methods with Britain and France", r: 0 },

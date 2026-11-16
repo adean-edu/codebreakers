@@ -29,3 +29,4 @@ a { color: var(--gold); } .guide ol li, .guide ul li { margin: 6px 0; } .guide p
 .ver { border-left: 4px solid var(--gold); padding: 8px 14px; background: var(--panel); }
 .box { background: var(--panel); border: 1px solid var(--line); padding: 4px 16px 12px; margin: 10px 0; }
 pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var(--ink); margin: 0; }
+.subt2 { margin: -2px 0 10px; font: 700 15px "Courier New", monospace; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); }

@@ -1,4 +1,6 @@
-# Codebreakers: The Silent Service — project handoff
+# Operation Chicken Feed: Lies That Saved Lives — project handoff
+
+**Name (teacher's choice, 2026-11-16):** the game is **Operation Chicken Feed: Lies That Saved Lives**. It was "Codebreakers: The Silent Service" until then; renamed because not every role breaks codes, and "the Silent Service" is the well-known nickname of the submarine service. "Chicken feed" was MI5's real term for true but harmless information fed to the enemy; it was checked not to be a real WWII operation, game or film. The repo and web address stay `codebreakers` so shared links keep working. The top rank "Master of the Silent Service" became "Master of Tradecraft". The frozen `v1/` keeps the old name; the new name reaches other teachers when `v2/` is published.
 
 A single-page WWII codebreaking game for a high school World History class. Students play one of five intelligence roles across six rounds (1939–1944), crack a Caesar cipher each round, make a decision, and see consequences tied to real history. They then use Padlet to swap "Signal IDs" with classmates, decode each other, and reassemble six secret messages they submit privately to the teacher.
 
