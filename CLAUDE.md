@@ -12,10 +12,20 @@ Owner: a high school World History teacher (GitHub `adean-edu`). Not a developer
 - `dist/studio.html` and `dist/studio-test.html` are the **Asset Studio**: a teacher-facing gallery of every image and animation slot, with file names and style-matched prompts.
 - `dist/check.html` is the **Teacher Check** page (live at `/check.html`; copy it to the repo root to deploy). The teacher pastes students' private submissions; it tests every Signal ID (the student's own and the classmates they decoded), shows which of the five roles each student covered and whether the six messages are right, flags shared own Signal IDs and word-for-word identical reflections, and copies a tab-separated table for a gradebook. It also looks up any single Signal ID. It never shows the messages themselves. Nothing pasted is stored or sent. Source: `src/checker.js`, `src/checker.css` (built with `data.js` and `logic.js`).
 
+## Sharing with other teachers (set up 2026-11-16)
+
+- **Two versions are live.** The main game at the repo root (`index.html`, `check.html`, `teachers.html`) is the working copy, and every push changes it. **`v1/`** is a frozen copy for classes and other teachers: https://adean-edu.github.io/codebreakers/v1/teachers.html is the link to share.
+- **Never change `v1/`** (or any later `vN/`): teachers may be mid-unit. To ship improvements to other teachers, publish a new version with `node release.js v2` and tell the teacher the new link. `release.js` refuses to overwrite an existing version without `--force`.
+- **For Teachers guide:** `src/guide.html`, built into `dist/teachers.html` (root) by `build.js` and into `vN/teachers.html` by `release.js`. It covers setup, the Padlet flow, grading with Teacher Check, privacy and credits. It must never contain test Signal IDs or the messages.
+- **No outside connections:** fonts are embedded from `src/fonts.css` (made from Google Fonts, latin and latin-ext only, SIL OFL). The pages load nothing from any other server. Don't add CDN links, analytics or web fonts.
+- **Card footer is generic:** "Unit 10 World History" was removed from the Padlet card so it suits any class.
+- **Rights check:** `docs/rights-check.md` lists every sound and image and who must confirm it can be shared. The three sounds and `r4-fa`, `r3-ul`, `r6` are the teacher's files and await the teacher's answer. Map data credits: Natural Earth (public domain), CShapes 2.0 (CC BY-NC-SA 4.0: credit, non-commercial, share-alike).
+
 ## Build and test
 
 ```
-node build.js                  # src/* -> dist/index.html, dist/test.html, dist/studio*.html
+node build.js                  # src/* -> dist/index.html, dist/test.html, dist/studio*.html, dist/check.html, dist/teachers.html
+node release.js v2             # publish a frozen copy for other teachers in v2/ (never overwrite an existing version)
 python3 mkimg.py               # img/* -> src/recimages.js (resizes to 1500px, WebP, base64)
 node t.js desktop NV ABCABC    # Playwright: plays a full game as role NV with picks A,B,C,A,B,C; screenshots in shots/
 ```
@@ -39,7 +49,9 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 | `app.js` | UI and screens: title, role pick, round (brief → decrypt → decide → debrief), end screen, Decoder board, Padlet card and post text, sounds, title cards, typewriter, stamps, image zoom, image-swap loader. |
 | `style.css` | All styles. It's layered, and later rules override earlier ones. The current theme is the original dark look ("Stable 3" style). Desktop only: students play on computers, and mobile layout no longer matters. |
 | `studio.js`, `studio.css` | Asset Studio page. |
-| `checker.js`, `checker.css` | Teacher Check page (`dist/check.html`). |
+| `checker.js`, `checker.css` | Teacher Check page (`dist/check.html`); the CSS is shared with the guide. |
+| `guide.html` | For Teachers guide body (`teachers.html`, `vN/teachers.html`). |
+| `fonts.css` | Embedded fonts (generated; don't hand-edit). |
 
 **Redrawing a map image:** follow `maps/redraw/STEPS.md` (method, data sources, projection and scale math, house style, swap-in steps). `maps/redraw/assets/` has optional parchment textures.
 

@@ -23,3 +23,9 @@ td div + div { margin-top: 4px; }
 .roles { display: flex; gap: 3px; margin-top: 4px; } .roles span { font: 700 11px "Courier New", monospace; padding: 1px 4px; border: 1px solid var(--line); color: var(--dim); }
 .roles span.on { background: var(--green); color: #07090a; border-color: var(--green); }
 ol li { margin: 3px 0; }
+
+/* For Teachers guide (shares this stylesheet) */
+a { color: var(--gold); } .guide ol li, .guide ul li { margin: 6px 0; } .guide p { max-width: 900px; }
+.ver { border-left: 4px solid var(--gold); padding: 8px 14px; background: var(--panel); }
+.box { background: var(--panel); border: 1px solid var(--line); padding: 4px 16px 12px; margin: 10px 0; }
+pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var(--ink); margin: 0; }

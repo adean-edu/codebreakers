@@ -2,8 +2,8 @@ const fs = require("fs"); const r = (f) => fs.readFileSync(__dirname + "/src/" +
 const js = ["data.js", "logic.js", "art.js", "typesound.js", "dialsound.js", "recimages.js", "recmaps.js", "app.js"].map(r).join("\n");
 const html = `<title>Codebreakers: The Silent Service</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Silkscreen:wght@400;700&family=VT323&display=swap">
+<style id="fonts">
+${r("fonts.css")}</style>
 <style>
 ${r("style.css")}
 </style>
@@ -14,7 +14,7 @@ ${js}
 `;
 const head = `<title>Codebreakers: The Silent Service</title>\n<meta name="claude:viewport-fit-sides" content="cover">`;
 fs.mkdirSync(__dirname + "/dist", { recursive: true }); fs.writeFileSync(__dirname + "/dist/index.html", html);
-const fonts = html.match(/<link rel="preconnect"[^]*?display=swap">/)[0];
+const fonts = html.match(/<style id="fonts">[^]*?<\/style>/)[0]; /* fonts are embedded (src/fonts.css), so no page loads anything from Google */
 const css = html.match(/<style>[^]*?<\/style>/)[0];
 const body = html.slice(html.indexOf('<div id="app">'));
 fs.writeFileSync(__dirname + "/dist/test.html", `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Codebreakers: The Silent Service</title>${fonts}<style>body{margin:0}[hidden]{display:none!important}</style>${css}</head><body>${body}</body></html>`);
@@ -51,4 +51,11 @@ ${r("checker.css")}
 <script>
 ${cjs}
 </script></body></html>`);
+/* For Teachers guide: dist/teachers.html, for the latest version at the repo root. release.js makes the frozen copies (v1/, v2/ …). */
+const SITE = "https://adean-edu.github.io/codebreakers/";
+const guide = (note, base) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codebreakers: For Teachers</title>${fonts}<style>
+${r("checker.css")}
+</style></head><body>${r("guide.html").split("{{VERSION_NOTE}}").join(note).split("{{GAME_URL}}").join(base).split("{{CHECK_URL}}").join(base + "check.html")}</body></html>`;
+fs.writeFileSync(__dirname + "/dist/teachers.html", guide(`This is the <b>latest version</b>, which changes whenever the game is improved. To use the game with a class, or to share it with other teachers, use the frozen version, which never changes mid-unit: <a href="v1/teachers.html">${SITE}v1/teachers.html</a>.`, SITE));
+module.exports = { guide, SITE };
 console.log("built", (html.length / 1024).toFixed(0) + " KB");

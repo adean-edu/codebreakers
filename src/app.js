@@ -390,7 +390,7 @@
       <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">PIECES</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="12" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(L.piece(i, role.id), 12))}</text>`).join("")}
       ${S.log.map((x, i) => `<text x="206" y="${284 + i * 31}" font-size="11" fill="#c9d0c8">${esc(clip(x.label, 56))}</text>`).join("")}
       <text x="28" y="${H - 44}" font-size="11" fill="#f0b93a">BADGES</text><text x="86" y="${H - 44}" font-size="11" fill="#c9d0c8">${esc(clip(L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty", 66))}</text>
-      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077" textLength="${W - 64}" lengthAdjust="spacingAndGlyphs">Decode this Signal ID in Codebreakers: The Silent Service to read my choices. · Unit 10 World History</text></svg>`;
+      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Codebreakers: The Silent Service to read my choices.</text></svg>`;
   }
   async function cardPNG() {
     const svg = $("#cardsvg svg"), vb = svg.viewBox.baseVal, scale = 2, xml = new XMLSerializer().serializeToString(svg);
