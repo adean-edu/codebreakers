@@ -4,6 +4,10 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } } };
+  /* Student names are never saved: the name lives only in this variable, for this visit to the page.
+     Earlier versions kept it in localStorage ("cb_name" and inside the saved game), so wipe those copies. */
+  let nameNow = "";
+  try { localStorage.removeItem("cb_name"); const g0 = store.get("cb_game", null); if (g0 && g0.S && g0.S.name) { g0.S.name = ""; store.set("cb_game", g0); } } catch (e) { }
   const root = document.getElementById("app");
   let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null, titleCard = false, typedFor = -1, fxTimer = null;
   const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -112,7 +116,7 @@
   /* Stamped debrief */
   const STAMPS = { cover: ["APPROVED", "good"], share: ["TRUSTED", "good"], open: ["HIGH RISK", "risk"], hold: ["FILED AWAY", "calm"], hold3: ["NO REPLY", "calm"], blunder: ["COMPROMISED", "risk"] };
   const METERS = [["s", "Secrecy", "Does the enemy still believe its codes are safe?"], ["i", "Impact", "Did your intelligence change events?"], ["t", "Trust", "Do the people who rely on you still trust you?"]];
-  const saveGame = (done) => { if (S) store.set("cb_game", { S, done: !!done, at: Date.now() }); };
+  const saveGame = (done) => { if (S) store.set("cb_game", { S: Object.assign({}, S, { name: "" }), done: !!done, at: Date.now() }); };
   const loadGame = () => { const g = store.get("cb_game", null); return g && g.S && g.S.role && L.roleById(g.S.role.id) && Array.isArray(g.S.log) ? g : null; };
   const board = () => { const b = store.get("cb_board", { sig: [], own: null }); b.sig = b.sig || []; return b; };
   /* Individual scenarios: a role's own version of a round, when its story happens away from the headline event. */
@@ -180,7 +184,7 @@
         <div class="hero-t"><span class="stampline">TOP SECRET</span><h1 data-focus tabindex="-1">Codebreakers: The Silent Service</h1>
         <p class="lede">You hold one piece of a secret message. The people who hold the rest are your classmates. Crack your fragment, make the call, then use Padlet to piece the message together.</p>
         <p class="boot">&gt; CLEARANCE: <span>GRANTED</span><br>&gt; OPERATION: <span>SIX ROUNDS, 1939 TO 1944</span><br>&gt; ASSET: <span>YOU</span><b class="blink">_</b></p>
-        <div class="row">${saved ? `<button class="btn" id="resume">Resume: ${esc(saved.S.role.name)}, round ${Math.min(saved.S.i + 1, 6)}</button>` : ""}<button class="btn${saved ? " ghost" : ""}" id="start">${saved ? "Start a new game" : "Begin operation"}</button><button class="btn ghost" data-go="board">Decoder board${n ? ` (${n})` : ""}</button></div></div></section>
+        ${saved && !nameNow ? `<div class="field"><label for="rname">To resume, enter your name or codename again (it is never saved)</label><input id="rname" maxlength="24" autocomplete="off"></div>` : ""}<p class="err" id="rerr" role="alert"></p><div class="row">${saved ? `<button class="btn" id="resume">Resume: ${esc(saved.S.role.name)}, round ${Math.min(saved.S.i + 1, 6)}</button>` : ""}<button class="btn${saved ? " ghost" : ""}" id="start">${saved ? "Start a new game" : "Begin operation"}</button><button class="btn ghost" data-go="board">Decoder board${n ? ` (${n})` : ""}</button></div></div></section>
       <section class="how panel"><h2>Your mission</h2><ol class="steps">
         <li><span><b>Play your role.</b> Six rounds. Each has a private briefing, a coded fragment to crack, and orders to give.</span></li>
         <li><span><b>Post your file to Padlet.</b> You finish with a case card and a Signal ID.</span></li>
@@ -189,7 +193,7 @@
         <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then submit the decoded messages to your teacher for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
     swapScene($(".hero-art"));
     $("#start").addEventListener("click", () => { if (saved) store.set("cb_game", null); go("pick"); });
-    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { S = saved.S; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done ? "end" : "round"); });
+    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done ? "end" : "round"); });
   }
 
   /* ---------- role pick ---------- */
@@ -197,14 +201,14 @@
     root.innerHTML = topbar() + `<main class="wrap"><div><p class="kick">STEP 1 OF 2 · PERSONNEL FILES</p><h1 data-focus tabindex="-1">Choose your role</h1></div>
       <p class="lede">Pick any role you like. Every role holds a different piece of the message in every round.</p>
       <div class="roles" role="radiogroup" aria-label="Role">${D.ROLES.map((r) => `<button class="rolecard${picked === r.id ? " on" : ""}" role="radio" aria-checked="${picked === r.id}" data-r="${r.id}"><span class="rp">${ART.portrait(r.id, "pk" + r.id)}</span><span class="rb"><span class="rcode">${r.id}</span><b>${esc(r.name)}</b><small>${esc(r.place)}</small></span><span class="rb rd">${esc(r.blurb)}</span></button>`).join("")}</div>
-      <div class="field"><label for="cname">STEP 2 OF 2 · Your name or codename (printed on your Padlet card)</label><input id="cname" maxlength="24" autocomplete="off" value="${esc(store.get("cb_name", ""))}"></div>
+      <div class="field"><label for="cname">STEP 2 OF 2 · Your name or codename (printed on your Padlet card; never saved)</label><input id="cname" maxlength="24" autocomplete="off" value="${esc(nameNow)}"></div>
       <div class="row"><button class="btn" id="begin" disabled>Begin round 1</button><button class="btn ghost" data-go="title">Back</button></div><p class="err" id="perr" role="alert"></p></main>`;
     const bb = $("#begin"), sync = () => { bb.disabled = !picked; };
     $$(".rolecard").forEach((c) => c.addEventListener("click", () => { picked = c.dataset.r; $$(".rolecard").forEach((x) => { const on = x.dataset.r === picked; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); }); sync(); }));
     sync();
     bb.addEventListener("click", () => {
       const name = $("#cname").value.trim(); if (!name) { $("#perr").textContent = "Enter a name or codename first."; $("#cname").focus(); return; }
-      store.set("cb_name", name); S = L.newState(L.roleById(picked), name); stage = "brief"; solved = false; chosen = null; titleCard = true; typedFor = -1;
+      nameNow = name; S = L.newState(L.roleById(picked), name); stage = "brief"; solved = false; chosen = null; titleCard = true; typedFor = -1;
       const b = board(); b.own = { role: S.role.id, rounds: 0 }; b.prog = b.prog || {}; b.prog[S.role.id] = 0; store.set("cb_board", b); saveGame(false); go("round");
     });
   }
@@ -447,13 +451,14 @@
 
   /* ---------- completion post ---------- */
   function completionText(b, parsed, refl) {
-    const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = store.get("cb_name", "") || "Anonymous";
+    const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = nameNow || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
     return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
   }
   function completion(b, parsed, full) {
     if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p></section>`;
     return `<section class="padlet panel"><h2>All six messages decoded</h2><p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
+      <div class="field"><label for="cnm">Your name (so your teacher knows who this is; never saved)</label><input id="cnm" maxlength="40" autocomplete="off" value="${esc(nameNow)}"></div>
       <div class="field"><label for="crefl">Your reflection (one or two sentences)</label><textarea id="crefl" rows="3" placeholder="Which message surprised you most, and why?"></textarea></div>
       <div class="field"><label for="cptext2">Your submission</label><textarea id="cptext2" rows="14" readonly></textarea></div>
       <div class="row"><button class="btn" id="cppost">Copy submission</button></div><p class="small cmsg" role="status"></p></section>`;
@@ -481,7 +486,7 @@
     $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
     bindDecoder();
     $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); $("#dres").innerHTML = decodedCard(p); bindReply(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
-    const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), upd = () => { ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
+    const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
     $("#clr").addEventListener("click", () => { const b2 = board(); b2.sig = []; store.set("cb_board", b2); renderBoard(); bindGo(); });
   }
 
