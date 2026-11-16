@@ -2117,6 +2117,15 @@ const RECMAPS = (function () {
       im.onload = () => { FOUND["scene-" + slot] = src; box.innerHTML = `<img class="sceneimg" src="${src}" alt="">`; }; im.onerror = () => tryExt(list.slice(1)); im.src = src; };
     if (FOUND["scene-" + slot]) { box.innerHTML = `<img class="sceneimg" src="${FOUND["scene-" + slot]}" alt="">`; return; } tryExt(["gif", "png"]);
   }
+  /* Padlet card look for each ending: accent colour, darker frame colour, and the stamp word. */
+  const CARD_LOOK = {
+    burned: { c: "#e0544a", dim: "#6b2a25", stamp: "COMPROMISED" },
+    lone: { c: "#7fa7c0", dim: "#34505f", stamp: "NO CONTACT" },
+    quiet: { c: "#f0b93a", dim: "#6b5420", stamp: "MOST SECRET" },
+    vault: { c: "#9aa7b0", dim: "#45525a", stamp: "SEALED" },
+    gambler: { c: "#e08a3a", dim: "#6b4220", stamp: "HIGH RISK" },
+    steady: { c: "#5f9e6e", dim: "#2f5038", stamp: "IN GOOD ORDER" }
+  };
   const KIND_NOTE = { cover: "Used with a cover story", share: "Shared honestly", open: "Acted openly", hold: "Held back", hold3: "Stayed silent", blunder: "Guessed" };
 
   /* ---------- shared UI ---------- */
@@ -2317,7 +2326,7 @@ const RECMAPS = (function () {
   function renderEnd() {
     const fs = L.finalScore(S), e = fs.e, rank = L.rank(fs.total), id = L.signalId(S), role = S.role, rIdx = D.RANKS.indexOf(rank);
     S.ended = { fs, e, rank, id };
-    const b = board(); b.own = { role: role.id, rounds: 6 }; b.prog = b.prog || {}; b.prog[role.id] = 6; store.set("cb_board", b); saveGame(true);
+    const b = board(); b.own = { role: role.id, rounds: 6 }; b.prog = b.prog || {}; b.prog[role.id] = 6; b.mine = b.mine || {}; b.mine[role.id] = id; store.set("cb_board", b); saveGame(true);
     const meters = METERS.map(([k, n]) => `<div class="meter"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
     root.innerHTML = topbar() + `<main class="wrap">
       <section class="endhero"><div class="pw">${ART.portrait(role.id, "end")}<div class="stampbig">CLEARED<br>${esc(rank.title.toUpperCase())}</div></div><div><p class="kick">FILE CLOSED · ${esc(role.name.toUpperCase())}</p><h1 data-focus tabindex="-1">${esc(e.title)}</h1><p class="small">${esc(e.tag)}</p><p>${esc(e.desc)}</p></div></section>
@@ -2346,21 +2355,21 @@ const RECMAPS = (function () {
     return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "Decode my Signal ID in Codebreakers: The Silent Service, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
   function cardSVG() {
-    const role = S.role, fs = S.ended.fs, W = 640, H = 500;
+    const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
     const rows = S.log.map((x, i) => `<text x="206" y="${272 + i * 31}" font-size="12" fill="#dfe3dc"><tspan fill="#f0b93a" font-weight="700">${i + 1}  ${esc(L.piece(i, role.id))}</tspan></text><text x="206" y="${286 + i * 31}" font-size="11" fill="#8e9a93">${esc(clip(x.label, 54))}</text>`).join("");
     const bar = (k, n, y) => `<text x="206" y="${y}" font-size="11" fill="#8e9a93" letter-spacing="2">${n.toUpperCase()}</text><rect x="290" y="${y - 9}" width="220" height="9" fill="#1a2320"/><rect x="290" y="${y - 9}" width="${S.st[k] * 2.2}" height="9" fill="${{ s: "#4f7d96", i: "#f0b93a", t: "#5f9e6e" }[k]}"/><text x="520" y="${y}" font-size="11" fill="#dfe3dc">${S.st[k]}</text>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Courier New, monospace" shape-rendering="crispEdges"><rect width="${W}" height="${H}" fill="#07090a"/><rect x="10" y="10" width="${W - 20}" height="${H - 20}" fill="none" stroke="#46555b" stroke-width="4"/>
-      <path d="M10 34v-24h24M${W - 34} ${H - 10}h24v-24" stroke="#f0b93a" stroke-width="4" fill="none"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Courier New, monospace" shape-rendering="crispEdges"><rect width="${W}" height="${H}" fill="#07090a"/><text x="${W / 2}" y="${H / 2 + 40}" text-anchor="middle" font-size="64" font-weight="700" fill="${lk.c}" opacity="0.07" letter-spacing="6" transform="rotate(-24 ${W / 2} ${H / 2})" shape-rendering="auto">${lk.stamp}</text><rect x="10" y="10" width="${W - 20}" height="${H - 20}" fill="none" stroke="${lk.dim}" stroke-width="4"/>
+      <path d="M10 34v-24h24M${W - 34} ${H - 10}h24v-24M${W - 34} 10h24v24M10 ${H - 34}v24h24" stroke="${lk.c}" stroke-width="4" fill="none"/>
       <text x="28" y="40" font-size="11" fill="#e0544a" letter-spacing="4">TOP SECRET // CODEBREAKERS: THE SILENT SERVICE</text>
       <g transform="translate(28 56)"><rect width="152" height="176" fill="#000" stroke="#46555b" stroke-width="4"/><svg x="0" y="0" width="152" height="176" viewBox="0 0 120 140" preserveAspectRatio="xMidYMid slice">${ART.portraitInner(role.id, "cd")}</svg></g>
-      <text x="206" y="82" font-size="30" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="126" font-size="13" fill="#8e9a93">${esc(S.ended.e.title)}</text>
-      <g><rect x="396" y="40" width="200" height="60" fill="none" stroke="#e0544a" stroke-width="4"/><text x="496" y="64" text-anchor="middle" font-size="12" fill="#e0544a" font-weight="700" letter-spacing="3">CLEARED</text><text x="496" y="88" text-anchor="middle" font-size="14" fill="#e0544a" font-weight="700">${esc(clip(S.ended.rank.title.toUpperCase(), 18))}</text></g>
+      <text x="206" y="82" font-size="30" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="125" font-size="16" font-weight="700" fill="${lk.c}" letter-spacing="1">${esc(e.title.toUpperCase())}</text><text x="206" y="139" font-size="11" font-style="italic" fill="#8e9a93">${esc(e.tag)}</text>
+      <g transform="rotate(-3 502 78)"><rect x="410" y="50" width="184" height="56" fill="none" stroke="${lk.c}" stroke-width="4"/><rect x="415" y="55" width="174" height="46" fill="none" stroke="${lk.c}" stroke-width="1"/><text x="502" y="74" text-anchor="middle" font-size="12" fill="${lk.c}" font-weight="700" letter-spacing="3">${lk.stamp}</text><text x="502" y="94" text-anchor="middle" font-size="13" fill="${lk.c}" font-weight="700">${esc(clip(S.ended.rank.title.toUpperCase(), 18))}</text></g>
       ${bar("s", "Secrecy", 156)}${bar("i", "Impact", 176)}${bar("t", "Trust", 196)}
-      <text x="206" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SCORE</text><text x="262" y="222" font-size="15" font-weight="700" fill="#dfe3dc">${fs.total}</text><text x="320" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SIGNAL ID</text><text x="398" y="222" font-size="17" font-weight="700" fill="#f0b93a" letter-spacing="2">${S.ended.id}</text>
+      <text x="206" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SCORE</text><text x="262" y="222" font-size="15" font-weight="700" fill="#dfe3dc">${fs.total}</text><text x="320" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SIGNAL ID</text><text x="406" y="222" font-size="17" font-weight="700" fill="#f0b93a" letter-spacing="2">${S.ended.id}</text>
       <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">PIECES</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="12" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(L.piece(i, role.id), 12))}</text>`).join("")}
       ${S.log.map((x, i) => `<text x="206" y="${284 + i * 31}" font-size="11" fill="#c9d0c8">${esc(clip(x.label, 56))}</text>`).join("")}
       <text x="28" y="${H - 44}" font-size="11" fill="#f0b93a">BADGES</text><text x="86" y="${H - 44}" font-size="11" fill="#c9d0c8">${esc(clip(L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty", 66))}</text>
-      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Codebreakers: The Silent Service to read my choices. · Unit 10 World History</text></svg>`;
+      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077" textLength="${W - 64}" lengthAdjust="spacingAndGlyphs">Decode this Signal ID in Codebreakers: The Silent Service to read my choices. · Unit 10 World History</text></svg>`;
   }
   async function cardPNG() {
     const svg = $("#cardsvg svg"), vb = svg.viewBox.baseVal, scale = 2, xml = new XMLSerializer().serializeToString(svg);
@@ -2423,7 +2432,7 @@ const RECMAPS = (function () {
   function completionText(b, parsed, refl) {
     const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = store.get("cb_name", "") || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
-    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
   }
   function completion(b, parsed, full) {
     if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p></section>`;

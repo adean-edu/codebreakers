@@ -37,4 +37,18 @@ ${sjs}
 `;
 fs.writeFileSync(__dirname + "/dist/studio.html", studio);
 fs.writeFileSync(__dirname + "/dist/studio-test.html", `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>${studio}</body></html>`);
+/* Teacher checking page: dist/check.html (copy to check.html at the repo root to deploy). */
+const cjs = ["data.js", "logic.js", "checker.js"].map(r).join("\n");
+fs.writeFileSync(__dirname + "/dist/check.html", `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Codebreakers Teacher Check</title>${fonts}<style>
+${r("checker.css")}
+</style></head><body><main class="wrap"><h1>CODEBREAKERS · TEACHER CHECK</h1>
+<p class="lead">Check students' private submissions. Every Signal ID is tested, so you can see who really decoded classmates from all five roles. Nothing you paste here is saved or sent anywhere.</p>
+<section class="how"><ol><li>Copy one or more submissions (each starts with <b>MISSION COMPLETE</b>) and paste them all into the box. They can be one after another.</li><li>Press <b>Check</b>. Each student gets a row: their own Signal ID, which roles they decoded, whether the six messages are right, and anything to look at.</li><li>Use <b>Copy results for a spreadsheet</b> to paste the table into your gradebook sheet.</li></ol></section>
+<h2>SUBMISSIONS</h2><label class="small" for="subs">Paste submissions here</label><textarea id="subs" spellcheck="false" placeholder="MISSION COMPLETE · ..."></textarea>
+<div class="row"><button class="btn" id="go">Check</button><button class="btn ghost" id="clear">Clear</button></div><div id="out" aria-live="polite"></div>
+<h2>LOOK UP ONE SIGNAL ID</h2><p class="small">See the role, ending and all six choices behind any Signal ID, for example one on a Padlet card.</p>
+<div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
+<script>
+${cjs}
+</script></body></html>`);
 console.log("built", (html.length / 1024).toFixed(0) + " KB");

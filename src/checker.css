@@ -1,0 +1,25 @@
+:root { --bg: #07090a; --panel: #10161a; --line: #2a363b; --ink: #dfe3dc; --dim: #8e9a93; --gold: #f0b93a; --red: #e0544a; --green: #5f9e6e; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-family: "Courier New", monospace; color: var(--gold); letter-spacing: 3px; font-size: 26px; margin: 0 0 6px; }
+h2 { font-family: "Courier New", monospace; color: var(--gold); letter-spacing: 2px; font-size: 17px; margin: 28px 0 8px; }
+.lead, .small { color: var(--dim); } .small { font-size: 14px; }
+.how { background: var(--panel); border: 1px solid var(--line); padding: 12px 18px; margin: 14px 0; }
+.how ol { margin: 6px 0; padding-left: 22px; }
+textarea, input { width: 100%; box-sizing: border-box; background: #0b1013; color: var(--ink); border: 2px solid var(--line); padding: 10px; font: 14px/1.4 "Courier New", monospace; }
+textarea { min-height: 220px; } input { max-width: 320px; }
+textarea:focus, input:focus { outline: 2px solid var(--gold); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+.btn { background: var(--gold); color: #111; border: 0; padding: 9px 16px; font: 700 15px "Atkinson Hyperlegible", sans-serif; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+.err { color: var(--red); }
+.sum { font-size: 17px; } .sum .ok { color: var(--green); } .sum .bad { color: var(--red); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+th, td { border: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top; }
+th { background: var(--panel); color: var(--gold); font-weight: 700; }
+tr.g td:nth-child(6) { color: var(--green); } tr.b td:nth-child(6) { color: var(--red); } tr.w td:nth-child(6) { color: var(--gold); }
+td div + div { margin-top: 4px; }
+.mono { font-family: "Courier New", monospace; }
+.roles { display: flex; gap: 3px; margin-top: 4px; } .roles span { font: 700 11px "Courier New", monospace; padding: 1px 4px; border: 1px solid var(--line); color: var(--dim); }
+.roles span.on { background: var(--green); color: #07090a; border-color: var(--green); }
+ol li { margin: 3px 0; }

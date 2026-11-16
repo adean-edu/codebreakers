@@ -10,6 +10,7 @@ Owner: a high school World History teacher (GitHub `adean-edu`). Not a developer
 - **Built output:** `dist/test.html` is the standalone page. Copy it to the repo root as `index.html` to deploy.
 - `dist/index.html` is an HTML fragment used for a claude.ai artifact version. Ignore it unless you're publishing there.
 - `dist/studio.html` and `dist/studio-test.html` are the **Asset Studio**: a teacher-facing gallery of every image and animation slot, with file names and style-matched prompts.
+- `dist/check.html` is the **Teacher Check** page (live at `/check.html`; copy it to the repo root to deploy). The teacher pastes students' private submissions; it tests every Signal ID (the student's own and the classmates they decoded), shows which of the five roles each student covered and whether the six messages are right, flags shared own Signal IDs and word-for-word identical reflections, and copies a tab-separated table for a gradebook. It also looks up any single Signal ID. It never shows the messages themselves. Nothing pasted is stored or sent. Source: `src/checker.js`, `src/checker.css` (built with `data.js` and `logic.js`).
 
 ## Build and test
 
@@ -38,6 +39,7 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 | `app.js` | UI and screens: title, role pick, round (brief → decrypt → decide → debrief), end screen, Decoder board, Padlet card and post text, sounds, title cards, typewriter, stamps, image zoom, image-swap loader. |
 | `style.css` | All styles. It's layered, and later rules override earlier ones. The current theme is the original dark look ("Stable 3" style). Desktop only: students play on computers, and mobile layout no longer matters. |
 | `studio.js`, `studio.css` | Asset Studio page. |
+| `checker.js`, `checker.css` | Teacher Check page (`dist/check.html`). |
 
 **Redrawing a map image:** follow `maps/redraw/STEPS.md` (method, data sources, projection and scale math, house style, swap-in steps). `maps/redraw/assets/` has optional parchment textures.
 
@@ -66,6 +68,9 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 - Students **choose** their own role. Roles are never assigned.
 - On Padlet, students post **only** their finished card (an image plus short post text with a Signal ID and a question). They reply to classmates they decode using premade questions, and replies start with `DECODED <ID>`. No per-round posts. Keep the Padlet clean and simple.
 - The fully decoded six messages are a **private submission** to the teacher for credit, and are **never** posted on Padlet.
+- **Padlet card look by ending (2026-11-16, teacher's choice of idea 4):** `CARD_LOOK` in `app.js` gives each ending its own accent colour, frame, tilted stamp word (Quiet Hand MOST SECRET, Steady Hand IN GOOD ORDER, Vault SEALED, Gambler HIGH RISK, Lone Operator NO CONTACT, Burned Source COMPROMISED), a faint diagonal watermark of that word, and the ending title and tagline as the card headline.
+- **Submissions carry the student's own Signal ID (2026-11-16):** `board().mine` stores the Signal ID of every role the student finishes, and the submission has a "My Signal ID:" line so Teacher Check can verify it. Submissions from before this change have no such line; Teacher Check notes that and counts their stated role.
+- Other Padlet ideas offered on 2026-11-16 and not chosen yet (don't build without asking): a locked cipher line on each card (idea 1), a class-wide seventh message (2), teacher "breaking intercept" posts (3), the game helping card owners answer replies (5), sharper reply questions (6), one Padlet column per role (7).
 - Rejected features (don't bring them back): the Intel Pass mechanic ("too complicated"), and a "Compare calls" card.
 - Signal ID format is `XX-ABCABC-YY`, with a 2-character checksum. It isn't tamper-proof. That's a known, accepted limit.
 
