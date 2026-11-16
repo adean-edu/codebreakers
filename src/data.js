@@ -1,4 +1,4 @@
-/* OPERATION CHICKEN FEED: LIES THAT SAVED LIVES (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
+/* CODEBREAKERS: THE HIDDEN WAR (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
 const DATA = (function () {
   const KINDS = {
     cover: { s: 4, i: 6, t: 2, p: 20 }, share: { s: 1, i: 5, t: 5, p: 20 },

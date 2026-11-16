@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Operation Chicken Feed: Teacher Check</title><style id="fonts">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Codebreakers: Teacher Check</title><style id="fonts">
 /* Fonts (SIL Open Font License): Atkinson Hyperlegible, Silkscreen, VT323. Embedded so the game makes no requests to Google or any other outside server. Generated; do not hand-edit. */
 /* latin-ext */
 @font-face {
@@ -142,7 +142,7 @@ a { color: var(--gold); } .guide ol li, .guide ul li { margin: 6px 0; } .guide p
 pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var(--ink); margin: 0; }
 .subt2 { margin: -2px 0 10px; font: 700 15px "Courier New", monospace; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); }
 
-</style></head><body><main class="wrap"><h1>OPERATION CHICKEN FEED · TEACHER CHECK</h1>
+</style></head><body><main class="wrap"><h1>CODEBREAKERS · TEACHER CHECK</h1>
 <p class="lead">Check students' private submissions. Every Signal ID is tested, so you can see who really decoded classmates from all five roles. Nothing you paste here is saved or sent anywhere.</p>
 <section class="how"><ol><li>Copy one or more submissions (each starts with <b>MISSION COMPLETE</b>) and paste them all into the box. They can be one after another.</li><li>Press <b>Check</b>. Each student gets a row: their own Signal ID, which roles they decoded, whether the six messages are right, and anything to look at.</li><li>Use <b>Copy results for a spreadsheet</b> to paste the table into your gradebook sheet.</li></ol></section>
 <h2>SUBMISSIONS</h2><label class="small" for="subs">Paste submissions here</label><textarea id="subs" spellcheck="false" placeholder="MISSION COMPLETE · ..."></textarea>
@@ -150,7 +150,7 @@ pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var
 <h2>LOOK UP ONE SIGNAL ID</h2><p class="small">See the role, ending and all six choices behind any Signal ID, for example one on a Padlet card.</p>
 <div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
 <script>
-/* OPERATION CHICKEN FEED: LIES THAT SAVED LIVES (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
+/* CODEBREAKERS: THE HIDDEN WAR (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
 const DATA = (function () {
   const KINDS = {
     cover: { s: 4, i: 6, t: 2, p: 20 }, share: { s: 1, i: 5, t: 5, p: 20 },

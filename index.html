@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Operation Chicken Feed: Lies That Saved Lives</title><style id="fonts">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Codebreakers: The Hidden War</title><style id="fonts">
 /* Fonts (SIL Open Font License): Atkinson Hyperlegible, Silkscreen, VT323. Embedded so the game makes no requests to Google or any other outside server. Generated; do not hand-edit. */
 /* latin-ext */
 @font-face {
@@ -371,7 +371,7 @@ svg.portrait, svg.scene { image-rendering: pixelated; shape-rendering: crispEdge
 
 </style></head><body><div id="app"></div>
 <script>
-/* OPERATION CHICKEN FEED: LIES THAT SAVED LIVES (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
+/* CODEBREAKERS: THE HIDDEN WAR (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
 const DATA = (function () {
   const KINDS = {
     cover: { s: 4, i: 6, t: 2, p: 20 }, share: { s: 1, i: 5, t: 5, p: 20 },
@@ -2243,7 +2243,7 @@ const RECMAPS = (function () {
 
   /* ---------- shared UI ---------- */
   function topbar(extra) {
-    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">OPERATION CHICKEN FEED</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-go="board">Decoder board</button></nav></header>`;
+    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-go="board">Decoder board</button></nav></header>`;
   }
   function hud() {
     const pips = D.ROUNDS.map((r, i) => `<span class="pip ${i < S.i ? "done" : i === S.i ? "now" : ""}" title="Round ${i + 1}"></span>`).join("");
@@ -2273,7 +2273,7 @@ const RECMAPS = (function () {
     const b = board(), n = b.sig.length, saved = loadGame();
     root.innerHTML = topbar() + `<main class="wrap">
       <section class="hero"><div class="hero-art" data-scene="title">${ART.scene("enigma")}</div>
-        <div class="hero-t"><span class="stampline">TOP SECRET</span><h1 data-focus tabindex="-1">Operation Chicken Feed</h1><p class="subt">Lies That Saved Lives</p>
+        <div class="hero-t"><span class="stampline">TOP SECRET</span><h1 data-focus tabindex="-1">Codebreakers</h1><p class="subt">The Hidden War</p>
         <p class="lede">You hold one piece of a secret message. The people who hold the rest are your classmates. Crack your fragment, make the call, then use Padlet to piece the message together.</p>
         <p class="boot">&gt; CLEARANCE: <span>GRANTED</span><br>&gt; OPERATION: <span>SIX ROUNDS, 1939 TO 1944</span><br>&gt; ASSET: <span>YOU</span><b class="blink">_</b></p>
         ${saved && !nameNow ? `<div class="field"><label for="rname">To resume, enter your name or codename again (it is never saved)</label><input id="rname" maxlength="24" autocomplete="off"></div>` : ""}<p class="err" id="rerr" role="alert"></p><div class="row">${saved ? `<button class="btn" id="resume">Resume: ${esc(saved.S.role.name)}, round ${Math.min(saved.S.i + 1, 6)}</button>` : ""}<button class="btn${saved ? " ghost" : ""}" id="start">${saved ? "Start a new game" : "Begin operation"}</button><button class="btn ghost" data-go="board">Decoder board${n ? ` (${n})` : ""}</button></div></div></section>
@@ -2465,7 +2465,7 @@ const RECMAPS = (function () {
   }
   function cardText(q) {
     const fs = S.ended.fs, role = S.role, L1 = "━━━━━━━━━━━━━━━━━━━━";
-    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "Decode my Signal ID in Operation Chicken Feed, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
+    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
   function cardSVG() {
     const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
@@ -2473,7 +2473,7 @@ const RECMAPS = (function () {
     const bar = (k, n, y) => `<text x="206" y="${y}" font-size="11" fill="#8e9a93" letter-spacing="2">${n.toUpperCase()}</text><rect x="290" y="${y - 9}" width="220" height="9" fill="#1a2320"/><rect x="290" y="${y - 9}" width="${S.st[k] * 2.2}" height="9" fill="${{ s: "#4f7d96", i: "#f0b93a", t: "#5f9e6e" }[k]}"/><text x="520" y="${y}" font-size="11" fill="#dfe3dc">${S.st[k]}</text>`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Courier New, monospace" shape-rendering="crispEdges"><rect width="${W}" height="${H}" fill="#07090a"/><text x="${W / 2}" y="${H / 2 + 40}" text-anchor="middle" font-size="64" font-weight="700" fill="${lk.c}" opacity="0.07" letter-spacing="6" transform="rotate(-24 ${W / 2} ${H / 2})" shape-rendering="auto">${lk.stamp}</text><rect x="10" y="10" width="${W - 20}" height="${H - 20}" fill="none" stroke="${lk.dim}" stroke-width="4"/>
       <path d="M10 34v-24h24M${W - 34} ${H - 10}h24v-24M${W - 34} 10h24v24M10 ${H - 34}v24h24" stroke="${lk.c}" stroke-width="4" fill="none"/>
-      <text x="28" y="40" font-size="11" fill="#e0544a" letter-spacing="4">TOP SECRET // OPERATION CHICKEN FEED</text>
+      <text x="28" y="40" font-size="11" fill="#e0544a" letter-spacing="4">TOP SECRET // CODEBREAKERS: THE HIDDEN WAR</text>
       <g transform="translate(28 56)"><rect width="152" height="176" fill="#000" stroke="#46555b" stroke-width="4"/><svg x="0" y="0" width="152" height="176" viewBox="0 0 120 140" preserveAspectRatio="xMidYMid slice">${ART.portraitInner(role.id, "cd")}</svg></g>
       <text x="206" y="82" font-size="30" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="125" font-size="16" font-weight="700" fill="${lk.c}" letter-spacing="1">${esc(e.title.toUpperCase())}</text><text x="206" y="139" font-size="11" font-style="italic" fill="#8e9a93">${esc(e.tag)}</text>
       <g transform="rotate(-3 502 78)"><rect x="410" y="50" width="184" height="56" fill="none" stroke="${lk.c}" stroke-width="4"/><rect x="415" y="55" width="174" height="46" fill="none" stroke="${lk.c}" stroke-width="1"/><text x="502" y="74" text-anchor="middle" font-size="12" fill="${lk.c}" font-weight="700" letter-spacing="3">${lk.stamp}</text><text x="502" y="94" text-anchor="middle" font-size="13" fill="${lk.c}" font-weight="700">${esc(clip(S.ended.rank.title.toUpperCase(), 18))}</text></g>
@@ -2482,7 +2482,7 @@ const RECMAPS = (function () {
       <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">PIECES</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="12" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(L.piece(i, role.id), 12))}</text>`).join("")}
       ${S.log.map((x, i) => `<text x="206" y="${284 + i * 31}" font-size="11" fill="#c9d0c8">${esc(clip(x.label, 56))}</text>`).join("")}
       <text x="28" y="${H - 44}" font-size="11" fill="#f0b93a">BADGES</text><text x="86" y="${H - 44}" font-size="11" fill="#c9d0c8">${esc(clip(L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty", 66))}</text>
-      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Operation Chicken Feed: Lies That Saved Lives to read my choices.</text></svg>`;
+      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Codebreakers: The Hidden War to read my choices.</text></svg>`;
   }
   async function cardPNG() {
     const svg = $("#cardsvg svg"), vb = svg.viewBox.baseVal, scale = 2, xml = new XMLSerializer().serializeToString(svg);
