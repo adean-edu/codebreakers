@@ -19,8 +19,12 @@ const { chromium } = require('playwright'); const L = require('./src/logic.js');
   await p.waitForTimeout(600); await p.screenshot({ path: `shots/${mode}-allegiance.png`, fullPage: true }); await p.click('#alok');
   await p.waitForSelector('#sigid'); const id = await p.textContent('#sigid'); console.log('signal', id);
   const pa = L.parseSignal(id); if (!pa || pa.alleg !== alg || (alg && pa.lie !== lv)) errs.push('ALLEGIANCE did not round-trip: ' + id);
-  const post = await p.inputValue('#ptext'); if (!/INTEL REPORTS FROM MY FRONT/.test(post)) errs.push('POST has no intel reports');
-  if (alg && post.indexOf(L.plantedLie(role, alg, lv).lie) < 0) errs.push('POST is missing the chosen lie');
+  // the post carries the Signal ID, questions and a CLASSIFIED intel block, but never the report text (that unlocks only by decoding)
+  const post = await p.inputValue('#ptext'); if (!/INTEL REPORTS FROM MY FRONT \(CLASSIFIED\)/.test(post) || !/█{10}/.test(post)) errs.push('POST has no classified intel block');
+  if (!post.includes('SIGNAL ID: ' + id)) errs.push('POST has no Signal ID');
+  DATA.INTEL[role].forEach((x) => [x.truth, x.fake, x.third].forEach((w) => { if (post.includes(x.t.replace('{X}', w))) errs.push('POST leaks a report: ' + w); }));
+  if (/Secrecy \d|Badges:|Score \d/.test(post)) errs.push('POST repeats card details');
+  await p.selectOption('#qsel2', '4'); if (!/QUESTIONS FOR YOU\n1\. .+\n2\. /.test(await p.inputValue('#ptext'))) errs.push('second question not added');
   await p.screenshot({ path: `shots/${mode}-end.png`, fullPage: true });
   // decode another role (a double agent who falsified report 2), use the Archive, interrogate
   const o = role === 'NV' ? 'BP' : 'NV'; const S = L.newState(L.roleById(o), 'x'); for (let r = 0; r < 6; r++) { S.i = r; L.choose(S, r % 3); } S.alg = { v: 2, r: 5 }; const sid = L.signalId(S);

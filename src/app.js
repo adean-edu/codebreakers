@@ -384,10 +384,11 @@
       <section class="decoder"><h2>Decode a classmate</h2><p>Find a classmate's Padlet card from a different role. Type their Signal ID here. You will see their choices and unlock their pieces of the messages.</p>${decoderForm()}</section>
       <section class="padlet"><h2>Post to Padlet</h2><p>Add your card image and post text to the class Padlet. Then decode classmates from other roles with the Signal IDs on their cards, and reply to their posts.</p>
         <div class="cardwrap" id="cardsvg">${cardSVG()}</div><div class="row"><button class="btn" id="dl">Download card image</button><button class="btn ghost" id="cpimg">Copy image</button></div>
-        <div class="field"><label for="qsel">Question for your classmates</label><select id="qsel">${role.qs.concat([e.ask]).map((q, i) => `<option value="${i}">${esc(clip(q, 100))}</option>`).join("")}</select></div>
+        <div class="field"><label for="qsel">Question for your classmates</label><select id="qsel">${postQs(role, e).map((q, i) => `<option value="${i}">${esc(clip(q, 100))}</option>`).join("")}</select></div>
+        <div class="field"><label for="qsel2">Second question (optional)</label><select id="qsel2"><option value="-1">No second question</option>${postQs(role, e).map((q, i) => `<option value="${i}">${esc(clip(q, 100))}</option>`).join("")}</select></div>
         <div class="field"><label for="ptext">Post text (edit it so it sounds like you)</label><textarea id="ptext" rows="12"></textarea></div><div class="row"><button class="btn" id="cptext">Copy post text</button><button class="btn ghost" id="again">Play another role</button></div><p class="small cmsg" role="status"></p></section></main>`;
-    const qs = role.qs.concat([e.ask]), paint = () => { $("#ptext").value = cardText(qs[+$("#qsel").value]); };
-    $("#qsel").addEventListener("change", paint); paint();
+    const qs = postQs(role, e), paint = () => { const a = +$("#qsel").value, b2 = +$("#qsel2").value; $("#ptext").value = cardText([qs[a]].concat(b2 >= 0 && b2 !== a ? [qs[b2]] : [])); };
+    $("#qsel").addEventListener("change", paint); $("#qsel2").addEventListener("change", paint); paint();
     $("#cptext").addEventListener("click", (ev) => copyText($("#ptext").value, ev.currentTarget, "Copied. Paste it into your Padlet post."));
     $("#again").addEventListener("click", () => { store.set("cb_game", null); S = null; picked = null; go("pick"); });
     $("#dl").addEventListener("click", downloadCard); $("#cpimg").addEventListener("click", copyCard);
@@ -396,10 +397,17 @@
   function badgesHTML() {
     const b = L.badges(S); return `<section class="badges"><h2>Badges earned</h2><ul class="bdg">${b.got.map((x) => `<li><span class="medal" aria-hidden="true">${x.icon}</span><span><b>${esc(x.name)}</b><small>${esc(x.why)}</small></span></li>`).join("")}</ul><p class="small">${b.got.length} of ${b.total} badges. Play a different role to earn more.</p></section>`;
   }
-  function cardText(q) {
-    const fs = S.ended.fs, role = S.role, L1 = "━━━━━━━━━━━━━━━━━━━━";
-    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "INTEL REPORTS FROM MY FRONT", ...L.intelFor(role.id, S.alg ? S.alg.v : 0, S.alg && S.alg.lie).map((x, i) => `${i + 1}. ${x.text}`), "Trust me or deny me. Decode my Signal ID to decide.", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
+  /* Questions a student can put in their post: their role's own three, their ending's question, then general ones. */
+  const POST_QS = ["Which of your decisions would you change now, and why?", "Was keeping the secret worth what it cost? Why or why not?", "What would have happened if the enemy had found out your secret?", "Which real person from your role would you most like to meet, and why?", "What surprised you most about your role's part of the war?", "Which round was the hardest call for you, and why?"];
+  const postQs = (role, e) => role.qs.concat([e.ask], POST_QS);
+  /* Padlet post text. Name, role, ending, score, gauges and badges are already on the card image, so the text carries only what the
+     image can't: the Signal ID to copy, the questions, and the intel reports, which stay classified until a classmate decodes the ID. */
+  function cardText(qList) {
+    const L1 = "━━━━━━━━━━━━━━━━━━━━", BAR = "████████████████████";
+    return [`SIGNAL ID: ${S.ended.id}`, L1, qList.length > 1 ? "QUESTIONS FOR YOU" : "QUESTION FOR YOU", ...qList.map((q, i) => (qList.length > 1 ? `${i + 1}. ` : "") + q), L1, "INTEL REPORTS FROM MY FRONT (CLASSIFIED)", `1. ${BAR}`, `2. ${BAR.slice(3)}`, `3. ${BAR.slice(1)}`, "Decode my Signal ID to read my reports. Trust me, or deny me?", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
+  /* The name sits between the portrait (x 206) and the tilted ending stamp (from about x 405), so long names shrink to fit. */
+  const nameSize = (n) => Math.max(14, Math.min(30, Math.floor(196 / (n.length * 0.62))));
   function cardSVG() {
     const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
     const rows = S.log.map((x, i) => `<text x="206" y="${272 + i * 31}" font-size="12" fill="#dfe3dc"><tspan fill="#f0b93a" font-weight="700">${i + 1}  ${esc(L.piece(i, role.id))}</tspan></text><text x="206" y="${286 + i * 31}" font-size="11" fill="#8e9a93">${esc(clip(x.label, 54))}</text>`).join("");
@@ -408,14 +416,14 @@
       <path d="M10 34v-24h24M${W - 34} ${H - 10}h24v-24M${W - 34} 10h24v24M10 ${H - 34}v24h24" stroke="${lk.c}" stroke-width="4" fill="none"/>
       <text x="28" y="40" font-size="11" fill="#e0544a" letter-spacing="4">TOP SECRET // CODEBREAKERS: THE HIDDEN WAR</text>
       <g transform="translate(28 56)"><rect width="152" height="176" fill="#000" stroke="#46555b" stroke-width="4"/><svg x="0" y="0" width="152" height="176" viewBox="0 0 120 140" preserveAspectRatio="xMidYMid slice">${ART.portraitInner(role.id, "cd")}</svg></g>
-      <text x="206" y="82" font-size="30" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="125" font-size="16" font-weight="700" fill="${lk.c}" letter-spacing="1">${esc(e.title.toUpperCase())}</text><text x="206" y="139" font-size="11" font-style="italic" fill="#8e9a93">${esc(e.tag)}</text>
+      <text x="206" y="82" font-size="${nameSize(clip(S.name.toUpperCase(), 16))}" font-weight="700" fill="#dfe3dc" letter-spacing="1">${esc(clip(S.name.toUpperCase(), 16))}</text><text x="206" y="106" font-size="14" fill="#f0b93a">${esc(role.name)}</text><text x="206" y="125" font-size="16" font-weight="700" fill="${lk.c}" letter-spacing="1">${esc(e.title.toUpperCase())}</text><text x="206" y="139" font-size="11" font-style="italic" fill="#8e9a93">${esc(e.tag)}</text>
       <g transform="rotate(-3 502 78)"><rect x="410" y="50" width="184" height="56" fill="none" stroke="${lk.c}" stroke-width="4"/><rect x="415" y="55" width="174" height="46" fill="none" stroke="${lk.c}" stroke-width="1"/><text x="502" y="74" text-anchor="middle" font-size="12" fill="${lk.c}" font-weight="700" letter-spacing="3">${lk.stamp}</text><text x="502" y="94" text-anchor="middle" font-size="13" fill="${lk.c}" font-weight="700">${esc(clip(S.ended.rank.title.toUpperCase(), 18))}</text></g>
       ${bar("s", "Secrecy", 156)}${bar("i", "Impact", 176)}${bar("t", "Trust", 196)}
       <text x="206" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SCORE</text><text x="262" y="222" font-size="15" font-weight="700" fill="#dfe3dc">${fs.total}</text><text x="320" y="222" font-size="11" fill="#8e9a93" letter-spacing="2">SIGNAL ID</text><text x="406" y="222" font-size="17" font-weight="700" fill="#f0b93a" letter-spacing="2">${S.ended.id}</text>
-      <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">PIECES</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="12" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(L.piece(i, role.id), 12))}</text>`).join("")}
+      <text x="28" y="262" font-size="11" fill="#8e9a93" letter-spacing="3">MY ROUNDS</text>${S.log.map((x, i) => `<text x="28" y="${284 + i * 31}" font-size="11" fill="#f0b93a" font-weight="700">R${i + 1} ${esc(clip(rTitle(role.id, i), 22))}</text>`).join("")}
       ${S.log.map((x, i) => `<text x="206" y="${284 + i * 31}" font-size="11" fill="#c9d0c8">${esc(clip(x.label, 56))}</text>`).join("")}
       <text x="28" y="${H - 44}" font-size="11" fill="#f0b93a">BADGES</text><text x="86" y="${H - 44}" font-size="11" fill="#c9d0c8">${esc(clip(L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty", 66))}</text>
-      <text x="28" y="${H - 26}" font-size="10" fill="#6e8077">Decode this Signal ID in Codebreakers: The Hidden War to read my choices.</text></svg>`;
+      <text x="28" y="${H - 24}" font-size="11" fill="#e0544a" letter-spacing="2">INTEL</text><rect x="86" y="${H - 34}" width="190" height="13" fill="#000" stroke="#46555b"/><text x="286" y="${H - 24}" font-size="10" fill="#8e9a93">CLASSIFIED. Decode my Signal ID to read it.</text></svg>`;
   }
   async function cardPNG() {
     const svg = $("#cardsvg svg"), vb = svg.viewBox.baseVal, scale = 2, xml = new XMLSerializer().serializeToString(svg);
@@ -552,7 +560,7 @@
   function completionText(b, parsed, refl) {
     const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = nameNow || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
-    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. Message ${i + 1} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
   }
   /* Verdicts in the submission: "<ID> A" (approved) or "<ID> D2T" (denied report 2, picked the truth; F = picked the fake, O = the third choice); "*" = with research. Teacher Check rescores them from the IDs. */
   function verdictList(b) { return Object.keys(b.verdicts || {}).map((id) => ({ id, vd: b.verdicts[id], p: L.parseSignal(id) })).filter((x) => x.p && x.p.alleg != null); }
