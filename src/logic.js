@@ -31,25 +31,40 @@ const Logic = (function () {
   const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   function chk(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 31 + body.charCodeAt(i) * (i + 7)) % 1024; return ALPHA[h >> 5] + ALPHA[h & 31]; }
   /* Trust or Traitor: the hidden allegiance rides in one extra character K, so a v3 Signal ID is XX-ABCABC-K-YY.
-     S.alg = { v, r }: v = 0 loyal, 1-3 = which intel report was falsified; r = a random salt 0-7 so K differs between students.
+     S.alg = { v, r, lie }: v = 0 loyal, 1-3 = which intel report was falsified; r = a random salt 0-7 so K differs between students;
+     lie = "F" (the report's first false version) or "O" (its second), chosen by the student. Lie "O" is marked by taking the checksum
+     over body + "~" instead of body, so IDs made before students could choose their lie (all "F") keep their meaning.
      K = ALPHA[(h + v*8 + r) % 32], where h comes from the role and picks. Not secure, just not readable at a glance. */
   function pickHash(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 17 + body.charCodeAt(i)) % 32; return h; }
   function allegChar(rp, alg) { return ALPHA[(pickHash(rp) + alg.v * 8 + alg.r) % 32]; }
-  function signalId(S) { let body = S.role.id + "-" + S.path; if (S.alg) body += "-" + allegChar(body, S.alg); return body + "-" + chk(body); }
+  function signalId(S) { let body = S.role.id + "-" + S.path; if (S.alg) body += "-" + allegChar(body, S.alg); return body + "-" + chk(S.alg && S.alg.v && S.alg.lie === "O" ? body + "~" : body); }
+  /* Seal a finished game's allegiance. For lie "O", re-roll the salt if both checksums happen to match, so the ID can't be misread. */
+  function sealAlg(S, v, lie) {
+    for (let k = 0; k < 64; k++) {
+      S.alg = { v, r: Math.floor(Math.random() * 8), lie: v ? (lie === "O" ? "O" : "F") : null };
+      if (S.alg.lie !== "O") return S.alg;
+      const rp = S.role.id + "-" + S.path, body = rp + "-" + allegChar(rp, S.alg); if (chk(body) !== chk(body + "~")) return S.alg;
+    }
+    S.alg.lie = "F"; return S.alg;
+  }
   /* Rebuild a finished game from a Signal ID. Returns null if invalid. alleg: null for an old (v1/v2) ID, else 0 loyal or 1-3. */
   function parseSignal(raw) {
     const m = /^([A-Z]{2})-([ABC]{6})(?:-([A-Z0-9]))?-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
     if (!m || roleIdx(m[1]) < 0) return null;
     const rp = m[1] + "-" + m[2], body = m[3] ? rp + "-" + m[3] : rp;
-    if (chk(body) !== m[4]) return null;
+    let lie = "F"; if (chk(body) !== m[4]) { if (m[3] && chk(body + "~") === m[4]) lie = "O"; else return null; }
     let alleg = null; if (m[3]) { const k = ALPHA.indexOf(m[3]); if (k < 0) return null; alleg = ((k - pickHash(rp) + 64) % 32) >> 3; }
+    if (!alleg) { if (lie === "O") return null; lie = null; }
     const role = roleById(m[1]), S = newState(role, ""); const picks = [];
     for (let r = 0; r < 6; r++) { S.i = r; const slot = "ABC".indexOf(m[2][r]); const res = choose(S, slot); picks.push({ slot, label: res.c[0], kind: kindOf(r, order(role.id, r)[slot]) }); }
     const fs = finalScore(S);
-    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e, alleg };
+    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e, alleg, lie };
   }
-  /* The three intel reports as a card shows them. alleg 0 = all true; 1-3 = that report carries the fake. */
-  function intelFor(roleId, alleg) { return D.INTEL[roleId].map((x, i) => ({ text: x.t.replace("{X}", alleg === i + 1 ? x.fake : x.truth), fakeHere: alleg === i + 1, file: x.file })); }
+  /* The three intel reports as a card shows them. alleg 0 = all true; 1-3 = that report carries the student's chosen lie. */
+  const lieWord = (x, lie) => (lie === "O" ? x.third : x.fake);
+  function intelFor(roleId, alleg, lie) { return D.INTEL[roleId].map((x, i) => ({ text: x.t.replace("{X}", alleg === i + 1 ? lieWord(x, lie) : x.truth), fakeHere: alleg === i + 1, file: x.file })); }
+  /* A double agent's planted sentence beside the true one. */
+  function plantedLie(roleId, alleg, lie) { const x = D.INTEL[roleId][alleg - 1]; return { lie: x.t.replace("{X}", lieWord(x, lie)), truth: x.t.replace("{X}", x.truth), lieWord: lieWord(x, lie), truthWord: x.truth }; }
   /* "Prove it" choices for report n (0-2): truth, fake and a third, in an order fixed by the Signal ID so it doesn't change on reload. */
   function proveOpts(id, roleId, n) { const x = D.INTEL[roleId][n]; const o = [{ k: "T", v: x.truth }, { k: "F", v: x.fake }, { k: "O", v: x.third }]; let h = 7; for (const ch of id + n) h = (h * 31 + ch.charCodeAt(0)) % 9973; for (let i = 2; i > 0; i--) { const j = h % (i + 1); h = Math.floor(h / 3) + 11; [o[i], o[j]] = [o[j], o[i]]; } return o; }
   /* Score one filed verdict against the truth. vd = { v: "A"|"D", r: 1-3, t: "T"|"F"|"O", res }. +1 right verdict; on a double agent also +1 right report and +1 right truth. A perfect 3 drops to 2 if a redaction was revealed. */
@@ -83,6 +98,6 @@ const Logic = (function () {
     const c = { S, e, n, minS }, got = BADGE_DEFS.filter((b) => b.test(c)).map(({ id, name, icon, why }) => ({ id, name, icon, why }));
     return { got, total: BADGE_DEFS.length };
   }
-  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk, intelFor, proveOpts, verdictScore };
+  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, sealAlg, parseSignal, chk, intelFor, plantedLie, proveOpts, verdictScore };
 })();
 if (typeof module !== "undefined") module.exports = Logic;

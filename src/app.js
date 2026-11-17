@@ -347,21 +347,26 @@
   /* ---------- Trust or Traitor: the secret allegiance, chosen once after round 6 ---------- */
   function renderAllegiance() {
     if (S.alg) { view = "end"; renderEnd(); return; }
-    const role = S.role, rep = D.INTEL[role.id]; let pick = null, lie = 0;
+    const role = S.role, rep = D.INTEL[role.id]; let pick = null, lie = 0, lv = null;
     root.innerHTML = topbar() + `<main class="wrap tot"><div><p class="kick">FILE CLOSING · ${esc(role.name.toUpperCase())} · ONE LAST DECISION</p><h1 data-focus tabindex="-1">Trust or traitor?</h1></div>
       <p class="lede">Your Padlet card will carry three intel reports from your front. Classmates who decode your Signal ID must decide whether to trust them. Choose in secret: nobody finds out until your teacher unmasks the agents.</p>
       <div class="paper"><div class="mlist" role="group" aria-label="Your allegiance">
         <button class="mitem" data-al="0" aria-pressed="false"><span class="key">L</span><span><b>Loyal agent.</b> All three of your reports are true. You score a point for every classmate who approves you.</span></button>
-        <button class="mitem" data-al="D" aria-pressed="false"><span class="key">D</span><span><b>Double agent.</b> One report carries a lie the enemy wants believed. You score a point for every classmate you fool.</span></button></div>
+        <button class="mitem" data-al="D" aria-pressed="false"><span class="key">D</span><span><b>Double agent.</b> You pick one report and the lie it will carry. You score a point for every classmate you fool.</span></button></div>
         <div id="alrep"></div></div>
       <div class="row"><button class="btn" id="alok" disabled>Seal my file</button></div><p class="small">Once your file is sealed you can't change your mind: your Signal ID carries your choice.</p></main>`;
-    const ok = $("#alok"), sync = () => { ok.disabled = !(pick === "0" || (pick === "D" && lie)); };
+    const ok = $("#alok"), sync = () => { ok.disabled = !(pick === "0" || (pick === "D" && lie && lv)); };
+    const lieOpts = (x) => [["F", x.fake], ["O", x.third]];
     const paintRep = () => {
-      $("#alrep").innerHTML = pick !== "D" ? "" : `<h2>Choose the report to falsify</h2><p class="small">The game writes the lie for you. Pick the one you think classmates are least likely to catch.</p><div class="mlist" role="group" aria-label="Report to falsify">${rep.map((x, i) => `<button class="mitem" data-lie="${i + 1}" aria-pressed="${lie === i + 1}"><span class="key">${i + 1}</span><span>${esc(x.t.replace("{X}", x.truth))}</span></button>`).join("")}</div>${lie ? `<p class="lieline"><b>Your card will say:</b> ${esc(rep[lie - 1].t.replace("{X}", rep[lie - 1].fake))}</p>` : ""}`;
-      $$("[data-lie]").forEach((b) => b.addEventListener("click", () => { lie = +b.dataset.lie; paintRep(); sync(); }));
+      const x = lie ? rep[lie - 1] : null;
+      $("#alrep").innerHTML = pick !== "D" ? "" : `<h2>1. Choose the report to falsify</h2><p class="small">Pick the one you think classmates are least likely to catch.</p><div class="mlist" role="group" aria-label="Report to falsify">${rep.map((r, i) => `<button class="mitem" data-lie="${i + 1}" aria-pressed="${lie === i + 1}"><span class="key">${i + 1}</span><span>${esc(r.t.replace("{X}", r.truth))}</span></button>`).join("")}</div>`
+        + (x ? `<h2>2. Choose your lie</h2><p class="small">Pick the false version your card will carry.</p><div class="mlist" role="group" aria-label="Your lie">${lieOpts(x).map(([k, w], i) => `<button class="mitem" data-lv="${k}" aria-pressed="${lv === k}"><span class="key">${"AB"[i]}</span><span>${esc(x.t.replace("{X}", w))}</span></button>`).join("")}</div>` : "")
+        + (x && lv ? `<p class="lieline"><b>Your card will say:</b> ${esc(x.t.replace("{X}", lv === "O" ? x.third : x.fake))}</p>` : "");
+      $$("[data-lie]").forEach((b) => b.addEventListener("click", () => { lie = +b.dataset.lie; lv = null; paintRep(); sync(); }));
+      $$("[data-lv]").forEach((b) => b.addEventListener("click", () => { lv = b.dataset.lv; paintRep(); sync(); }));
     };
-    $$("[data-al]").forEach((b) => b.addEventListener("click", () => { pick = b.dataset.al; if (pick === "0") lie = 0; $$("[data-al]").forEach((x) => x.setAttribute("aria-pressed", x === b)); paintRep(); sync(); }));
-    ok.addEventListener("click", () => { S.alg = { v: pick === "D" ? lie : 0, r: Math.floor(Math.random() * 8) }; saveGame(true); go("end"); });
+    $$("[data-al]").forEach((b) => b.addEventListener("click", () => { pick = b.dataset.al; if (pick === "0") { lie = 0; lv = null; } $$("[data-al]").forEach((x) => x.setAttribute("aria-pressed", x === b)); paintRep(); sync(); }));
+    ok.addEventListener("click", () => { L.sealAlg(S, pick === "D" ? lie : 0, lv); saveGame(true); go("end"); });
   }
   function renderEnd() {
     if (!S.alg) { view = "allegiance"; renderAllegiance(); return; }
@@ -393,7 +398,7 @@
   }
   function cardText(q) {
     const fs = S.ended.fs, role = S.role, L1 = "━━━━━━━━━━━━━━━━━━━━";
-    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "INTEL REPORTS FROM MY FRONT", ...L.intelFor(role.id, S.alg ? S.alg.v : 0).map((x, i) => `${i + 1}. ${x.text}`), "Trust me or deny me. Decode my Signal ID to decide.", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
+    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "INTEL REPORTS FROM MY FRONT", ...L.intelFor(role.id, S.alg ? S.alg.v : 0, S.alg && S.alg.lie).map((x, i) => `${i + 1}. ${x.text}`), "Trust me or deny me. Decode my Signal ID to decide.", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
   function cardSVG() {
     const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
@@ -461,13 +466,13 @@
   const unsealed = () => fullCount(board()) >= 6;
   const vdText = (p, vd) => vd.v === "A" ? "APPROVED: you trusted all three reports." : `DENIED: you said report ${vd.r} was false and the truth is “${D.INTEL[p.role.id][vd.r - 1][{ T: "truth", F: "fake", O: "third" }[vd.t]]}”.`;
   function vdResult(p, vd) {
-    const sc = L.verdictScore(p.alleg, vd), x = p.alleg ? D.INTEL[p.role.id][p.alleg - 1] : null;
-    return `<p class="vres ${sc.right ? "good" : "bad"}"><b>${p.alleg ? "DOUBLE AGENT." : "LOYAL AGENT."}</b> ${p.alleg ? `Report ${p.alleg} was planted: it said “${esc(x.fake)}”, but the truth is “${esc(x.truth)}”.` : "All three reports were true."} You scored ${sc.pts} of ${sc.max}${vd.res ? " (with research)" : ""}.</p>`;
+    const sc = L.verdictScore(p.alleg, vd), x = p.alleg ? L.plantedLie(p.role.id, p.alleg, p.lie) : null;
+    return `<p class="vres ${sc.right ? "good" : "bad"}"><b>${p.alleg ? "DOUBLE AGENT." : "LOYAL AGENT."}</b> ${p.alleg ? `Report ${p.alleg} was planted: it said “${esc(x.lieWord)}”, but the truth is “${esc(x.truthWord)}”.` : "All three reports were true."} You scored ${sc.pts} of ${sc.max}${vd.res ? " (with research)" : ""}.</p>`;
   }
   function interHTML(p) {
     if (p.alleg == null) return `<p class="small">This Signal ID is from an older version of the game, so there are no intel reports to check.</p>`;
     if (isMine(p.id)) return `<p class="small">This is your own Signal ID, so there is nothing to interrogate.</p>`;
-    const reps = L.intelFor(p.role.id, p.alleg).map((x, i) => `<li><b>Report ${i + 1}.</b> ${esc(x.text)}</li>`).join("");
+    const reps = L.intelFor(p.role.id, p.alleg, p.lie).map((x, i) => `<li><b>Report ${i + 1}.</b> ${esc(x.text)}</li>`).join("");
     return `<section class="interro"><p class="src">INTERROGATION · TRUST OR TRAITOR</p><p>${esc(p.role.name)}'s card carries these intel reports. Is this agent loyal, or a double agent who planted one lie?</p><ol class="intel">${reps}</ol><div id="istep"></div>
       <div class="row"><button class="mini" id="iarch">Check the Archive</button></div><p class="small">Reading the Archive is free. Revealing a blacked-out line while this interrogation is open marks your verdict “with research”: a perfect verdict then scores 2 points instead of 3.</p></section>`;
   }

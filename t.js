@@ -1,7 +1,8 @@
 const { chromium } = require('playwright'); const L = require('./src/logic.js'); global.DATA = require('./src/data.js');
 (async () => {
-  // node t.js desktop ROLE PICKS [ALLEGIANCE]   ALLEGIANCE: 0 = loyal (default), 1-3 = double agent falsifying that report
-  const mode = process.argv[2] || 'desktop', role = process.argv[3] || 'BP', picks = process.argv[4] || 'ABCABC', alg = +(process.argv[5] || 0);
+  // node t.js desktop ROLE PICKS [ALLEGIANCE]   ALLEGIANCE: 0 = loyal (default), or 1-3 = double agent falsifying that report,
+  // optionally followed by the lie: F (the report's first false version, default) or O (its second), e.g. 2O
+  const mode = process.argv[2] || 'desktop', role = process.argv[3] || 'BP', picks = process.argv[4] || 'ABCABC', algArg = process.argv[5] || '0', alg = +algArg[0], lv = algArg[1] === 'O' ? 'O' : 'F';
   const b = await chromium.launch(); const ctx = await b.newContext(mode === 'mobile' ? { viewport: { width: 400, height: 860 } } : { viewport: { width: 1280, height: 900 } });
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push('PAGEERR ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|fonts/.test(m.text())) errs.push('CONSOLE ' + m.text()); });
   await p.goto('file://' + process.cwd() + '/dist/test.html'); await p.waitForTimeout(400); await p.screenshot({ path: `shots/${mode}-title.png`, fullPage: true });
@@ -14,12 +15,12 @@ const { chromium } = require('playwright'); const L = require('./src/logic.js');
   }
   // Trust or Traitor: choose the secret allegiance
   await p.waitForSelector('[data-al]');
-  if (alg) { await p.click('[data-al="D"]'); await p.click(`[data-lie="${alg}"]`); } else await p.click('[data-al="0"]');
+  if (alg) { await p.click('[data-al="D"]'); await p.click(`[data-lie="${alg}"]`); if (!(await p.isDisabled('#alok'))) errs.push('SEAL allowed before a lie was chosen'); await p.click(`[data-lv="${lv}"]`); } else await p.click('[data-al="0"]');
   await p.waitForTimeout(600); await p.screenshot({ path: `shots/${mode}-allegiance.png`, fullPage: true }); await p.click('#alok');
   await p.waitForSelector('#sigid'); const id = await p.textContent('#sigid'); console.log('signal', id);
-  const pa = L.parseSignal(id); if (!pa || pa.alleg !== alg) errs.push('ALLEGIANCE did not round-trip: ' + id);
+  const pa = L.parseSignal(id); if (!pa || pa.alleg !== alg || (alg && pa.lie !== lv)) errs.push('ALLEGIANCE did not round-trip: ' + id);
   const post = await p.inputValue('#ptext'); if (!/INTEL REPORTS FROM MY FRONT/.test(post)) errs.push('POST has no intel reports');
-  if (alg && post.indexOf(DATA.INTEL[role][alg - 1].fake) < 0) errs.push('POST is missing the planted lie');
+  if (alg && post.indexOf(L.plantedLie(role, alg, lv).lie) < 0) errs.push('POST is missing the chosen lie');
   await p.screenshot({ path: `shots/${mode}-end.png`, fullPage: true });
   // decode another role (a double agent who falsified report 2), use the Archive, interrogate
   const o = role === 'NV' ? 'BP' : 'NV'; const S = L.newState(L.roleById(o), 'x'); for (let r = 0; r < 6; r++) { S.i = r; L.choose(S, r % 3); } S.alg = { v: 2, r: 5 }; const sid = L.signalId(S);
