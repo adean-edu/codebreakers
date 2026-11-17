@@ -52,7 +52,7 @@ ${r("checker.css")}
 ${cjs}
 </script></body></html>`);
 /* For Teachers guide: dist/teachers.html, for the latest version at the repo root. release.js makes the frozen copies (v1/, v2/ …). */
-const SITE = "https://adean-edu.github.io/codebreakers/";
+const SITE = "https://spyglass-lab.github.io/codebreakers/";
 const guide = (note, base) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codebreakers: For Teachers</title>${fonts}<style>
 ${r("checker.css")}
 </style></head><body>${r("guide.html").split("{{VERSION_NOTE}}").join(note).split("{{GAME_URL}}").join(base).split("{{CHECK_URL}}").join(base + "check.html").split("{{SITE}}").join(SITE)}</body></html>`;

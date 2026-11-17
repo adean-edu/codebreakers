@@ -1,6 +1,6 @@
 /* Publish a frozen copy of the game for other teachers: node release.js v1
    Builds, then copies the game, Teacher Check and the For Teachers guide into <version>/ at the repo root
-   (live at https://adean-edu.github.io/codebreakers/<version>/). Later changes to the main game do not touch it.
+   (live at https://spyglass-lab.github.io/codebreakers/<version>/). Later changes to the main game do not touch it.
    Refuses to overwrite an existing version unless you add --force, so a class mid-unit is never changed by accident. */
 const fs = require("fs"), path = require("path");
 const ver = process.argv[2], force = process.argv.includes("--force");
