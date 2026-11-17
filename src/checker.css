@@ -34,3 +34,16 @@ pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var
 /* Trust or Traitor: the Unmasking */
 .unmask { margin-top: 18px; } .awards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 18px; } .awards .sl { font-size: .8rem; letter-spacing: .16em; color: #a3312a; margin: 0 0 6px; }
 .lies li { margin: 0 0 10px; } .lies .lie { color: #a3312a; } .lies .truth { color: #2f6b45; }
+
+/* Teacher hub: everything in one place */
+.hub { margin: 18px 0 8px; } .hub h2 { margin-top: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 6px; }
+.tile h3 { margin: 0; font: 700 22px "Atkinson Hyperlegible", sans-serif; color: var(--ink); } .tile p { margin: 0; } .tile .row { margin: 6px 0 0; }
+.tk { font: 700 12px "Courier New", monospace; letter-spacing: 2px; color: var(--dim); margin: 0; }
+.t-game { border-top-color: var(--gold); } .t-padlet { border-top-color: #5aa7bf; } .t-check { border-top-color: var(--red); } .t-lesson { border-top-color: #b98a5a; } .t-brief { border-top-color: var(--green); } .t-guide { border-top-color: #8e9a93; }
+.url { font-size: 14px; color: var(--gold); word-break: break-all; }
+a.btn { display: inline-block; text-decoration: none; } .btn:focus-visible, a:focus-visible { outline: 3px solid #8ab4f8; outline-offset: 2px; }
+.jump { margin: 2px 0 0; padding-left: 20px; columns: 2; } .jump li { margin: 3px 0; }
+.plan, .share { background: var(--panel); border: 1px solid var(--line); padding: 12px 18px; margin: 14px 0 0; }
+.plan ol { margin: 6px 0 0; padding-left: 22px; } .share { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; } .share p { margin: 0; }

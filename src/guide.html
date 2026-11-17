@@ -5,13 +5,33 @@
 <p class="small"><b>About the name:</b> version 1 was called "Codebreakers: The Silent Service". It is now "Codebreakers: The Hidden War", because "the Silent Service" is the well-known nickname of the submarine service, and the game is about the whole hidden war of codebreakers, couriers, double agents and liaison officers.</p>
 <p class="ver">{{VERSION_NOTE}}</p>
 
-<section class="how"><h2>LINKS</h2><ul>
-<li><b>Game (give this to students):</b> <a href="./">{{GAME_URL}}</a></li>
-<li><b>Ready-made Padlet (click to copy it into your own Padlet account):</b> <a href="https://padlet.com/commonwealthcharter/remake-link/1JkMb04BV11JbdD8">https://padlet.com/commonwealthcharter/remake-link/1JkMb04BV11JbdD8</a></li>
-<li><b>Teacher Check (for grading; keep this one to yourself):</b> <a href="check.html">{{CHECK_URL}}</a></li>
-</ul></section>
+<section class="hub" aria-labelledby="hubh"><h2 id="hubh">EVERYTHING IN ONE PLACE</h2>
+<div class="tiles">
+<div class="tile t-game"><p class="tk">FOR STUDENTS</p><h3>The game</h3><p>Students play here, on any computer. No accounts.</p><p class="url mono">{{GAME_URL}}</p><div class="row"><a class="btn" href="./">Open the game</a><button class="btn ghost" type="button" data-copy="{{GAME_URL}}">Copy student link</button></div></div>
+<div class="tile t-padlet"><p class="tk">BEFORE CLASS</p><h3>Your class Padlet</h3><p>One click makes your own copy, with the role columns, welcome post and example card ready.</p><div class="row"><a class="btn" href="https://padlet.com/commonwealthcharter/remake-link/1JkMb04BV11JbdD8">Make my Padlet</a></div><p class="small">Sign in to Padlet first. Then edit the welcome post's last step to say how your students hand in work.</p></div>
+<div class="tile t-check"><p class="tk">FOR GRADING · TEACHERS ONLY</p><h3>Teacher Check</h3><p>Paste submissions to check every Signal ID and message, score Trust or Traitor, and show the Unmasking.</p><div class="row"><a class="btn" href="check.html">Open Teacher Check</a></div><p class="small">Keep this link to yourself.</p></div>
+<div class="tile t-lesson"><p class="tk">DAY 1 · ABOUT 20 MINUTES</p><h3>Mini lesson slides</h3><p>Secrets of the Hidden War: real codebreakers, spies and deceivers, with a myth-or-fact warm-up and speaker notes.</p><div class="row"><a class="btn" href="https://claude.ai/artifact/6VxYWiZy8caahFuaoqfYJF">Open the mini lesson</a></div></div>
+<div class="tile t-brief"><p class="tk">DAY 1 · BEFORE PLAYING</p><h3>Class briefing slides</h3><p>How to play, the Padlet, Trust or Traitor, the rules and how students get credit, with speaker notes.</p><div class="row"><a class="btn" href="https://claude.ai/artifact/H6rRLJQehCXvqrMtnwHjS2">Open the briefing</a></div></div>
+<div class="tile t-guide"><p class="tk">READ ONCE</p><h3>This guide</h3><ul class="jump"><li><a href="#before">Before class</a></li><li><a href="#inclass">In class</a></li><li><a href="#tot">Trust or Traitor</a></li><li><a href="#grading">Grading</a></li><li><a href="#privacy">Privacy</a></li></ul></div>
+</div>
+<div class="plan"><p class="tk">A SIMPLE PLAN</p><ol>
+<li><b>Before class:</b> make your Padlet, and decide how students hand in work privately.</li>
+<li><b>Day 1:</b> mini lesson, class briefing, then students play all six rounds.</li>
+<li><b>Day 2:</b> students post their cards, decode classmates, file verdicts and submit.</li>
+<li><b>After:</b> grade with Teacher Check, then show the class the Unmasking.</li>
+</ol></div>
+<div class="share"><div><p class="tk">SHARE WITH ANOTHER TEACHER</p><p>Send them this page. Everything they need is linked here, and this version never changes mid-unit.</p></div><button class="btn" type="button" data-copy="page">Copy link to this page</button></div>
+<p class="small cmsg" role="status" aria-live="polite"></p>
+</section>
+<script>
+document.querySelectorAll("[data-copy]").forEach(function (b) { b.addEventListener("click", function () {
+  var t = b.getAttribute("data-copy") === "page" ? location.href.split("#")[0] : b.getAttribute("data-copy"), m = document.querySelector(".cmsg");
+  var done = function (ok) { m.textContent = ok ? "Copied: " + t : "Select and copy: " + t; if (ok) { var o = b.textContent; b.textContent = "Copied"; setTimeout(function () { b.textContent = o; }, 1500); } };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); }); else done(false);
+}); });
+</script>
 
-<h2>BEFORE CLASS</h2>
+<h2 id="before">BEFORE CLASS</h2>
 <ol>
 <li><b>Make your class Padlet in one click:</b> open the <a href="https://padlet.com/commonwealthcharter/remake-link/1JkMb04BV11JbdD8">ready-made Padlet</a> while signed in to Padlet. It makes your own copy, with a column for each role, the pinned welcome post and an example card. None of another class’s posts come with it.</li>
 <li><b>Edit the welcome post’s last step</b> to say how your students hand in their submission (it names the original teacher’s system).</li>
@@ -20,13 +40,13 @@
 <li><b>Decide how students hand in their submission</b>: your learning management system, a form, or email. It must be private. Never on Padlet.</li>
 </ol>
 <div class="box"><p class="small">Suggested welcome post (copy and edit):</p><pre>Welcome, codebreakers.
-1. Play the game: choose any role and finish all six rounds.
+1. Play the game: choose any role and finish all six rounds. Then choose, in secret, loyal agent or double agent. Tell no one.
 2. Post ONLY your case card here: the card image plus the post text the game gives you.
-3. Decode classmates from the OTHER four roles: type the Signal ID from their card into the game's Decoder board.
-4. Reply to each card you decode with the reply the game writes for you. It starts with DECODED and their ID.
+3. Decode classmates from the OTHER four roles: type the Signal ID from their card into the game's Decoder board, then decide whether to trust their intel reports. Your verdict stays in the game.
+4. Reply to each card you decode with the reply the game writes for you. It starts with DECODED and their ID. Never say whether you trust them.
 5. When all six messages are decoded, hand in your submission privately. Never post the messages here.</pre></div>
 
-<h2>IN CLASS</h2>
+<h2 id="inclass">IN CLASS</h2>
 <ol>
 <li><b>Students choose their own role</b> and type a name or codename. Every role has a different piece of each message, so a mix of roles across the class is what makes the puzzle work. If one role is missing, students cannot finish; nudge a few students toward it.</li>
 <li><b>They play six rounds.</b> Each round has a briefing, a cipher to crack with the dial, a decision, and a debrief comparing their choice with what really happened. Plan for at least one class period.</li>
@@ -35,7 +55,7 @@
 <li><b>They hand in the six messages.</b> When all six are complete, the game makes a submission with their name, their own Signal ID, the Signal IDs they decoded, their verdicts, and a short reflection. They copy it and hand it in privately.</li>
 </ol>
 
-<h2>TRUST OR TRAITOR</h2>
+<h2 id="tot">TRUST OR TRAITOR</h2>
 <p>This is the assessment part of the game. Students check each other's history facts, all with choices only and no typing.</p>
 <ol>
 <li><b>A secret choice.</b> After round 6, each student chooses in secret to be a <b>loyal agent</b> or a <b>double agent</b>. A double agent picks one of three intel reports to falsify, then chooses its lie from two false versions (no typing). The choice is hidden inside their Signal ID. Nobody else can see it.</li>
@@ -47,7 +67,7 @@
 <p><b>Scoring.</b> A verdict earns 1 point if it is right. On a double agent, it earns 1 more point for naming the false report, and 1 more for picking the truth. A perfect verdict made "with research" scores 2 instead of 3. As agents, loyal students score 1 point for each classmate who approved them, and double agents score 1 point for each classmate they fooled. Teacher Check works out every score again from the Signal IDs, so students can't change their own scores.</p>
 <p><b>The Unmasking.</b> After grading, press <b>Show the Unmasking</b> in Teacher Check. It shows the class who was a double agent, the best deceiver, the best spy-catcher, and every planted lie with the truth beside it. Keep it hidden until everyone has finished.</p>
 
-<h2>GRADING</h2>
+<h2 id="grading">GRADING</h2>
 <ol>
 <li>Collect the submissions and paste them, all at once, into <a href="check.html">Teacher Check</a>.</li>
 <li>Each student gets a row: whether their own Signal ID is real, which of the five roles they covered, whether the six messages are right, their Trust or Traitor verdict points and research count, their points as an agent, and anything to look at (made-up Signal IDs, two students with the same Signal ID, reflections copied word for word).</li>
@@ -55,7 +75,7 @@
 </ol>
 <p class="small">Known limits: Signal IDs are checked, but they are not tamper-proof, and a Signal ID from another class works in any class. Teacher Check flags the most common shortcuts; it does not replace your judgment.</p>
 
-<h2>PRIVACY</h2>
+<h2 id="privacy">PRIVACY</h2>
 <ul>
 <li><b>No accounts and no data collection.</b> The game is a single web page. It sends nothing to any server.</li>
 <li><b>Student names are never saved.</b> A student's name is kept only while the page is open, for their card and their submission. The game remembers progress and decoded Signal IDs in the student's own browser, without the name.</li>
