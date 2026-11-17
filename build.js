@@ -55,7 +55,7 @@ ${cjs}
 const SITE = "https://adean-edu.github.io/codebreakers/";
 const guide = (note, base) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codebreakers: For Teachers</title>${fonts}<style>
 ${r("checker.css")}
-</style></head><body>${r("guide.html").split("{{VERSION_NOTE}}").join(note).split("{{GAME_URL}}").join(base).split("{{CHECK_URL}}").join(base + "check.html")}</body></html>`;
+</style></head><body>${r("guide.html").split("{{VERSION_NOTE}}").join(note).split("{{GAME_URL}}").join(base).split("{{CHECK_URL}}").join(base + "check.html").split("{{SITE}}").join(SITE)}</body></html>`;
 fs.writeFileSync(__dirname + "/dist/teachers.html", guide(`This is the <b>latest version</b>, which changes whenever the game is improved. To use the game with a class, or to share it with other teachers, use the frozen version, which never changes mid-unit: <a href="v3/teachers.html">${SITE}v3/teachers.html</a>.`, SITE));
 module.exports = { guide, SITE };
 console.log("built", (html.length / 1024).toFixed(0) + " KB");

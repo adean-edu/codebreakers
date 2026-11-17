@@ -1,0 +1,74 @@
+{
+  "v": 5,
+  "attachments": {},
+  "cover": "cover",
+  "createdOnFiles": {
+    "at": "2026-11-16T19:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "faces": {
+    "public-sans": {
+      "family": "Public Sans",
+      "href": "https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&display=swap"
+    },
+    "special-elite": {
+      "family": "Special Elite",
+      "href": "https://fonts.googleapis.com/css2?family=Special+Elite&display=swap"
+    }
+  },
+  "format": {
+    "shared": [
+      "project/deck.css"
+    ],
+    "v": 1
+  },
+  "lists": "css",
+  "order": [
+    "cover",
+    "quiz",
+    "enigma",
+    "crossword",
+    "women",
+    "colossus",
+    "garbo",
+    "mincemeat",
+    "hall",
+    "ghostarmy",
+    "listeners",
+    "coastwatchers",
+    "radio",
+    "interpreters",
+    "escape",
+    "codetalkers",
+    "pigeon",
+    "turn"
+  ],
+  "sections": {
+    "s1": {
+      "description": "A hook: a myth-or-fact warm-up.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "The codebreakers: Enigma, the crossword, the women of Bletchley and the secret computer.",
+      "start": "enigma"
+    },
+    "s3": {
+      "description": "Spies and deceivers: Garbo, Operation Mincemeat and Virginia Hall.",
+      "start": "garbo"
+    },
+    "s3b": {
+      "description": "More roles in the secret war: listeners, coastwatchers, radio operators, photo interpreters and escape gadget makers.",
+      "start": "listeners"
+    },
+    "s4": {
+      "description": "Beyond the game: the Navajo Code Talkers, the Ghost Army and the pigeon mystery.",
+      "start": "codetalkers"
+    },
+    "s5": {
+      "description": "Bridge into the game.",
+      "start": "turn"
+    }
+  },
+  "title": "Secrets of the Hidden War: Mini Lesson"
+}
