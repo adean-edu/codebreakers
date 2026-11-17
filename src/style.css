@@ -299,3 +299,6 @@ svg.portrait, svg.scene { image-rendering: pixelated; shape-rendering: crispEdge
 .dhint { font-size: 1.05rem; color: #5a523c; margin: 6px 0; }
 .dfoot { border-top: 1px solid #8f8360; padding-top: 6px; font-size: 1.02rem; color: #5a523c; font-style: italic; }
 @media (prefers-reduced-motion: reduce) { .archive { animation: none; } .red { transition: none; } }
+
+/* Decoder board: clear with confirmation */
+.clrwrap { margin-top: 18px; } .clrbox { margin-top: 10px; } .clrbox h3 { margin: 0 0 6px; font-family: var(--display); font-size: 1rem; letter-spacing: .08em; color: var(--stamp); } .clrbox p { margin: 6px 0; }

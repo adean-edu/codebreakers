@@ -604,12 +604,31 @@
       <section class="decoder"><h2>Decode a Signal ID</h2>${decoderForm()}</section>
       ${parsed.length ? `<section><h2>Decoded so far</h2><ul class="chiplist">${parsed.map((p) => `<li><button class="chipb" data-sig="${p.id}">${esc(p.id)} · ${esc(p.role.short)}</button></li>`).join("")}</ul></section>` : ""}
       ${completion(b, parsed, full)}
-      ${rows}<p class="small"><button class="mini" id="clr">Clear decoded signals</button></p></main>`;
+      ${rows}<div class="clrwrap"><button class="mini" id="clr" aria-expanded="false" aria-controls="clrbox">Clear the decoder board</button>
+      <div class="clrbox panel" id="clrbox" role="group" aria-labelledby="clrh" hidden><h3 id="clrh">Clear the decoder board?</h3>
+        <p>This can't be undone. Verdicts you have already filed stay locked either way.</p>
+        <div class="row"><button class="btn" id="clrsig">Clear classmates' Signal IDs</button><button class="btn ghost" id="clrall">Also forget other roles I played</button><button class="mini" id="clrno">Cancel</button></div>
+        <p class="small"><b>Clear classmates' Signal IDs</b> removes everyone you decoded, so their pieces disappear. Pieces from roles you played yourself stay.<br><b>Also forget other roles I played</b> clears those too, except the game you are playing now.</p></div>
+      <p class="small cmsg" id="clrmsg" role="status"></p></div></main>`;
     $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
     bindDecoder();
     $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); showDecoded(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
     const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
-    $("#clr").addEventListener("click", () => { const b2 = board(); b2.sig = []; store.set("cb_board", b2); renderBoard(); bindGo(); });
+    /* Clearing asks first. Option 1 forgets decoded classmates; option 2 also forgets other roles this student played
+       (their pieces and Signal IDs), keeping the current game. Filed verdicts are never cleared, so results can't be redone. */
+    const box = $("#clrbox"), clr = $("#clr");
+    const toggle = (open) => { box.hidden = !open; clr.setAttribute("aria-expanded", String(open)); if (open) $("#clrsig").focus(); else clr.focus(); };
+    clr.addEventListener("click", () => toggle(box.hidden));
+    $("#clrno").addEventListener("click", () => toggle(false));
+    box.addEventListener("keydown", (e) => { if (e.key === "Escape") toggle(false); });
+    const done = (msg) => { renderBoard(); bindGo(); const m = $("#clrmsg"); if (m) m.textContent = msg; const c = $("#clr"); if (c) c.focus({ preventScroll: false }); };
+    $("#clrsig").addEventListener("click", () => { const b2 = board(); const n = b2.sig.length; b2.sig = []; store.set("cb_board", b2); lastDecoded = null; done(n ? `Cleared ${n} classmate Signal ID${n === 1 ? "" : "s"}.` : "There were no classmate Signal IDs to clear."); });
+    $("#clrall").addEventListener("click", () => {
+      const saved = loadGame(), cur = S && S.role ? S.role.id : saved ? saved.S.role.id : null, b2 = board(); b2.sig = []; lastDecoded = null;
+      const keep = (o) => { const r = {}; if (cur && o && o[cur] !== undefined) r[cur] = o[cur]; return r; };
+      b2.prog = keep(b2.prog); b2.mine = keep(b2.mine); b2.own = cur && b2.own && b2.own.role === cur ? b2.own : null;
+      store.set("cb_board", b2); done("Cleared. Only your current game is left on the board.");
+    });
   }
 
 
