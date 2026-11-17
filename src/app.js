@@ -9,7 +9,7 @@
   let nameNow = "";
   try { localStorage.removeItem("cb_name"); const g0 = store.get("cb_game", null); if (g0 && g0.S && g0.S.name) { g0.S.name = ""; store.set("cb_game", g0); } } catch (e) { }
   const root = document.getElementById("app");
-  let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null, titleCard = false, typedFor = -1, fxTimer = null;
+  let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null, titleCard = false, typedFor = -1, fxTimer = null, curInt = null;   // curInt: the Signal ID whose interrogation is open (no verdict filed yet)
   const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FX_ON = location.hash === "#fx", noFx = () => (navigator.webdriver && !FX_ON) || reduceMotion();   // automated tests skip the effects unless asked
   /* small synthesized sound effects for the title card, typewriter and stamp */
@@ -151,14 +151,14 @@
 
   /* ---------- shared UI ---------- */
   function topbar(extra) {
-    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-go="board">Decoder board</button></nav></header>`;
+    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-arch>Archive</button><button class="mini" data-go="board">Decoder board</button></nav></header>`;
   }
   function hud() {
     const pips = D.ROUNDS.map((r, i) => `<span class="pip ${i < S.i ? "done" : i === S.i ? "now" : ""}" title="Round ${i + 1}"></span>`).join("");
     const bars = METERS.map(([k, n, h]) => `<div class="meter" title="${esc(h)}"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
     return `<div class="hud" role="group" aria-label="Status"><div class="pips" aria-label="Round ${S.i + 1} of 6">${pips}</div>${bars}<div class="score">SCORE <b>${S.score}</b></div></div>`;
   }
-  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); }
+  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); $$("[data-arch]").forEach((b) => b.addEventListener("click", () => openArchive())); }
   function go(v) {
     if (v === "board") { if (view !== "board") prevView = view; }
     
@@ -166,8 +166,8 @@
     try { history.replaceState(null, "", v === "board" ? "#board" : location.pathname + location.search); } catch (e) { }
   }
   function render() {
-    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
-    ({ title: renderTitle, pick: renderPick, round: renderRound, end: renderEnd, board: renderBoard }[view] || renderTitle)();
+    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } curInt = null; closeArchive(); const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
+    ({ title: renderTitle, pick: renderPick, round: renderRound, allegiance: renderAllegiance, end: renderEnd, board: renderBoard }[view] || renderTitle)();
     bindGo(); const h = $("[data-focus]"); if (h) h.focus({ preventScroll: true });
   }
   function copyText(text, btn, done) {
@@ -193,7 +193,7 @@
         <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then submit the decoded messages to your teacher for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
     swapScene($(".hero-art"));
     $("#start").addEventListener("click", () => { if (saved) store.set("cb_game", null); go("pick"); });
-    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done ? "end" : "round"); });
+    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done || S.fin ? (S.alg ? "end" : "allegiance") : "round"); });
   }
 
   /* ---------- role pick ---------- */
@@ -269,7 +269,7 @@
     if (stage === "brief") $("#next").addEventListener("click", () => { stage = "work"; solved = false; chosen = null; render(); window.scrollTo(0, 0); });
     else if (stage === "work") bindWork();
     else {
-      $("#next").addEventListener("click", () => { S.i++; stage = "brief"; solved = false; chosen = null; titleCard = true; if (S.i >= 6) { S.i = 5; go("end"); } else { saveGame(false); render(); window.scrollTo(0, 0); } });
+      $("#next").addEventListener("click", () => { S.i++; stage = "brief"; solved = false; chosen = null; titleCard = true; if (S.i >= 6) { S.i = 5; S.fin = true; saveGame(false); go(S.alg ? "end" : "allegiance"); } else { saveGame(false); render(); window.scrollTo(0, 0); } });
     }
   }
   function bindWork() {
@@ -344,7 +344,27 @@
   });
 
   /* ---------- end ---------- */
+  /* ---------- Trust or Traitor: the secret allegiance, chosen once after round 6 ---------- */
+  function renderAllegiance() {
+    if (S.alg) { view = "end"; renderEnd(); return; }
+    const role = S.role, rep = D.INTEL[role.id]; let pick = null, lie = 0;
+    root.innerHTML = topbar() + `<main class="wrap tot"><div><p class="kick">FILE CLOSING · ${esc(role.name.toUpperCase())} · ONE LAST DECISION</p><h1 data-focus tabindex="-1">Trust or traitor?</h1></div>
+      <p class="lede">Your Padlet card will carry three intel reports from your front. Classmates who decode your Signal ID must decide whether to trust them. Choose in secret: nobody finds out until your teacher unmasks the agents.</p>
+      <div class="paper"><div class="mlist" role="group" aria-label="Your allegiance">
+        <button class="mitem" data-al="0" aria-pressed="false"><span class="key">L</span><span><b>Loyal agent.</b> All three of your reports are true. You score a point for every classmate who approves you.</span></button>
+        <button class="mitem" data-al="D" aria-pressed="false"><span class="key">D</span><span><b>Double agent.</b> One report carries a lie the enemy wants believed. You score a point for every classmate you fool.</span></button></div>
+        <div id="alrep"></div></div>
+      <div class="row"><button class="btn" id="alok" disabled>Seal my file</button></div><p class="small">Once your file is sealed you can't change your mind: your Signal ID carries your choice.</p></main>`;
+    const ok = $("#alok"), sync = () => { ok.disabled = !(pick === "0" || (pick === "D" && lie)); };
+    const paintRep = () => {
+      $("#alrep").innerHTML = pick !== "D" ? "" : `<h2>Choose the report to falsify</h2><p class="small">The game writes the lie for you. Pick the one you think classmates are least likely to catch.</p><div class="mlist" role="group" aria-label="Report to falsify">${rep.map((x, i) => `<button class="mitem" data-lie="${i + 1}" aria-pressed="${lie === i + 1}"><span class="key">${i + 1}</span><span>${esc(x.t.replace("{X}", x.truth))}</span></button>`).join("")}</div>${lie ? `<p class="lieline"><b>Your card will say:</b> ${esc(rep[lie - 1].t.replace("{X}", rep[lie - 1].fake))}</p>` : ""}`;
+      $$("[data-lie]").forEach((b) => b.addEventListener("click", () => { lie = +b.dataset.lie; paintRep(); sync(); }));
+    };
+    $$("[data-al]").forEach((b) => b.addEventListener("click", () => { pick = b.dataset.al; if (pick === "0") lie = 0; $$("[data-al]").forEach((x) => x.setAttribute("aria-pressed", x === b)); paintRep(); sync(); }));
+    ok.addEventListener("click", () => { S.alg = { v: pick === "D" ? lie : 0, r: Math.floor(Math.random() * 8) }; saveGame(true); go("end"); });
+  }
   function renderEnd() {
+    if (!S.alg) { view = "allegiance"; renderAllegiance(); return; }
     const fs = L.finalScore(S), e = fs.e, rank = L.rank(fs.total), id = L.signalId(S), role = S.role, rIdx = D.RANKS.indexOf(rank);
     S.ended = { fs, e, rank, id };
     const b = board(); b.own = { role: role.id, rounds: 6 }; b.prog = b.prog || {}; b.prog[role.id] = 6; b.mine = b.mine || {}; b.mine[role.id] = id; store.set("cb_board", b); saveGame(true);
@@ -373,7 +393,7 @@
   }
   function cardText(q) {
     const fs = S.ended.fs, role = S.role, L1 = "━━━━━━━━━━━━━━━━━━━━";
-    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
+    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "INTEL REPORTS FROM MY FRONT", ...L.intelFor(role.id, S.alg ? S.alg.v : 0).map((x, i) => `${i + 1}. ${x.text}`), "Trust me or deny me. Decode my Signal ID to decide.", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
   function cardSVG() {
     const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
@@ -413,13 +433,13 @@
   }
 
   /* ---------- decoder ---------- */
-  function decoderForm() { return `<div class="dform"><label for="sid" class="sr">Signal ID</label><input id="sid" placeholder="Example: BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="dgo">Decode</button></div><p class="err" id="derr" role="alert"></p><div id="dres" aria-live="polite"></div>`; }
+  function decoderForm() { return `<div class="dform"><label for="sid" class="sr">Signal ID</label><input id="sid" placeholder="Example: BP-ACBACB-K-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="dgo">Decode</button></div><p class="err" id="derr" role="alert"></p><div id="dres" aria-live="polite"></div>`; }
   function bindDecoder() {
     const run = () => {
       const p = L.parseSignal($("#sid").value), err = $("#derr"); $("#dres").innerHTML = "";
-      if (!p) { err.textContent = "That Signal ID does not decode. Check the letters and dashes. It looks like XX-ABCABC-YY."; return; }
+      if (!p) { err.textContent = "That Signal ID does not decode. Check the letters and dashes. It looks like XX-ABCABC-K-YY."; return; }
       err.textContent = ""; const b = board(); if (b.sig.indexOf(p.id) < 0) { b.sig.push(p.id); store.set("cb_board", b); }
-      lastDecoded = p.id; $("#dres").innerHTML = decodedCard(p); bindReply(p);
+      lastDecoded = p.id; showDecoded(p);
     };
     $("#dgo").addEventListener("click", run); $("#sid").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
     if (lastDecoded && view === "board") { const p = L.parseSignal(lastDecoded); if (p) { $("#sid").value = ""; } }
@@ -428,10 +448,84 @@
     const mine = S && S.role ? S : null;
     const rows = p.picks.map((x, i) => `<li><span class="jd">R${i + 1} · ${esc(rTitle(p.role.id, i))}</span><span class="pc">“${esc(L.piece(i, p.role.id))}”</span><span>${esc(x.label)}</span></li>`).join("");
     const sameRole = mine && mine.role.id === p.role.id;
-    return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}<ol class="journey">${rows}</ol>
+    return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}${interHTML(p)}<ol class="journey">${rows}</ol>
       <div class="field"><label for="rr">Reply about round</label><select id="rr">${D.ROUNDS.map((r, i) => `<option value="${i}">${i + 1}. ${esc(rTitle(p.role.id, i))}</option>`).join("")}</select></div>
       <div class="field"><label for="rq">Question for them (pick one)</label><select id="rq"></select></div>
       <textarea id="rtext" rows="6" readonly aria-label="Reply text"></textarea><div class="row"><button class="mini" id="cprep">Copy reply</button></div><p class="small cmsg" role="status"></p><p class="small">Paste this as a reply on their card post on Padlet.</p></div>`;
+  }
+
+  function showDecoded(p) { $("#dres").innerHTML = decodedCard(p); bindReply(p); bindInter(p); }
+
+  /* ---------- Trust or Traitor: the interrogation (choices only; results sealed until all six messages are decoded) ---------- */
+  const isMine = (id) => Object.values(board().mine || {}).indexOf(id) >= 0;
+  const unsealed = () => fullCount(board()) >= 6;
+  const vdText = (p, vd) => vd.v === "A" ? "APPROVED: you trusted all three reports." : `DENIED: you said report ${vd.r} was false and the truth is “${D.INTEL[p.role.id][vd.r - 1][{ T: "truth", F: "fake", O: "third" }[vd.t]]}”.`;
+  function vdResult(p, vd) {
+    const sc = L.verdictScore(p.alleg, vd), x = p.alleg ? D.INTEL[p.role.id][p.alleg - 1] : null;
+    return `<p class="vres ${sc.right ? "good" : "bad"}"><b>${p.alleg ? "DOUBLE AGENT." : "LOYAL AGENT."}</b> ${p.alleg ? `Report ${p.alleg} was planted: it said “${esc(x.fake)}”, but the truth is “${esc(x.truth)}”.` : "All three reports were true."} You scored ${sc.pts} of ${sc.max}${vd.res ? " (with research)" : ""}.</p>`;
+  }
+  function interHTML(p) {
+    if (p.alleg == null) return `<p class="small">This Signal ID is from an older version of the game, so there are no intel reports to check.</p>`;
+    if (isMine(p.id)) return `<p class="small">This is your own Signal ID, so there is nothing to interrogate.</p>`;
+    const reps = L.intelFor(p.role.id, p.alleg).map((x, i) => `<li><b>Report ${i + 1}.</b> ${esc(x.text)}</li>`).join("");
+    return `<section class="interro"><p class="src">INTERROGATION · TRUST OR TRAITOR</p><p>${esc(p.role.name)}'s card carries these intel reports. Is this agent loyal, or a double agent who planted one lie?</p><ol class="intel">${reps}</ol><div id="istep"></div>
+      <div class="row"><button class="mini" id="iarch">Check the Archive</button></div><p class="small">Reading the Archive is free. Revealing a blacked-out line while this interrogation is open marks your verdict “with research”: a perfect verdict then scores 2 points instead of 3.</p></section>`;
+  }
+  function bindInter(p) {
+    const box = $("#istep"); if (!box) return;
+    const ab = $("#iarch"); if (ab) ab.addEventListener("click", () => openArchive(p.role.id));
+    const b0 = board(), filed = (b0.verdicts || {})[p.id];
+    if (filed) { curInt = null; box.innerHTML = `<p class="vfiled"><b>Verdict filed.</b> ${esc(vdText(p, filed))}</p>${unsealed() ? vdResult(p, filed) : `<p class="small">Results are sealed until you have decoded all six messages.</p>`}`; return; }
+    curInt = p.id; const vd = {};
+    const opt = (attr, val, key, txt, on) => `<button class="mitem" ${attr}="${val}" aria-pressed="${!!on}"><span class="key">${key}</span><span>${txt}</span></button>`;
+    const paint = () => {
+      const res = !!((board().resd || {})[p.id]);
+      let h = `<h3>1. Your verdict</h3><div class="mlist" role="group" aria-label="Verdict">${opt("data-v", "A", "A", "<b>APPROVE.</b> I trust all three reports.", vd.v === "A")}${opt("data-v", "D", "D", "<b>DENY.</b> One of these reports is a lie.", vd.v === "D")}</div>`;
+      if (vd.v === "D") h += `<h3>2. Which report is false?</h3><div class="mlist" role="group" aria-label="False report">${[1, 2, 3].map((n) => opt("data-r", n, n, "Report " + n, vd.r === n)).join("")}</div>`;
+      if (vd.v === "D" && vd.r) h += `<h3>3. Prove it: what is the truth?</h3><div class="mlist" role="group" aria-label="The truth">${L.proveOpts(p.id, p.role.id, vd.r - 1).map((o, i) => opt("data-t", o.k, "ABC"[i], esc(D.INTEL[p.role.id][vd.r - 1].t.replace("{X}", o.v)), vd.t === o.k)).join("")}</div>`;
+      const ready = vd.v === "A" || (vd.v === "D" && vd.r && vd.t);
+      h += `<div class="row"><button class="btn" id="ifile"${ready ? "" : " disabled"}>File verdict</button></div><p class="small">${res ? "<b>Research used</b> for this verdict. " : ""}A filed verdict can't be changed.</p>`;
+      box.innerHTML = h;
+      $$("[data-v]", box).forEach((x) => x.addEventListener("click", () => { vd.v = x.dataset.v; if (vd.v === "A") { delete vd.r; delete vd.t; } paint(); }));
+      $$("[data-r]", box).forEach((x) => x.addEventListener("click", () => { vd.r = +x.dataset.r; delete vd.t; paint(); }));
+      $$("[data-t]", box).forEach((x) => x.addEventListener("click", () => { vd.t = x.dataset.t; paint(); }));
+      $("#ifile").addEventListener("click", () => { const b = board(); b.verdicts = b.verdicts || {}; if (b.verdicts[p.id]) return; b.verdicts[p.id] = Object.assign({}, vd, { res: !!((b.resd || {})[p.id]) }); store.set("cb_board", b); bindInter(p); });
+    };
+    paint();
+  }
+
+  /* ---------- Trust or Traitor: the Archive of declassified files ---------- */
+  let arch = { d: 0, f: 0 }, archKey = null;
+  const redact = (t) => esc(t).replace(/\[\[(.+?)\]\]/g, '<span class="red" tabindex="0" role="button" aria-label="Blacked-out text. Press to reveal.">$1</span>');
+  function closeArchive() { const a = $(".archive"); if (a) { a.remove(); document.body.style.overflow = ""; } if (archKey) { document.removeEventListener("keydown", archKey); archKey = null; } }
+  function noteResearch() { if (!curInt) return; const b = board(); if ((b.verdicts || {})[curInt]) return; b.resd = b.resd || {}; if (b.resd[curInt]) return; b.resd[curInt] = true; store.set("cb_board", b); const n = $(".arch-int"); if (n) n.innerHTML = `<b>Research used</b> for your verdict on ${esc(curInt)}.`; }
+  function openArchive(drawer) {
+    closeArchive(); const back = document.activeElement;
+    if (drawer) { const i = D.ARCHIVE.findIndex((x) => x.id === drawer); if (i >= 0) arch = { d: i, f: 0 }; }
+    const el = document.createElement("div"); el.className = "archive"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "The Archive: declassified files");
+    document.body.appendChild(el); document.body.style.overflow = "hidden";
+    const close = () => { closeArchive(); if (back && back.focus) back.focus(); };
+    archKey = (e) => { if (e.key === "Escape") close(); }; document.addEventListener("keydown", archKey);
+    const paint = (focusSel) => {
+      const d = D.ARCHIVE[arch.d], f = d.files[arch.f], res = curInt && ((board().resd || {})[curInt]);
+      el.innerHTML = `<div class="arch-in" style="--dc:${d.color}"><div class="arch-top"><h2>The Archive <small>Declassified files</small></h2><button class="mini" id="archx">Close</button></div>
+        ${curInt ? `<p class="arch-int">${res ? `<b>Research used</b> for your verdict on ${esc(curInt)}.` : `Interrogation open for ${esc(curInt)}. Revealing a blacked-out line marks that verdict “with research”.`}</p>` : ""}
+        <nav class="drawers" aria-label="Drawers">${D.ARCHIVE.map((x, i) => `<button class="drawer${i === arch.d ? " on" : ""}" data-d="${i}" style="--dc:${x.color}" aria-pressed="${i === arch.d}">${esc(x.name)}</button>`).join("")}</nav>
+        <div class="folder"><div class="ftabs" role="tablist" aria-label="${esc(d.name)} files">${d.files.map((x, i) => `<button class="ftab${i === arch.f ? " on" : ""}" role="tab" aria-selected="${i === arch.f}" data-f="${i}">${esc(x.tab)}</button>`).join("")}</div>
+        <article class="dossier" role="tabpanel"><header class="dhead"><span>${esc(f.org)}</span><s>${esc(f.cls)}</s></header><p class="arstamp" aria-label="Declassified">DECLASSIFIED</p><h3>${esc(f.tab)}</h3><p class="dtext">${redact(f.text)}</p>
+        <p class="dhint">Hover over a black bar, or tap it, to see what is underneath.</p><footer class="dfoot">Reconstruction: the facts are checked; the layout imitates a wartime file.</footer></article></div></div>`;
+      $("#archx", el).addEventListener("click", close);
+      $$("[data-d]", el).forEach((b) => b.addEventListener("click", () => { arch = { d: +b.dataset.d, f: 0 }; paint(`[data-d="${b.dataset.d}"]`); }));
+      $$("[data-f]", el).forEach((b) => b.addEventListener("click", () => { arch.f = +b.dataset.f; paint(`[data-f="${b.dataset.f}"]`); }));
+      $$(".red", el).forEach((s) => {
+        let t = null; const show = () => { if (!s.classList.contains("shown")) { s.classList.add("shown"); s.removeAttribute("aria-label"); s.removeAttribute("role"); } noteResearch(); };
+        s.addEventListener("mouseenter", () => { t = setTimeout(show, 250); }); s.addEventListener("mouseleave", () => { clearTimeout(t); });
+        s.addEventListener("focus", show); s.addEventListener("click", show);
+      });
+      const fc = $(focusSel || "#archx", el); if (fc) fc.focus({ preventScroll: true });
+    };
+    el.addEventListener("click", (e) => { if (e.target === el) close(); });
+    paint();
   }
 
   const REPLY_QS = ["What did you think would happen when you made that choice?", "Which of Secrecy, Impact or Trust were you protecting?", "Would you make the same choice again? Why or why not?", "What did your role know that other roles did not?"];
@@ -453,11 +547,23 @@
   function completionText(b, parsed, refl) {
     const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = nameNow || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
-    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
+  }
+  /* Verdicts in the submission: "<ID> A" (approved) or "<ID> D2T" (denied report 2, picked the truth; F = picked the fake, O = the third choice); "*" = with research. Teacher Check rescores them from the IDs. */
+  function verdictList(b) { return Object.keys(b.verdicts || {}).map((id) => ({ id, vd: b.verdicts[id], p: L.parseSignal(id) })).filter((x) => x.p && x.p.alleg != null); }
+  function verdictLines(b) {
+    const v = verdictList(b); if (!v.length) return "Verdicts: none\n";
+    let pts = 0, max = 0; v.forEach((x) => { const s = L.verdictScore(x.p.alleg, x.vd); pts += s.pts; max += s.max; });
+    return `Verdicts: ${v.map((x) => x.id + " " + (x.vd.v === "A" ? "A" : "D" + x.vd.r + x.vd.t) + (x.vd.res ? "*" : "")).join("; ")}\nInterrogation score: ${pts} of ${max}\n`;
+  }
+  function verdictPanel(b, open) {
+    const v = verdictList(b); if (!v.length) return "";
+    if (!open) return `<p class="small">Verdicts filed: ${v.length}. Results are sealed until you have decoded all six messages.</p>`;
+    return `<div class="paper vlist"><p class="src">UNSEALED · YOUR VERDICTS</p>${v.map((x) => `<div class="vrow"><p><b>${esc(x.id)}</b> · ${esc(x.p.role.name)}<br>${esc(vdText(x.p, x.vd))}</p>${vdResult(x.p, x.vd)}</div>`).join("")}</div>`;
   }
   function completion(b, parsed, full) {
-    if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p></section>`;
-    return `<section class="padlet panel"><h2>All six messages decoded</h2><p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
+    if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p>${verdictPanel(b, false)}</section>`;
+    return `<section class="padlet panel"><h2>All six messages decoded</h2>${verdictPanel(b, true)}<p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
       <div class="field"><label for="cnm">Your name (so your teacher knows who this is; never saved)</label><input id="cnm" maxlength="40" autocomplete="off" value="${esc(nameNow)}"></div>
       <div class="field"><label for="crefl">Your reflection (one or two sentences)</label><textarea id="crefl" rows="3" placeholder="Which message surprised you most, and why?"></textarea></div>
       <div class="field"><label for="cptext2">Your submission</label><textarea id="cptext2" rows="14" readonly></textarea></div>
@@ -465,12 +571,15 @@
   }
 
   /* ---------- board ---------- */
+  function knownFn(b) {
+    const have = {}; b.sig.map(L.parseSignal).filter(Boolean).forEach((p) => { have[p.role.id] = true; });
+    const own = b.own || null, prog = Object.assign({}, b.prog || {}); if (own && prog[own.role] === undefined) prog[own.role] = own.rounds;
+    return (r, rid) => (prog[rid] || 0) > r || !!have[rid];
+  }
+  function fullCount(b) { const known = knownFn(b); return D.ROUNDS.filter((rd, r) => D.ROLES.every((x) => known(r, x.id))).length; }
   function renderBoard() {
-    const b = board(), parsed = b.sig.map(L.parseSignal).filter(Boolean), have = {};
-    parsed.forEach((p) => { have[p.role.id] = true; });
-    const own = b.own || null;
-    const prog = b.prog || {}; if (own && prog[own.role] === undefined) prog[own.role] = own.rounds;
-    const known = (r, rid) => (prog[rid] || 0) > r || !!have[rid];
+    const b = board(), parsed = b.sig.map(L.parseSignal).filter(Boolean);
+    const known = knownFn(b);
     let full = 0;
     const rows = D.ROUNDS.map((rd, r) => {
       const n = D.ROLES.filter((x) => known(r, x.id)).length, done = n === 5; if (done) full++;
@@ -485,7 +594,7 @@
       ${rows}<p class="small"><button class="mini" id="clr">Clear decoded signals</button></p></main>`;
     $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
     bindDecoder();
-    $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); $("#dres").innerHTML = decodedCard(p); bindReply(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
+    $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); showDecoded(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
     const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
     $("#clr").addEventListener("click", () => { const b2 = board(); b2.sig = []; store.set("cb_board", b2); renderBoard(); bindGo(); });
   }

@@ -142,13 +142,17 @@ a { color: var(--gold); } .guide ol li, .guide ul li { margin: 6px 0; } .guide p
 pre { white-space: pre-wrap; font: 14px/1.5 "Courier New", monospace; color: var(--ink); margin: 0; }
 .subt2 { margin: -2px 0 10px; font: 700 15px "Courier New", monospace; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); }
 
+/* Trust or Traitor: the Unmasking */
+.unmask { margin-top: 18px; } .awards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 18px; } .awards .sl { font-size: .8rem; letter-spacing: .16em; color: #a3312a; margin: 0 0 6px; }
+.lies li { margin: 0 0 10px; } .lies .lie { color: #a3312a; } .lies .truth { color: #2f6b45; }
+
 </style></head><body><main class="wrap"><h1>CODEBREAKERS · TEACHER CHECK</h1>
 <p class="lead">Check students' private submissions. Every Signal ID is tested, so you can see who really decoded classmates from all five roles. Nothing you paste here is saved or sent anywhere.</p>
 <section class="how"><ol><li>Copy one or more submissions (each starts with <b>MISSION COMPLETE</b>) and paste them all into the box. They can be one after another.</li><li>Press <b>Check</b>. Each student gets a row: their own Signal ID, which roles they decoded, whether the six messages are right, and anything to look at.</li><li>Use <b>Copy results for a spreadsheet</b> to paste the table into your gradebook sheet.</li></ol></section>
 <h2>SUBMISSIONS</h2><label class="small" for="subs">Paste submissions here</label><textarea id="subs" spellcheck="false" placeholder="MISSION COMPLETE · ..."></textarea>
 <div class="row"><button class="btn" id="go">Check</button><button class="btn ghost" id="clear">Clear</button></div><div id="out" aria-live="polite"></div>
 <h2>LOOK UP ONE SIGNAL ID</h2><p class="small">See the role, ending and all six choices behind any Signal ID, for example one on a Padlet card.</p>
-<div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
+<div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-K-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
 <script>
 /* CODEBREAKERS: THE HIDDEN WAR (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
 const DATA = (function () {
@@ -432,6 +436,72 @@ const DATA = (function () {
       sitrep: ["1943. Polish Home Army agents keep hearing about a secret German weapon: a rocket that can fly about 200 miles and fall without warning. Some of the clues point to a test range hidden in the Polish countryside.",
         "Your network has pieces of proof: scraps of metal, a hand-drawn map and the names of people who saw the launches. London needs that proof. The Germans want to find whoever has it."] }
   };
+  /* ---------- Trust or Traitor ----------
+     ARCHIVE: the in-game declassified files, one drawer per role plus the shared headline events, one file per fact.
+     Text in [[double brackets]] is redacted (a black bar students hover over to reveal).
+     Reviewed source list: docs/trust-or-traitor-content.md. Every fact comes from docs/fact-check.md or the mini lesson's checked facts. */
+  const ARCHIVE = [
+    { id: "HEAD", name: "Headlines", color: "#46555b", files: [
+      { id: "pyry", tab: "The Pyry meeting · 1939", org: "Polish Cipher Bureau", cls: "SECRET", text: "In [[July 1939]], Polish cryptologists met British and French intelligence officers in the Pyry forest near [[Warsaw]]. The Poles had been reading Germany's Enigma machine since [[1932]], and they showed their reconstructed machines and the methods they had used. Britain and France were each promised a replica Enigma. About five weeks later, Germany invaded Poland." },
+      { id: "u110", tab: "The capture of U-110 · 1941", org: "Admiralty", cls: "MOST SECRET", text: "On [[9 May 1941]], ships of the Royal Navy forced the German submarine U-110 to the surface south of [[Iceland]]. A boarding party from HMS Bulldog took its [[Enigma machine and codebooks]] before the U-boat sank while being towed. Britain kept the capture secret so Germany would believe the boat had simply been lost. The British sailors involved were sworn to silence." },
+      { id: "silence", tab: "The carriers go silent · 1941", org: "United States Navy", cls: "SECRET", text: "In late November 1941, Japan's carrier force sailed toward Hawaii under strict [[radio silence]]. US Navy listening posts had tracked those ships by their radio traffic, and now they lost them. The attack on Pearl Harbor came on [[7 December 1941]]. The planes launched from about [[230 miles north]] of Oahu." },
+      { id: "midway", tab: "Water at Midway · 1942", org: "United States Navy", cls: "SECRET", text: "US Navy codebreakers in Hawaii could read parts of Japan's main naval code, [[JN-25]]. Japanese messages named a target called \"AF\". To prove it was [[Midway]], Midway sent an uncoded message saying its water plant had broken, and Japanese messages soon reported that AF was [[short of fresh water]]. Admiral Nimitz placed his carriers to ambush the Japanese fleet, and in early June 1942 US planes sank [[four]] Japanese carriers." },
+      { id: "vengeance", tab: "Operation Vengeance · 1943", org: "United States Navy", cls: "SECRET", text: "Codebreakers read a radio message giving the times and places of Admiral [[Yamamoto]]'s inspection flight in the Solomon Islands. On [[18 April 1943]], US Army [[P-38]] fighters flying from Guadalcanal shot down his plane over [[Bougainville]]. To protect the codebreakers, the Americans let it be believed that [[coastwatchers]] had spotted his flight." },
+      { id: "fortitude", tab: "Operation Fortitude · 1944", org: "Allied deception staff", cls: "MOST SECRET", text: "Before D-Day, the Allies invented a whole army in southeast England, commanded on paper by General [[Patton]]. Fake radio traffic, dummy equipment and double agents made Germany expect the main landing at [[Calais]]. Even after the Normandy landings on [[6 June 1944]], Germany held back its 15th Army near Calais [[for weeks]]." }] },
+    { id: "BP", name: "Bletchley", color: "#7a4e2d", files: [
+      { id: "bombe", tab: "The first bombe · 1940", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "At Bletchley Park, Alan Turing and Gordon Welchman designed an electro-mechanical machine called the [[bombe]] to test thousands of possible Enigma settings at speed. The first one began work in [[1940]]. German army and air force settings changed every day at [[midnight]], so every morning the search started again." },
+      { id: "shark", tab: "Shark · 1942", org: "Government Code and Cypher School, Hut 8", cls: "MOST SECRET", text: "On [[1 February 1942]], German U-boats switched to a [[four-rotor]] Enigma that Bletchley called Shark. For about [[ten months]], Bletchley could not read U-boat orders. Codebooks seized from the sinking U-boat [[U-559]] in October 1942 helped break Shark that December." },
+      { id: "women", tab: "The women of Bletchley · 1939–1945", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "By 1945, nearly [[10,000]] people worked at Bletchley Park and its outstations. About [[three-quarters]] of them were women, who ran the bombes, handled and translated messages, and broke codes themselves. Mavis Lever (later Batey) helped break an Italian naval cipher before the Battle of Cape [[Matapan]] in 1941." },
+      { id: "mincedecrypts", tab: "The Mincemeat decrypts · 1943", org: "Government Code and Cypher School, Hut 3", cls: "MOST SECRET", text: "After the body carrying fake invasion plans was found off Spain, Bletchley's decrypts were the only way to know whether Germany had believed it. The decrypts showed German forces moving toward [[Greece and Sardinia]]. Prime Minister Churchill was told: \"Mincemeat [[swallowed rod, line and sinker]].\"" },
+      { id: "colossus", tab: "Colossus · 1944", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "Engineer [[Tommy Flowers]] and his team built Colossus, often called the world's first programmable electronic computer. It helped break [[Tunny]], the cipher used by Hitler's high command. By 1945, [[ten]] Colossus machines were working. Messages read just before D-Day showed Germany still expected the main attack at [[Calais]]." }] },
+    { id: "NV", name: "Navy", color: "#2b4a6b", files: [
+      { id: "jn25", tab: "JN-25 · 1939", org: "United States Navy, Washington", cls: "SECRET", text: "In [[June 1939]], the Japanese navy began using a new code, later called JN-25. Its messages were turned into [[five-digit]] number groups, then hidden again under a second layer of numbers. A small team of US Navy codebreakers worked on it with card-sorting machines, and by Pearl Harbor it was only [[partly]] readable." },
+      { id: "sinkov", tab: "The Sinkov mission · 1941", org: "United States Army and Navy", cls: "SECRET", text: "In January 1941, [[four]] American codebreakers sailed for Britain aboard the battleship HMS King George V. They reached Bletchley Park in [[February 1941]], bringing Purple machines, built to read Japan's diplomatic cipher, as a gift. In return they were shown Bletchley's work, the start of a codebreaking partnership that lasted the whole war." },
+      { id: "layton", tab: "\"We don't know where they are\" · 1941", org: "United States Pacific Fleet", cls: "SECRET", text: "In early December 1941, the Pacific Fleet's intelligence officer, [[Edwin Layton]], told Admiral Kimmel that he did not know where Japan's carriers were. Saying so was uncomfortable, but it was honest. Days later, the carriers attacked [[Pearl Harbor]]." },
+      { id: "hypo", tab: "Station HYPO · 1942", org: "United States Navy, Hawaii", cls: "SECRET", text: "Station HYPO, the Navy's codebreaking unit in Hawaii, was led by [[Joseph Rochefort]]. It worked in a windowless basement at Pearl Harbor. Using HYPO's work, Layton predicted the Japanese carriers would appear about [[175 miles]] northwest of Midway early on [[4 June 1942]]. The prediction was close to where they were found." },
+      { id: "driscoll", tab: "Agnes Meyer Driscoll", org: "United States Navy, Washington", cls: "SECRET", text: "Agnes Meyer Driscoll was one of the US Navy's leading codebreakers between the wars. She broke [[earlier Japanese naval codes]] in the 1920s and 1930s, and she trained many of the codebreakers who later worked on JN-25." }] },
+    { id: "FA", name: "Resistance", color: "#46603a", files: [
+      { id: "bertrand", tab: "The machine reaches London · 1939", org: "French intelligence", cls: "SECRET", text: "In [[August 1939]], French intelligence officer [[Gustave Bertrand]] carried one of the Polish replica Enigma machines to London in the diplomatic bag. He handed it to Stewart Menzies of British intelligence, who later became its head, at [[Victoria Station]]." },
+      { id: "ubases", tab: "Watching the U-boat bases · 1941", org: "Resistance networks", cls: "SECRET", text: "French resistance networks watched the U-boat bases at Brest, Lorient and [[Saint-Nazaire]] and reported sailings to London, often at great risk. Their reports also helped hide a bigger secret: Britain could already read many U-boat orders." },
+      { id: "dash", tab: "The Channel Dash · 1942", org: "Resistance networks", cls: "SECRET", text: "On the night of [[11 February 1942]], the German battleships [[Scharnhorst and Gneisenau]] and the cruiser Prinz Eugen slipped out of Brest. London knew they would soon sail, but they were not spotted until they were almost at [[Dover]], too late to stop them. All three reached German waters." },
+      { id: "rocket", tab: "The rocket secret · 1943–1944", org: "Polish Home Army", cls: "SECRET", text: "Polish Home Army reports helped Britain find Germany's secret rocket base at [[Peenemünde]], which the RAF bombed in [[August 1943]]. In May 1944 a test V-2 rocket came down by the Bug River, and the Home Army hid it from the Germans. In July 1944, parts of the [[V-2]] were flown out to Britain from a secret landing field, by way of Italy." },
+      { id: "verlaine", tab: "Verlaine on the BBC · 1944", org: "Special Operations Executive", cls: "MOST SECRET", text: "Just before D-Day, the BBC broadcast lines from Paul Verlaine's poem \"Autumn Song\" as a signal to resistance networks that the invasion was coming. German intelligence knew what the lines meant, but the warning was [[not acted on in time]]. On the night of D-Day, resistance groups [[cut rail lines and telephone cables]] across France." }] },
+    { id: "MI", name: "MI5", color: "#6a3d5a", files: [
+      { id: "snow", tab: "Agent SNOW · 1939", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "Arthur Owens was a Welsh engineer who had been passing information to German intelligence in [[Hamburg]]. Early in 1939 the Germans sent him a secret radio set, and he handed it to the British authorities. He was detained in [[September 1939]], and MI5 ran him as its [[first double agent]] of the war, code name SNOW. MI5 wrote his messages, feeding true but harmless details so his German handlers kept trusting him." },
+      { id: "doublecross", tab: "Double Cross · 1941", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "From [[January 1941]], a group called the Twenty Committee, chaired by [[J. C. Masterman]], oversaw Britain's double agents. Agents were fed \"[[chicken feed]]\": true but minor details, mixed with believable inventions. Decoded German intelligence messages let MI5 check whether the Germans still trusted each agent." },
+      { id: "popov", tab: "Popov's questions · 1941", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "The double agent Dušan Popov arrived in the United States in [[August 1941]] with a list of questions from his German handlers. Many were detailed questions about the defenses at [[Pearl Harbor]]. The questionnaire reached the FBI, but the warning was [[not taken seriously]]." },
+      { id: "garbo", tab: "Garbo's network · 1942", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "Juan Pujol García, a Spaniard, offered to spy for Britain and was turned down, so he got German intelligence to hire him instead. From Lisbon he invented reports about Britain from a guidebook, maps and newsreels. He reached London in [[April 1942]], where MI5 code-named him GARBO; the Germans called him ARABEL. With his case officer Tomás Harris, he built a network of imaginary agents that grew to [[27]], all paid by Germany." },
+      { id: "mincemeat", tab: "Operation Mincemeat · 1943", org: "Naval Intelligence", cls: "MOST SECRET", text: "To hide the real target, Sicily, British officers planted fake invasion plans on a dead body dressed as \"Major William Martin\" of the Royal Marines. The submarine HMS Seraph released the body off Huelva, Spain, on [[30 April 1943]], and a Spanish fisherman found it. The letters pointed Germany toward [[Greece and Sardinia]]. Decoded German messages later showed Germany sending reinforcements there." },
+      { id: "garbodday", tab: "Garbo's D-Day message · 1944", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "On the night of D-Day, MI5 let Garbo radio a warning that the invasion had begun, [[timed to arrive too late to help]] Germany. It made the Germans trust him even more. Three days later he told them Normandy was [[only a diversion]], helping keep German troops waiting at Calais." }] },
+    { id: "UL", name: "Ultra Liaison", color: "#8a6a1f", files: [
+      { id: "slu", tab: "Special Liaison Units · 1940", org: "Special Liaison Units", cls: "MOST SECRET", text: "Special Liaison Units, organized by Group Captain [[F. W. Winterbotham]], carried Ultra to commanders in the field. An officer showed the message, waited while it was read, then [[took the paper back]]. Only a handful of senior officers knew Ultra came from codebreaking, and they were forbidden to reveal it." },
+      { id: "rommel", tab: "Rommel strikes back · 1942", org: "Eighth Army", cls: "MOST SECRET", text: "On [[21 January 1942]], Rommel counterattacked in North Africa and caught the British by surprise. His forces retook [[Benghazi]] on 29 January, and by early February the British had fallen back to the [[Gazala]] line. Ultra had shown fresh tanks arriving at Tripoli, but not Rommel's plan to attack." },
+      { id: "malta", tab: "Convoys to Africa · 1942", org: "Malta", cls: "MOST SECRET", text: "Rommel's army depended on supply ships crossing the Mediterranean from Italy. Ultra often revealed when and where the convoys would sail. Before planes and submarines from [[Malta]] attacked, the British usually sent a [[reconnaissance plane]] first, so each strike seemed to follow a lucky sighting instead of a broken code." }] }
+  ];
+  /* INTEL: three reports per role for the Padlet card. "{X}" is the decisive detail: the truth, or (on a double agent's card) the fake.
+     The interrogation's "prove it" step offers truth, fake and third, in a shuffled order. "file" names the Archive file that settles it. */
+  const INTEL = {
+    BP: [
+      { t: "Shark, the four-rotor U-boat Enigma, kept Bletchley out of U-boat orders for about {X}.", truth: "ten months", fake: "two months", third: "two years", file: "shark" },
+      { t: "Codebooks from the sinking {X} in October 1942 helped break Shark.", truth: "U-559", fake: "U-110", third: "U-505", file: "shark" },
+      { t: "About {X} of Bletchley Park's staff were women.", truth: "three-quarters", fake: "one-quarter", third: "half", file: "women" }],
+    NV: [
+      { t: "Japan's navy began using the code later called JN-25 in {X}.", truth: "June 1939", fake: "June 1941", third: "December 1937", file: "jn25" },
+      { t: "In early 1941, {X} American codebreakers sailed to Britain and visited Bletchley Park.", truth: "four", fake: "ten", third: "two", file: "sinkov" },
+      { t: "Station HYPO's work put the Japanese carriers about {X} from Midway on 4 June 1942.", truth: "175 miles", fake: "500 miles", third: "50 miles", file: "hypo" }],
+    FA: [
+      { t: "Gustave Bertrand handed a replica Enigma to British intelligence at {X}.", truth: "Victoria Station in London", fake: "the British embassy in Paris", third: "Bletchley Park", file: "bertrand" },
+      { t: "The Channel Dash ships slipped out of Brest in {X}.", truth: "February 1942", fake: "March 1942", third: "June 1940", file: "dash" },
+      { t: "In 1944 the Polish Home Army got parts of {X} flown out to Britain.", truth: "a V-2 rocket", fake: "a jet fighter", third: "an Enigma machine", file: "rocket" }],
+    MI: [
+      { t: "MI5 turned Arthur Owens, code name SNOW, into its first double agent in {X}.", truth: "1939", fake: "1943", third: "1936", file: "snow" },
+      { t: "Garbo's network of imaginary agents grew to {X}.", truth: "27", fake: "12", third: "50", file: "garbo" },
+      { t: "Operation Mincemeat's fake letters pointed Germany toward {X}.", truth: "Greece and Sardinia", fake: "Corsica and Crete", third: "Sicily", file: "mincemeat" }],
+    UL: [
+      { t: "Special Liaison Units were organized by {X}.", truth: "F. W. Winterbotham", fake: "Alan Turing", third: "Ian Fleming", file: "slu" },
+      { t: "Rommel's January 1942 counterattack retook {X}.", truth: "Benghazi", fake: "Tobruk", third: "Tripoli", file: "rommel" },
+      { t: "Before a strike from Malta, the British usually sent {X} first.", truth: "a reconnaissance plane", fake: "a warship", third: "a fake radio message", file: "malta" }]
+  };
   /* One line per round so students in individual scenarios still know the headline event. */
   const MEANWHILE = ["Meanwhile in Poland: Polish codebreakers are handing their Enigma secrets to Britain and France.", null,
     "Meanwhile in the Pacific: Japan's aircraft carriers have gone silent, and the US Navy has lost track of them.",
@@ -441,7 +511,7 @@ const DATA = (function () {
   const HEAD_IMG = ["r1", "r2", "r3", "r4", "r5", "r6"];
   /* Place lines for the round title cards. */
   const PLACES = ["Pyry Forest, near Warsaw, Poland", "The North Atlantic", "The Pacific Ocean, near Hawaii", "Midway Atoll, central Pacific", "The Solomon Islands, South Pacific", "Southern England and the English Channel"];
-  return { KINDS, ORDER, ROLE_IDS, ROUNDS, ROLES, ENDINGS, RANKS, TIMELINE, REC, PLACES, ECHO, REALCALL, ROLE_HIST, ECHO_GENERIC, SCEN, MEANWHILE, HEAD_IMG };
+  return { KINDS, ORDER, ROLE_IDS, ROUNDS, ROLES, ENDINGS, RANKS, TIMELINE, REC, PLACES, ECHO, REALCALL, ROLE_HIST, ECHO_GENERIC, SCEN, MEANWHILE, HEAD_IMG, ARCHIVE, INTEL };
 })();
 if (typeof module !== "undefined") module.exports = DATA;
 
@@ -477,15 +547,36 @@ const Logic = (function () {
   function rank(total) { let r = D.RANKS[0]; D.RANKS.forEach((x) => { if (total >= x.min) r = x; }); return r; }
   const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   function chk(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 31 + body.charCodeAt(i) * (i + 7)) % 1024; return ALPHA[h >> 5] + ALPHA[h & 31]; }
-  function signalId(S) { const body = S.role.id + "-" + S.path; return body + "-" + chk(body); }
-  /* Rebuild a finished game from a Signal ID. Returns null if invalid. */
+  /* Trust or Traitor: the hidden allegiance rides in one extra character K, so a v3 Signal ID is XX-ABCABC-K-YY.
+     S.alg = { v, r }: v = 0 loyal, 1-3 = which intel report was falsified; r = a random salt 0-7 so K differs between students.
+     K = ALPHA[(h + v*8 + r) % 32], where h comes from the role and picks. Not secure, just not readable at a glance. */
+  function pickHash(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 17 + body.charCodeAt(i)) % 32; return h; }
+  function allegChar(rp, alg) { return ALPHA[(pickHash(rp) + alg.v * 8 + alg.r) % 32]; }
+  function signalId(S) { let body = S.role.id + "-" + S.path; if (S.alg) body += "-" + allegChar(body, S.alg); return body + "-" + chk(body); }
+  /* Rebuild a finished game from a Signal ID. Returns null if invalid. alleg: null for an old (v1/v2) ID, else 0 loyal or 1-3. */
   function parseSignal(raw) {
-    const m = /^([A-Z]{2})-([ABC]{6})-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
-    if (!m || roleIdx(m[1]) < 0 || chk(m[1] + "-" + m[2]) !== m[3]) return null;
+    const m = /^([A-Z]{2})-([ABC]{6})(?:-([A-Z0-9]))?-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
+    if (!m || roleIdx(m[1]) < 0) return null;
+    const rp = m[1] + "-" + m[2], body = m[3] ? rp + "-" + m[3] : rp;
+    if (chk(body) !== m[4]) return null;
+    let alleg = null; if (m[3]) { const k = ALPHA.indexOf(m[3]); if (k < 0) return null; alleg = ((k - pickHash(rp) + 64) % 32) >> 3; }
     const role = roleById(m[1]), S = newState(role, ""); const picks = [];
     for (let r = 0; r < 6; r++) { S.i = r; const slot = "ABC".indexOf(m[2][r]); const res = choose(S, slot); picks.push({ slot, label: res.c[0], kind: kindOf(r, order(role.id, r)[slot]) }); }
     const fs = finalScore(S);
-    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e };
+    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e, alleg };
+  }
+  /* The three intel reports as a card shows them. alleg 0 = all true; 1-3 = that report carries the fake. */
+  function intelFor(roleId, alleg) { return D.INTEL[roleId].map((x, i) => ({ text: x.t.replace("{X}", alleg === i + 1 ? x.fake : x.truth), fakeHere: alleg === i + 1, file: x.file })); }
+  /* "Prove it" choices for report n (0-2): truth, fake and a third, in an order fixed by the Signal ID so it doesn't change on reload. */
+  function proveOpts(id, roleId, n) { const x = D.INTEL[roleId][n]; const o = [{ k: "T", v: x.truth }, { k: "F", v: x.fake }, { k: "O", v: x.third }]; let h = 7; for (const ch of id + n) h = (h * 31 + ch.charCodeAt(0)) % 9973; for (let i = 2; i > 0; i--) { const j = h % (i + 1); h = Math.floor(h / 3) + 11; [o[i], o[j]] = [o[j], o[i]]; } return o; }
+  /* Score one filed verdict against the truth. vd = { v: "A"|"D", r: 1-3, t: "T"|"F"|"O", res }. +1 right verdict; on a double agent also +1 right report and +1 right truth. A perfect 3 drops to 2 if a redaction was revealed. */
+  function verdictScore(alleg, vd) {
+    if (alleg == null || !vd) return null;
+    let pts = 0; const right = (vd.v === "A") === (alleg === 0);
+    if (right) pts++;
+    if (right && alleg > 0 && vd.r === alleg) { pts++; if (vd.t === "T") pts++; }
+    if (vd.res && pts === 3) pts = 2;
+    return { pts, right, max: alleg === 0 ? 1 : 3 };
   }
   /* Achievement badges, earned from a finished game. Pure: depends only on the log, meters, score and hints used. */
   const BADGE_DEFS = [
@@ -509,7 +600,7 @@ const Logic = (function () {
     const c = { S, e, n, minS }, got = BADGE_DEFS.filter((b) => b.test(c)).map(({ id, name, icon, why }) => ({ id, name, icon, why }));
     return { got, total: BADGE_DEFS.length };
   }
-  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk };
+  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk, intelFor, proveOpts, verdictScore };
 })();
 if (typeof module !== "undefined") module.exports = Logic;
 
@@ -517,7 +608,9 @@ if (typeof module !== "undefined") module.exports = Logic;
 (function () {
   const D = DATA, L = Logic, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const ID_RE = /\b[A-Z]{2}-[ABC]{6}-[A-Z0-9]{2}\b/g;
+  const ID_RE = /\b[A-Z]{2}-[ABC]{6}(?:-[A-Z0-9])?-[A-Z0-9]{2}\b/g;
+  /* Trust or Traitor verdicts: "<ID> A" or "<ID> D2T", "*" = with research. */
+  const VD_RE = /\b([A-Z]{2}-[ABC]{6}-[A-Z0-9]-[A-Z0-9]{2})\s+(A|D([1-3])([TFO]))(\*?)/g;
   const norm = (t) => String(t || "").toUpperCase().replace(/[^A-Z]+/g, " ").trim();
   const roleByName = (n) => D.ROLES.find((r) => norm(r.name) === norm(n));
 
@@ -527,12 +620,14 @@ if (typeof module !== "undefined") module.exports = Logic;
     const line = (label) => { const m = new RegExp("^\\s*" + label + "\\s*:(.*)$", "mi").exec(text); return m ? m[1] : null; };
     const ownLine = line("My Signal IDs?"), decLine = line("Decoded with Signal IDs from");
     const msgs = {}; text.split(/\r?\n/).forEach((ln) => { const m = /^\s*([1-6])\.\s.*\):\s*(.+)$/.exec(ln); if (m) msgs[+m[1] - 1] = m[2].trim(); });
-    const refl = text.split(/^\s*Decoded with Signal IDs from:.*$/mi)[1] || "";
+    const vdLine = line("Verdicts"), verdicts = [];
+    if (vdLine) { let m; VD_RE.lastIndex = 0; while ((m = VD_RE.exec(vdLine.toUpperCase()))) verdicts.push({ id: m[1], vd: m[2] === "A" ? { v: "A", res: !!m[5] } : { v: "D", r: +m[3], t: m[4], res: !!m[5] } }); }
+    const refl = (text.split(/^\s*Decoded with Signal IDs from:.*$/mi)[1] || "").replace(/^\s*(Verdicts|Interrogation score)\s*:.*$/gmi, "");
     return {
       name: (head[1] || "").trim() || "(no name)", roleName: (head[2] || "").trim(),
       own: ownLine === null ? null : (ownLine.toUpperCase().match(ID_RE) || []),
       dec: decLine === null ? [] : (decLine.toUpperCase().match(ID_RE) || []),
-      decRaw: decLine, msgs, refl: refl.trim()
+      decRaw: decLine, msgs, refl: refl.trim(), verdicts, hasVd: vdLine !== null
     };
   }
 
@@ -566,7 +661,10 @@ if (typeof module !== "undefined") module.exports = Logic;
     D.ROUNDS.forEach((rd, i) => { if (norm(sub.msgs[i]) === norm(rd.msg.join(" "))) right++; else wrong.push(i + 1); });
     if (wrong.length) notes.push(`Message${wrong.length > 1 ? "s" : ""} wrong or missing: round ${wrong.join(", ")}.`);
     const ok = !notes.length && (ownOk || sub.own === null || !sub.own.length);
-    return { sub, role, covered, missing, right, notes, warn, ok, nRoles: D.ROLE_IDS.length - missing.length };
+    // Trust or Traitor: rescore every verdict from the Signal IDs (the student's own "Interrogation score" line is ignored)
+    const vs = { pts: 0, max: 0, n: 0, right: 0, res: 0, list: [] };
+    sub.verdicts.forEach((x) => { const p = L.parseSignal(x.id); if (!p || p.alleg == null || (sub.own || []).indexOf(x.id) >= 0) return; const s = L.verdictScore(p.alleg, x.vd); vs.pts += s.pts; vs.max += s.max; vs.n++; if (s.right) vs.right++; if (x.vd.res) vs.res++; vs.list.push({ id: x.id, p, vd: x.vd, s }); });
+    return { sub, role, covered, missing, right, notes, warn, ok, nRoles: D.ROLE_IDS.length - missing.length, vs };
   }
 
   /* Cross-checks between students: shared own Signal IDs, identical reflections. */
@@ -579,20 +677,45 @@ if (typeof module !== "undefined") module.exports = Logic;
     });
   }
 
+  /* Trust or Traitor: each student's own file as an agent, scored from classmates' verdicts. Loyal: +1 per decoder who approved. Double: +1 per decoder fooled (who approved). */
+  function agents(rows) {
+    const byId = {};
+    rows.forEach((r) => (r.sub.own || []).forEach((id) => { const p = L.parseSignal(id); if (p && p.alleg != null) byId[id] = { id, p, name: r.sub.name, row: r, seen: 0, pts: 0, caught: 0 }; }));
+    rows.forEach((r) => r.vs.list.forEach((x) => { const a = byId[x.id] || (byId[x.id] = { id: x.id, p: x.p, name: null, seen: 0, pts: 0, caught: 0 }); a.seen++; if (x.vd.v === "A") a.pts++; else if (x.p.alleg && x.vd.r === x.p.alleg) a.caught++; }));
+    rows.forEach((r) => { r.agent = null; (r.sub.own || []).forEach((id) => { if (byId[id]) r.agent = byId[id]; }); });
+    return Object.values(byId);
+  }
+  function unmaskHTML(rows, ag) {
+    if (!ag.length) return `<p class="small">No Trust or Traitor Signal IDs in these submissions (they come from version 3 of the game or later).</p>`;
+    const dbl = ag.filter((a) => a.p.alleg), top = (list, f) => { const m = Math.max(0, ...list.map(f)); return m > 0 ? list.filter((x) => f(x) === m) : []; };
+    const who = (a) => esc(a.name || "Unknown student") + " · " + esc(a.p.role.name);
+    const deceivers = top(dbl, (a) => a.pts), catchers = top(rows.filter((r) => r.vs.n), (r) => r.vs.pts);
+    return `<div class="unmask"><h2>THE UNMASKING</h2>
+      <div class="awards"><div class="box"><p class="sl">BEST DECEIVER</p>${deceivers.length ? deceivers.map((a) => `<p><b>${who(a)}</b><br>fooled ${a.pts} of ${a.seen} decoder${a.seen === 1 ? "" : "s"}</p>`).join("") : "<p>No double agent fooled anyone.</p>"}</div>
+      <div class="box"><p class="sl">BEST SPY-CATCHER</p>${catchers.length ? catchers.map((r) => `<p><b>${esc(r.sub.name)}</b><br>${r.vs.pts} interrogation point${r.vs.pts === 1 ? "" : "s"} from ${r.vs.n} verdict${r.vs.n === 1 ? "" : "s"}</p>`).join("") : "<p>No verdicts yet.</p>"}</div></div>
+      <h3>Allegiances</h3><table><thead><tr><th>Agent</th><th>Signal ID</th><th>Allegiance</th><th>Decoders</th><th>Agent points</th></tr></thead><tbody>${ag.map((a) => `<tr><td>${who(a)}</td><td class="mono">${esc(a.id)}</td><td><b>${a.p.alleg ? "Double agent" : "Loyal"}</b></td><td>${a.seen}</td><td>${a.pts} (${a.p.alleg ? "fooled" : "approved by"} ${a.pts}${a.p.alleg ? `, caught by ${a.caught}` : ""})</td></tr>`).join("")}</tbody></table>
+      <h3>Every planted lie</h3>${dbl.length ? `<ol class="lies">${dbl.map((a) => { const x = D.INTEL[a.p.role.id][a.p.alleg - 1]; return `<li><b>${who(a)}</b>, report ${a.p.alleg}:<br><span class="lie">Planted: ${esc(x.t.replace("{X}", x.fake))}</span><br><span class="truth">Truth: ${esc(x.t.replace("{X}", x.truth))}</span></li>`; }).join("")}</ol>` : "<p>No double agents in these submissions.</p>"}
+      <p class="small">Only Signal IDs that appear in pasted submissions are listed. An agent with no name was decoded by someone here but did not submit.</p></div>`;
+  }
   function run() {
     const text = $("#subs").value, parts = text.split(/(?=MISSION COMPLETE)/i).filter((t) => /MISSION COMPLETE/i.test(t));
     if (!parts.length) { $("#out").innerHTML = `<p class="err">No submissions found. Each one starts with "MISSION COMPLETE".</p>`; return; }
-    const rows = parts.map((t) => check(readOne(t))); crossCheck(rows);
+    const rows = parts.map((t) => check(readOne(t))); crossCheck(rows); const ag = agents(rows);
+    const vdCell = (r) => r.vs.n ? `${r.vs.pts} of ${r.vs.max}<div class="small">${r.vs.right} of ${r.vs.n} right${r.vs.res ? ` · research on ${r.vs.res}` : ""}</div>` : (r.sub.hasVd ? "None filed" : "—");
+    const agCell = (r) => r.agent ? `${r.agent.p.alleg ? "Double" : "Loyal"}: ${r.agent.pts}` : "—";
     const nOk = rows.filter((r) => r.ok).length, nNote = rows.filter((r) => r.ok && r.warn.length).length;
     $("#out").innerHTML = `<p class="sum"><b>${rows.length}</b> submission${rows.length > 1 ? "s" : ""} checked · <b class="ok">${nOk} complete</b>${nNote ? ` (${nNote} with a note to check)` : ""} · <b class="bad">${rows.length - nOk} not complete</b></p>
-      <table><thead><tr><th>Student</th><th>Role</th><th>Own Signal ID</th><th>Roles covered</th><th>Messages</th><th>Result</th><th>Notes</th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ok ? (r.warn.length ? "w" : "g") : "b"}">
+      <table><thead><tr><th>Student</th><th>Role</th><th>Own Signal ID</th><th>Roles covered</th><th>Messages</th><th>Result</th><th>Verdicts</th><th>As agent</th><th>Notes</th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ok ? (r.warn.length ? "w" : "g") : "b"}">
         <td>${esc(r.sub.name)}</td><td>${esc(r.role ? r.role.name : r.sub.roleName || "?")}</td><td class="mono">${esc((r.sub.own || []).join(", ") || "none")}</td>
         <td>${r.nRoles} of 5<div class="roles">${D.ROLES.map((x) => `<span class="${r.covered[x.id] ? "on" : ""}" title="${esc(x.name + ": " + (r.covered[x.id] || "missing"))}">${x.id}</span>`).join("")}</div></td>
-        <td>${r.right} of 6</td><td><b>${r.ok ? (r.warn.length ? "Complete, check note" : "✓ Complete") : "✗ Not complete"}</b></td>
+        <td>${r.right} of 6</td><td><b>${r.ok ? (r.warn.length ? "Complete, check note" : "✓ Complete") : "✗ Not complete"}</b></td><td>${vdCell(r)}</td><td>${agCell(r)}</td>
         <td>${r.notes.concat(r.warn).map((n) => `<div>${esc(n)}</div>`).join("") || "None"}</td></tr>`).join("")}</tbody></table>
-      <div class="row"><button class="btn" id="tsv">Copy results for a spreadsheet</button><span class="small" id="tsvmsg" role="status"></span></div>`;
+      <div class="row"><button class="btn" id="tsv">Copy results for a spreadsheet</button><span class="small" id="tsvmsg" role="status"></span></div>
+      <p class="small"><b>Verdicts</b> (Trust or Traitor): +1 for the right verdict; on a double agent, +1 more for the right report and +1 for the right truth. A perfect verdict made with research (a blacked-out line revealed in the Archive) scores 2 instead of 3. <b>As agent</b>: a loyal agent scores 1 per classmate who approved them, a double agent 1 per classmate fooled.</p>
+      <div class="row"><button class="btn ghost" id="unbtn" aria-expanded="false">Show the Unmasking</button><span class="small">Reveals who was a double agent. Show it to the class only when everyone is done.</span></div><div id="unmask" hidden>${unmaskHTML(rows, ag)}</div>`;
+    $("#unbtn").addEventListener("click", (e) => { const u = $("#unmask"), open = u.hidden; u.hidden = !open; e.currentTarget.textContent = open ? "Hide the Unmasking" : "Show the Unmasking"; e.currentTarget.setAttribute("aria-expanded", open); if (open) u.scrollIntoView({ block: "start" }); });
     $("#tsv").addEventListener("click", () => {
-      const tsv = [["Student", "Role", "Own Signal ID", "Roles covered", "Messages", "Result", "Notes"].join("\t")].concat(rows.map((r) => [r.sub.name, r.role ? r.role.name : r.sub.roleName, (r.sub.own || []).join(" "), r.nRoles + "/5", r.right + "/6", r.ok ? (r.warn.length ? "Complete (check note)" : "Complete") : "Not complete", r.notes.concat(r.warn).join(" ")].join("\t"))).join("\n");
+      const tsv = [["Student", "Role", "Own Signal ID", "Roles covered", "Messages", "Result", "Verdict points", "Verdicts filed", "Research used", "Allegiance", "Agent points", "Notes"].join("\t")].concat(rows.map((r) => [r.sub.name, r.role ? r.role.name : r.sub.roleName, (r.sub.own || []).join(" "), r.nRoles + "/5", r.right + "/6", r.ok ? (r.warn.length ? "Complete (check note)" : "Complete") : "Not complete", r.vs.n ? r.vs.pts + "/" + r.vs.max : "", r.vs.n, r.vs.res, r.agent ? (r.agent.p.alleg ? "Double" : "Loyal") : "", r.agent ? r.agent.pts : "", r.notes.concat(r.warn).join(" ")].join("\t"))).join("\n");
       navigator.clipboard.writeText(tsv).then(() => { $("#tsvmsg").textContent = "Copied. Paste into a spreadsheet."; }, () => { $("#tsvmsg").textContent = "Your browser would not copy."; });
     });
   }
@@ -600,7 +723,7 @@ if (typeof module !== "undefined") module.exports = Logic;
   /* Look up one Signal ID: what that student chose. */
   function look() {
     const p = L.parseSignal($("#one").value), out = $("#oneout");
-    if (!p) { out.innerHTML = `<p class="err">That is not a real Signal ID. It looks like XX-ABCABC-YY.</p>`; return; }
+    if (!p) { out.innerHTML = `<p class="err">That is not a real Signal ID. It looks like XX-ABCABC-K-YY.</p>`; return; }
     out.innerHTML = `<p><b>${esc(p.role.name)}</b> · ${esc(p.ending.title)} · ${esc(p.rank.title)} · score ${p.fs.total}</p><ol>${p.picks.map((x, i) => { const sc = D.SCEN[p.role.id + "-" + i]; return `<li><b>${esc(sc ? sc.title : D.ROUNDS[i].title)}:</b> ${"ABC"[x.slot]}. ${esc(x.label)}</li>`; }).join("")}</ol>`;
   }
 

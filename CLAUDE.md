@@ -16,7 +16,7 @@ Owner: a high school World History teacher (GitHub `adean-edu`). Not a developer
 
 ## Sharing with other teachers (set up 2026-11-16)
 
-- **Two versions are live.** The main game at the repo root (`index.html`, `check.html`, `teachers.html`) is the working copy, and every push changes it. Frozen copies for classes and other teachers: **`v1/`** (2026-11-16, old name "Codebreakers: The Silent Service") and **`v2/`** (2026-11-16, "Codebreakers: The Hidden War"; published at the teacher's request before the rights check was finished). **The link to share is https://adean-edu.github.io/codebreakers/v2/teachers.html.** The main guide points to the newest version; bump that link in `build.js` with each release.
+- **Two versions are live.** The main game at the repo root (`index.html`, `check.html`, `teachers.html`) is the working copy, and every push changes it. Frozen copies for classes and other teachers: **`v1/`** (2026-11-16, old name "Codebreakers: The Silent Service") and **`v2/`** (2026-11-16, "Codebreakers: The Hidden War"; published at the teacher's request before the rights check was finished). **`v3/`** (2026-11-17, adds Trust or Traitor and the Archive). **The link to share is https://adean-edu.github.io/codebreakers/v3/teachers.html.** The class Padlet description still links `/v2/` (the teacher asked to leave the Padlet as it is for now). The main guide points to the newest version; bump that link in `build.js` with each release.
 - **Never change `v1/`** (or any later `vN/`): teachers may be mid-unit. Exception made 2026-11-16 at the teacher's request: `v2/teachers.html` (the guide only, not the game or Teacher Check) was rebuilt to add the Padlet auto-remake link. To ship improvements to other teachers, publish a new version with `node release.js v2` and tell the teacher the new link. `release.js` refuses to overwrite an existing version without `--force`.
 - **For Teachers guide:** `src/guide.html`, built into `dist/teachers.html` (root) by `build.js` and into `vN/teachers.html` by `release.js`. It covers setup, the Padlet flow, grading with Teacher Check, privacy and credits. It must never contain test Signal IDs or the messages.
 - **No outside connections:** fonts are embedded from `src/fonts.css` (made from Google Fonts, latin and latin-ext only, SIL OFL). The pages load nothing from any other server. Don't add CDN links, analytics or web fonts.
@@ -27,7 +27,7 @@ Owner: a high school World History teacher (GitHub `adean-edu`). Not a developer
 
 ```
 node build.js                  # src/* -> dist/index.html, dist/test.html, dist/studio*.html, dist/check.html, dist/teachers.html
-node release.js v2             # publish a frozen copy for other teachers in v2/ (never overwrite an existing version)
+node release.js v4             # publish a frozen copy for other teachers in v2/ (never overwrite an existing version)
 python3 mkimg.py               # img/* -> src/recimages.js (resizes to 1500px, WebP, base64)
 node t.js desktop NV ABCABC    # Playwright: plays a full game as role NV with picks A,B,C,A,B,C; screenshots in shots/
 ```
@@ -87,7 +87,19 @@ Roles: `BP` (Bletchley Park Analyst), `NV` (Navy Cryptanalyst), `FA` (Resistance
 - **Submissions carry the student's own Signal ID (2026-11-16):** `board().mine` stores the Signal ID of every role the student finishes, and the submission has a "My Signal ID:" line so Teacher Check can verify it. Submissions from before this change have no such line; Teacher Check notes that and counts their stated role.
 - Other Padlet ideas offered on 2026-11-16 and not chosen yet (don't build without asking): a locked cipher line on each card (idea 1), a class-wide seventh message (2), teacher "breaking intercept" posts (3), the game helping card owners answer replies (5), sharper reply questions (6), one Padlet column per role (7).
 - Rejected features (don't bring them back): the Intel Pass mechanic ("too complicated"), and a "Compare calls" card.
-- Signal ID format is `XX-ABCABC-YY`, with a 2-character checksum. It isn't tamper-proof. That's a known, accepted limit.
+- Signal ID format is `XX-ABCABC-K-YY` from v3 (was `XX-ABCABC-YY` in v1/v2, still accepted, with no allegiance). K hides the Trust or Traitor allegiance (`logic.js`: `K = ALPHA[(pickHash + v*8 + salt) % 32]`, v 0 = loyal, 1-3 = falsified report). The 2-character checksum covers K. It isn't tamper-proof. That's a known, accepted limit.
+
+## Trust or Traitor (v3, built 2026-11-17 at the teacher's request)
+
+The assessment layer. Content source: `docs/trust-or-traitor-content.md` → `ARCHIVE` and `INTEL` in `src/data.js`.
+- **Allegiance:** after round 6 the `allegiance` view asks Loyal or Double agent; a double agent picks one of 3 reports and the game supplies the fake. Stored as `S.alg = {v, r}` and carried in the Signal ID. It can't be changed after "Seal my file".
+- **Intel reports** go in the Padlet post text (`cardText`), never on the card image. The Padlet itself was not changed ("keep Padlet the same for now").
+- **Interrogation** (in the decoded card, choices only): APPROVE/DENY → which report → "prove it" from exactly 3 choices (truth, fake, third; order fixed per ID by `L.proveOpts`). Skipped for the student's own IDs and old IDs. Verdicts live in `cb_board.verdicts[id] = {v, r, t, res}` and can't be changed. Never on Padlet.
+- **Sealed results:** shown only when all six messages are decoded (`fullCount`), in the submission panel. The submission gets `Verdicts: <ID> A; <ID> D2T*` and `Interrogation score:` lines; Teacher Check ignores the score line and rescores from the IDs.
+- **Scoring (teacher's rules):** +1 right verdict; on a double agent +1 right report, +1 right truth (`L.verdictScore`; a correct approval of a loyal agent is worth 1). Research (a redaction revealed while that interrogation is open, `cb_board.resd`) turns a perfect 3 into 2; opening a file alone doesn't count. Agents: loyal +1 per decoder who approved; double +1 per decoder fooled (approved).
+- **The Archive:** overlay from the topbar "Archive" button or "Check the Archive" (opens at that role's drawer). Six drawers, one file per fact, folder tabs, struck-through MOST SECRET/SECRET, DECLASSIFIED stamp (`.arstamp`; `.dstamp` is the round stamp), footer "Reconstruction: the facts are checked; the layout imitates a wartime file." `[[...]]` = black bar revealed on hover (after 250 ms), focus or tap. No invented file numbers, initials or dates.
+- **Teacher Check:** Verdicts and As agent columns (also in the spreadsheet copy), and a hidden **Unmasking** (allegiances, best deceiver, best spy-catcher, every planted lie with its truth).
+- **Tests:** `node t.js desktop ROLE PICKS [0-3]` (last arg = allegiance; default loyal). It also files a researched verdict on a double agent and checks no name is stored.
 
 ## Teacher preferences
 

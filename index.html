@@ -369,6 +369,48 @@ svg.portrait, svg.scene { image-rendering: pixelated; shape-rendering: crispEdge
 .paper p.meanwhile { margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(0,0,0,.35); font-size: .95em; font-style: italic; color: #3b3f3a; }
 .sceneimg { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 
+/* ---------- Trust or Traitor (v3): allegiance, interrogation, the Archive ---------- */
+.mlist { display: grid; gap: 10px; margin: 10px 0; }
+.tot .paper h2 { margin-top: 18px; }
+.lieline { margin: 12px 0 0; padding: 10px 12px; border-left: 4px solid #a3312a; background: rgba(163, 49, 42, .08); }
+.interro { margin: 14px 0; padding: 14px 16px; border: 2px dashed #8a8878; background: rgba(0, 0, 0, .04); }
+.interro h3 { font-family: var(--display); font-size: 1rem; letter-spacing: .08em; margin: 16px 0 4px; color: #14231c; }
+.intel { margin: 8px 0 4px; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+.intel li { background: rgba(255, 255, 255, .35); border: 1px solid #a9a693; padding: 8px 10px; }
+.vfiled { margin: 10px 0 4px; }
+.vres { margin: 8px 0; padding: 8px 10px; border-left: 4px solid; } .vres.good { border-color: #2f6b45; background: rgba(47, 107, 69, .1); } .vres.bad { border-color: #a3312a; background: rgba(163, 49, 42, .08); }
+.vlist { margin: 12px 0; } .vrow { border-top: 1px solid #a9a693; padding-top: 6px; } .vrow p { margin: 4px 0; }
+
+.archive { position: fixed; inset: 0; z-index: 300; background: rgba(4, 6, 7, .97); overflow-y: auto; padding: 24px 16px; animation: tcfade .2s ease-out; }
+.arch-in { max-width: 1040px; margin: 0 auto; display: grid; gap: 14px; }
+.arch-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.arch-top h2 { margin: 0; font-family: var(--display); color: var(--amber); letter-spacing: .1em; font-size: 1.5rem; } .arch-top small { color: var(--mute); font-family: var(--mono); font-size: 1.1rem; letter-spacing: .12em; text-transform: uppercase; margin-left: 10px; }
+.arch-int { margin: 0; padding: 8px 12px; border: 1px solid var(--stamp); color: #f3c6bf; font-family: var(--mono); font-size: 1.1rem; }
+/* drawers: a row of filing-cabinet drawer fronts, each with its role colour */
+.drawers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.drawer { background: #1b2226; border: 2px solid #46555b; border-bottom: 6px solid var(--dc); color: var(--ink); font-family: var(--display); font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; padding: 12px 6px 10px; border-radius: 3px; position: relative; }
+.drawer::before { content: ""; display: block; width: 34px; height: 6px; margin: 0 auto 8px; border-radius: 3px; background: #8d9a96; }
+.drawer:hover { border-color: var(--dc); color: #fff; } .drawer.on { background: var(--dc); border-color: #e6e3d6; color: #fff; box-shadow: 0 0 0 2px var(--dc), 0 6px 18px rgba(0, 0, 0, .6); }
+/* the folder: manila tabs along the top, the open file lifted and banded in the drawer's colour */
+.folder { margin-top: 6px; }
+.ftabs { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-end; padding: 0 10px; }
+.ftab { background: #b9ab84; color: #2b261a; border: 2px solid #8f8360; border-bottom: 0; border-top: 6px solid #8f8360; border-radius: 8px 8px 0 0; padding: 9px 14px 8px; font-family: var(--type); font-size: 1.2rem; line-height: 1.1; max-width: 260px; text-align: left; position: relative; top: 2px; }
+.ftab:hover { background: #cdbf98; border-top-color: var(--dc); }
+.ftab.on { background: #e3d6b0; border-color: #8f8360; border-top: 8px solid var(--dc); padding-top: 13px; top: 2px; z-index: 2; color: #120f08; font-weight: 700; }
+.dossier { background: #e3d6b0; color: #1e1a10; border: 2px solid #8f8360; padding: 26px 30px 18px; position: relative; font-family: var(--type); font-size: 1.32rem; line-height: 1.5; box-shadow: 0 16px 36px rgba(0, 0, 0, .6); background-image: linear-gradient(180deg, rgba(255, 255, 255, .2), transparent 40%, rgba(60, 40, 0, .08)); }
+.dhead { display: flex; justify-content: space-between; gap: 12px; border-bottom: 2px solid #4a4230; padding-bottom: 6px; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; }
+.dhead s { color: #7a2a22; text-decoration-thickness: 2px; }
+.arstamp { float: right; margin: 10px 6px 12px 22px; font-family: var(--display); font-size: 1.5rem; letter-spacing: .14em; color: #a3312a; border: 4px solid #a3312a; padding: 4px 14px; transform: rotate(-8deg); opacity: .85; pointer-events: none; }
+.dossier h3 { font-family: var(--type); font-size: 1.6rem; margin: 18px 0 10px; color: #120f08; }
+.dtext { margin: 0 0 12px; }
+.red { background: #0b0b0b; color: transparent; border-radius: 1px; padding: 0 3px; cursor: pointer; transition: color .15s, background .15s; user-select: none; }
+.red:hover, .red.shown { background: rgba(163, 49, 42, .14); color: #7a1f18; transition-delay: .25s; user-select: auto; }
+.red.shown { transition-delay: 0s; }
+.red:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.dhint { font-size: 1.05rem; color: #5a523c; margin: 6px 0; }
+.dfoot { border-top: 1px solid #8f8360; padding-top: 6px; font-size: 1.02rem; color: #5a523c; font-style: italic; }
+@media (prefers-reduced-motion: reduce) { .archive { animation: none; } .red { transition: none; } }
+
 </style></head><body><div id="app"></div>
 <script>
 /* CODEBREAKERS: THE HIDDEN WAR (formerly "Codebreakers: The Silent Service"): a WWII codebreakers and spies game. Content (written from memory; proofread before class). */
@@ -653,6 +695,72 @@ const DATA = (function () {
       sitrep: ["1943. Polish Home Army agents keep hearing about a secret German weapon: a rocket that can fly about 200 miles and fall without warning. Some of the clues point to a test range hidden in the Polish countryside.",
         "Your network has pieces of proof: scraps of metal, a hand-drawn map and the names of people who saw the launches. London needs that proof. The Germans want to find whoever has it."] }
   };
+  /* ---------- Trust or Traitor ----------
+     ARCHIVE: the in-game declassified files, one drawer per role plus the shared headline events, one file per fact.
+     Text in [[double brackets]] is redacted (a black bar students hover over to reveal).
+     Reviewed source list: docs/trust-or-traitor-content.md. Every fact comes from docs/fact-check.md or the mini lesson's checked facts. */
+  const ARCHIVE = [
+    { id: "HEAD", name: "Headlines", color: "#46555b", files: [
+      { id: "pyry", tab: "The Pyry meeting · 1939", org: "Polish Cipher Bureau", cls: "SECRET", text: "In [[July 1939]], Polish cryptologists met British and French intelligence officers in the Pyry forest near [[Warsaw]]. The Poles had been reading Germany's Enigma machine since [[1932]], and they showed their reconstructed machines and the methods they had used. Britain and France were each promised a replica Enigma. About five weeks later, Germany invaded Poland." },
+      { id: "u110", tab: "The capture of U-110 · 1941", org: "Admiralty", cls: "MOST SECRET", text: "On [[9 May 1941]], ships of the Royal Navy forced the German submarine U-110 to the surface south of [[Iceland]]. A boarding party from HMS Bulldog took its [[Enigma machine and codebooks]] before the U-boat sank while being towed. Britain kept the capture secret so Germany would believe the boat had simply been lost. The British sailors involved were sworn to silence." },
+      { id: "silence", tab: "The carriers go silent · 1941", org: "United States Navy", cls: "SECRET", text: "In late November 1941, Japan's carrier force sailed toward Hawaii under strict [[radio silence]]. US Navy listening posts had tracked those ships by their radio traffic, and now they lost them. The attack on Pearl Harbor came on [[7 December 1941]]. The planes launched from about [[230 miles north]] of Oahu." },
+      { id: "midway", tab: "Water at Midway · 1942", org: "United States Navy", cls: "SECRET", text: "US Navy codebreakers in Hawaii could read parts of Japan's main naval code, [[JN-25]]. Japanese messages named a target called \"AF\". To prove it was [[Midway]], Midway sent an uncoded message saying its water plant had broken, and Japanese messages soon reported that AF was [[short of fresh water]]. Admiral Nimitz placed his carriers to ambush the Japanese fleet, and in early June 1942 US planes sank [[four]] Japanese carriers." },
+      { id: "vengeance", tab: "Operation Vengeance · 1943", org: "United States Navy", cls: "SECRET", text: "Codebreakers read a radio message giving the times and places of Admiral [[Yamamoto]]'s inspection flight in the Solomon Islands. On [[18 April 1943]], US Army [[P-38]] fighters flying from Guadalcanal shot down his plane over [[Bougainville]]. To protect the codebreakers, the Americans let it be believed that [[coastwatchers]] had spotted his flight." },
+      { id: "fortitude", tab: "Operation Fortitude · 1944", org: "Allied deception staff", cls: "MOST SECRET", text: "Before D-Day, the Allies invented a whole army in southeast England, commanded on paper by General [[Patton]]. Fake radio traffic, dummy equipment and double agents made Germany expect the main landing at [[Calais]]. Even after the Normandy landings on [[6 June 1944]], Germany held back its 15th Army near Calais [[for weeks]]." }] },
+    { id: "BP", name: "Bletchley", color: "#7a4e2d", files: [
+      { id: "bombe", tab: "The first bombe · 1940", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "At Bletchley Park, Alan Turing and Gordon Welchman designed an electro-mechanical machine called the [[bombe]] to test thousands of possible Enigma settings at speed. The first one began work in [[1940]]. German army and air force settings changed every day at [[midnight]], so every morning the search started again." },
+      { id: "shark", tab: "Shark · 1942", org: "Government Code and Cypher School, Hut 8", cls: "MOST SECRET", text: "On [[1 February 1942]], German U-boats switched to a [[four-rotor]] Enigma that Bletchley called Shark. For about [[ten months]], Bletchley could not read U-boat orders. Codebooks seized from the sinking U-boat [[U-559]] in October 1942 helped break Shark that December." },
+      { id: "women", tab: "The women of Bletchley · 1939–1945", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "By 1945, nearly [[10,000]] people worked at Bletchley Park and its outstations. About [[three-quarters]] of them were women, who ran the bombes, handled and translated messages, and broke codes themselves. Mavis Lever (later Batey) helped break an Italian naval cipher before the Battle of Cape [[Matapan]] in 1941." },
+      { id: "mincedecrypts", tab: "The Mincemeat decrypts · 1943", org: "Government Code and Cypher School, Hut 3", cls: "MOST SECRET", text: "After the body carrying fake invasion plans was found off Spain, Bletchley's decrypts were the only way to know whether Germany had believed it. The decrypts showed German forces moving toward [[Greece and Sardinia]]. Prime Minister Churchill was told: \"Mincemeat [[swallowed rod, line and sinker]].\"" },
+      { id: "colossus", tab: "Colossus · 1944", org: "Government Code and Cypher School", cls: "MOST SECRET", text: "Engineer [[Tommy Flowers]] and his team built Colossus, often called the world's first programmable electronic computer. It helped break [[Tunny]], the cipher used by Hitler's high command. By 1945, [[ten]] Colossus machines were working. Messages read just before D-Day showed Germany still expected the main attack at [[Calais]]." }] },
+    { id: "NV", name: "Navy", color: "#2b4a6b", files: [
+      { id: "jn25", tab: "JN-25 · 1939", org: "United States Navy, Washington", cls: "SECRET", text: "In [[June 1939]], the Japanese navy began using a new code, later called JN-25. Its messages were turned into [[five-digit]] number groups, then hidden again under a second layer of numbers. A small team of US Navy codebreakers worked on it with card-sorting machines, and by Pearl Harbor it was only [[partly]] readable." },
+      { id: "sinkov", tab: "The Sinkov mission · 1941", org: "United States Army and Navy", cls: "SECRET", text: "In January 1941, [[four]] American codebreakers sailed for Britain aboard the battleship HMS King George V. They reached Bletchley Park in [[February 1941]], bringing Purple machines, built to read Japan's diplomatic cipher, as a gift. In return they were shown Bletchley's work, the start of a codebreaking partnership that lasted the whole war." },
+      { id: "layton", tab: "\"We don't know where they are\" · 1941", org: "United States Pacific Fleet", cls: "SECRET", text: "In early December 1941, the Pacific Fleet's intelligence officer, [[Edwin Layton]], told Admiral Kimmel that he did not know where Japan's carriers were. Saying so was uncomfortable, but it was honest. Days later, the carriers attacked [[Pearl Harbor]]." },
+      { id: "hypo", tab: "Station HYPO · 1942", org: "United States Navy, Hawaii", cls: "SECRET", text: "Station HYPO, the Navy's codebreaking unit in Hawaii, was led by [[Joseph Rochefort]]. It worked in a windowless basement at Pearl Harbor. Using HYPO's work, Layton predicted the Japanese carriers would appear about [[175 miles]] northwest of Midway early on [[4 June 1942]]. The prediction was close to where they were found." },
+      { id: "driscoll", tab: "Agnes Meyer Driscoll", org: "United States Navy, Washington", cls: "SECRET", text: "Agnes Meyer Driscoll was one of the US Navy's leading codebreakers between the wars. She broke [[earlier Japanese naval codes]] in the 1920s and 1930s, and she trained many of the codebreakers who later worked on JN-25." }] },
+    { id: "FA", name: "Resistance", color: "#46603a", files: [
+      { id: "bertrand", tab: "The machine reaches London · 1939", org: "French intelligence", cls: "SECRET", text: "In [[August 1939]], French intelligence officer [[Gustave Bertrand]] carried one of the Polish replica Enigma machines to London in the diplomatic bag. He handed it to Stewart Menzies of British intelligence, who later became its head, at [[Victoria Station]]." },
+      { id: "ubases", tab: "Watching the U-boat bases · 1941", org: "Resistance networks", cls: "SECRET", text: "French resistance networks watched the U-boat bases at Brest, Lorient and [[Saint-Nazaire]] and reported sailings to London, often at great risk. Their reports also helped hide a bigger secret: Britain could already read many U-boat orders." },
+      { id: "dash", tab: "The Channel Dash · 1942", org: "Resistance networks", cls: "SECRET", text: "On the night of [[11 February 1942]], the German battleships [[Scharnhorst and Gneisenau]] and the cruiser Prinz Eugen slipped out of Brest. London knew they would soon sail, but they were not spotted until they were almost at [[Dover]], too late to stop them. All three reached German waters." },
+      { id: "rocket", tab: "The rocket secret · 1943–1944", org: "Polish Home Army", cls: "SECRET", text: "Polish Home Army reports helped Britain find Germany's secret rocket base at [[Peenemünde]], which the RAF bombed in [[August 1943]]. In May 1944 a test V-2 rocket came down by the Bug River, and the Home Army hid it from the Germans. In July 1944, parts of the [[V-2]] were flown out to Britain from a secret landing field, by way of Italy." },
+      { id: "verlaine", tab: "Verlaine on the BBC · 1944", org: "Special Operations Executive", cls: "MOST SECRET", text: "Just before D-Day, the BBC broadcast lines from Paul Verlaine's poem \"Autumn Song\" as a signal to resistance networks that the invasion was coming. German intelligence knew what the lines meant, but the warning was [[not acted on in time]]. On the night of D-Day, resistance groups [[cut rail lines and telephone cables]] across France." }] },
+    { id: "MI", name: "MI5", color: "#6a3d5a", files: [
+      { id: "snow", tab: "Agent SNOW · 1939", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "Arthur Owens was a Welsh engineer who had been passing information to German intelligence in [[Hamburg]]. Early in 1939 the Germans sent him a secret radio set, and he handed it to the British authorities. He was detained in [[September 1939]], and MI5 ran him as its [[first double agent]] of the war, code name SNOW. MI5 wrote his messages, feeding true but harmless details so his German handlers kept trusting him." },
+      { id: "doublecross", tab: "Double Cross · 1941", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "From [[January 1941]], a group called the Twenty Committee, chaired by [[J. C. Masterman]], oversaw Britain's double agents. Agents were fed \"[[chicken feed]]\": true but minor details, mixed with believable inventions. Decoded German intelligence messages let MI5 check whether the Germans still trusted each agent." },
+      { id: "popov", tab: "Popov's questions · 1941", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "The double agent Dušan Popov arrived in the United States in [[August 1941]] with a list of questions from his German handlers. Many were detailed questions about the defenses at [[Pearl Harbor]]. The questionnaire reached the FBI, but the warning was [[not taken seriously]]." },
+      { id: "garbo", tab: "Garbo's network · 1942", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "Juan Pujol García, a Spaniard, offered to spy for Britain and was turned down, so he got German intelligence to hire him instead. From Lisbon he invented reports about Britain from a guidebook, maps and newsreels. He reached London in [[April 1942]], where MI5 code-named him GARBO; the Germans called him ARABEL. With his case officer Tomás Harris, he built a network of imaginary agents that grew to [[27]], all paid by Germany." },
+      { id: "mincemeat", tab: "Operation Mincemeat · 1943", org: "Naval Intelligence", cls: "MOST SECRET", text: "To hide the real target, Sicily, British officers planted fake invasion plans on a dead body dressed as \"Major William Martin\" of the Royal Marines. The submarine HMS Seraph released the body off Huelva, Spain, on [[30 April 1943]], and a Spanish fisherman found it. The letters pointed Germany toward [[Greece and Sardinia]]. Decoded German messages later showed Germany sending reinforcements there." },
+      { id: "garbodday", tab: "Garbo's D-Day message · 1944", org: "Security Service (M.I.5)", cls: "MOST SECRET", text: "On the night of D-Day, MI5 let Garbo radio a warning that the invasion had begun, [[timed to arrive too late to help]] Germany. It made the Germans trust him even more. Three days later he told them Normandy was [[only a diversion]], helping keep German troops waiting at Calais." }] },
+    { id: "UL", name: "Ultra Liaison", color: "#8a6a1f", files: [
+      { id: "slu", tab: "Special Liaison Units · 1940", org: "Special Liaison Units", cls: "MOST SECRET", text: "Special Liaison Units, organized by Group Captain [[F. W. Winterbotham]], carried Ultra to commanders in the field. An officer showed the message, waited while it was read, then [[took the paper back]]. Only a handful of senior officers knew Ultra came from codebreaking, and they were forbidden to reveal it." },
+      { id: "rommel", tab: "Rommel strikes back · 1942", org: "Eighth Army", cls: "MOST SECRET", text: "On [[21 January 1942]], Rommel counterattacked in North Africa and caught the British by surprise. His forces retook [[Benghazi]] on 29 January, and by early February the British had fallen back to the [[Gazala]] line. Ultra had shown fresh tanks arriving at Tripoli, but not Rommel's plan to attack." },
+      { id: "malta", tab: "Convoys to Africa · 1942", org: "Malta", cls: "MOST SECRET", text: "Rommel's army depended on supply ships crossing the Mediterranean from Italy. Ultra often revealed when and where the convoys would sail. Before planes and submarines from [[Malta]] attacked, the British usually sent a [[reconnaissance plane]] first, so each strike seemed to follow a lucky sighting instead of a broken code." }] }
+  ];
+  /* INTEL: three reports per role for the Padlet card. "{X}" is the decisive detail: the truth, or (on a double agent's card) the fake.
+     The interrogation's "prove it" step offers truth, fake and third, in a shuffled order. "file" names the Archive file that settles it. */
+  const INTEL = {
+    BP: [
+      { t: "Shark, the four-rotor U-boat Enigma, kept Bletchley out of U-boat orders for about {X}.", truth: "ten months", fake: "two months", third: "two years", file: "shark" },
+      { t: "Codebooks from the sinking {X} in October 1942 helped break Shark.", truth: "U-559", fake: "U-110", third: "U-505", file: "shark" },
+      { t: "About {X} of Bletchley Park's staff were women.", truth: "three-quarters", fake: "one-quarter", third: "half", file: "women" }],
+    NV: [
+      { t: "Japan's navy began using the code later called JN-25 in {X}.", truth: "June 1939", fake: "June 1941", third: "December 1937", file: "jn25" },
+      { t: "In early 1941, {X} American codebreakers sailed to Britain and visited Bletchley Park.", truth: "four", fake: "ten", third: "two", file: "sinkov" },
+      { t: "Station HYPO's work put the Japanese carriers about {X} from Midway on 4 June 1942.", truth: "175 miles", fake: "500 miles", third: "50 miles", file: "hypo" }],
+    FA: [
+      { t: "Gustave Bertrand handed a replica Enigma to British intelligence at {X}.", truth: "Victoria Station in London", fake: "the British embassy in Paris", third: "Bletchley Park", file: "bertrand" },
+      { t: "The Channel Dash ships slipped out of Brest in {X}.", truth: "February 1942", fake: "March 1942", third: "June 1940", file: "dash" },
+      { t: "In 1944 the Polish Home Army got parts of {X} flown out to Britain.", truth: "a V-2 rocket", fake: "a jet fighter", third: "an Enigma machine", file: "rocket" }],
+    MI: [
+      { t: "MI5 turned Arthur Owens, code name SNOW, into its first double agent in {X}.", truth: "1939", fake: "1943", third: "1936", file: "snow" },
+      { t: "Garbo's network of imaginary agents grew to {X}.", truth: "27", fake: "12", third: "50", file: "garbo" },
+      { t: "Operation Mincemeat's fake letters pointed Germany toward {X}.", truth: "Greece and Sardinia", fake: "Corsica and Crete", third: "Sicily", file: "mincemeat" }],
+    UL: [
+      { t: "Special Liaison Units were organized by {X}.", truth: "F. W. Winterbotham", fake: "Alan Turing", third: "Ian Fleming", file: "slu" },
+      { t: "Rommel's January 1942 counterattack retook {X}.", truth: "Benghazi", fake: "Tobruk", third: "Tripoli", file: "rommel" },
+      { t: "Before a strike from Malta, the British usually sent {X} first.", truth: "a reconnaissance plane", fake: "a warship", third: "a fake radio message", file: "malta" }]
+  };
   /* One line per round so students in individual scenarios still know the headline event. */
   const MEANWHILE = ["Meanwhile in Poland: Polish codebreakers are handing their Enigma secrets to Britain and France.", null,
     "Meanwhile in the Pacific: Japan's aircraft carriers have gone silent, and the US Navy has lost track of them.",
@@ -662,7 +770,7 @@ const DATA = (function () {
   const HEAD_IMG = ["r1", "r2", "r3", "r4", "r5", "r6"];
   /* Place lines for the round title cards. */
   const PLACES = ["Pyry Forest, near Warsaw, Poland", "The North Atlantic", "The Pacific Ocean, near Hawaii", "Midway Atoll, central Pacific", "The Solomon Islands, South Pacific", "Southern England and the English Channel"];
-  return { KINDS, ORDER, ROLE_IDS, ROUNDS, ROLES, ENDINGS, RANKS, TIMELINE, REC, PLACES, ECHO, REALCALL, ROLE_HIST, ECHO_GENERIC, SCEN, MEANWHILE, HEAD_IMG };
+  return { KINDS, ORDER, ROLE_IDS, ROUNDS, ROLES, ENDINGS, RANKS, TIMELINE, REC, PLACES, ECHO, REALCALL, ROLE_HIST, ECHO_GENERIC, SCEN, MEANWHILE, HEAD_IMG, ARCHIVE, INTEL };
 })();
 if (typeof module !== "undefined") module.exports = DATA;
 
@@ -698,15 +806,36 @@ const Logic = (function () {
   function rank(total) { let r = D.RANKS[0]; D.RANKS.forEach((x) => { if (total >= x.min) r = x; }); return r; }
   const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   function chk(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 31 + body.charCodeAt(i) * (i + 7)) % 1024; return ALPHA[h >> 5] + ALPHA[h & 31]; }
-  function signalId(S) { const body = S.role.id + "-" + S.path; return body + "-" + chk(body); }
-  /* Rebuild a finished game from a Signal ID. Returns null if invalid. */
+  /* Trust or Traitor: the hidden allegiance rides in one extra character K, so a v3 Signal ID is XX-ABCABC-K-YY.
+     S.alg = { v, r }: v = 0 loyal, 1-3 = which intel report was falsified; r = a random salt 0-7 so K differs between students.
+     K = ALPHA[(h + v*8 + r) % 32], where h comes from the role and picks. Not secure, just not readable at a glance. */
+  function pickHash(body) { let h = 0; for (let i = 0; i < body.length; i++) h = (h * 17 + body.charCodeAt(i)) % 32; return h; }
+  function allegChar(rp, alg) { return ALPHA[(pickHash(rp) + alg.v * 8 + alg.r) % 32]; }
+  function signalId(S) { let body = S.role.id + "-" + S.path; if (S.alg) body += "-" + allegChar(body, S.alg); return body + "-" + chk(body); }
+  /* Rebuild a finished game from a Signal ID. Returns null if invalid. alleg: null for an old (v1/v2) ID, else 0 loyal or 1-3. */
   function parseSignal(raw) {
-    const m = /^([A-Z]{2})-([ABC]{6})-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
-    if (!m || roleIdx(m[1]) < 0 || chk(m[1] + "-" + m[2]) !== m[3]) return null;
+    const m = /^([A-Z]{2})-([ABC]{6})(?:-([A-Z0-9]))?-([A-Z0-9]{2})$/.exec(String(raw || "").trim().toUpperCase().replace(/\s+/g, ""));
+    if (!m || roleIdx(m[1]) < 0) return null;
+    const rp = m[1] + "-" + m[2], body = m[3] ? rp + "-" + m[3] : rp;
+    if (chk(body) !== m[4]) return null;
+    let alleg = null; if (m[3]) { const k = ALPHA.indexOf(m[3]); if (k < 0) return null; alleg = ((k - pickHash(rp) + 64) % 32) >> 3; }
     const role = roleById(m[1]), S = newState(role, ""); const picks = [];
     for (let r = 0; r < 6; r++) { S.i = r; const slot = "ABC".indexOf(m[2][r]); const res = choose(S, slot); picks.push({ slot, label: res.c[0], kind: kindOf(r, order(role.id, r)[slot]) }); }
     const fs = finalScore(S);
-    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e };
+    return { id: m[0], role, S, picks, fs, rank: rank(fs.total), ending: fs.e, alleg };
+  }
+  /* The three intel reports as a card shows them. alleg 0 = all true; 1-3 = that report carries the fake. */
+  function intelFor(roleId, alleg) { return D.INTEL[roleId].map((x, i) => ({ text: x.t.replace("{X}", alleg === i + 1 ? x.fake : x.truth), fakeHere: alleg === i + 1, file: x.file })); }
+  /* "Prove it" choices for report n (0-2): truth, fake and a third, in an order fixed by the Signal ID so it doesn't change on reload. */
+  function proveOpts(id, roleId, n) { const x = D.INTEL[roleId][n]; const o = [{ k: "T", v: x.truth }, { k: "F", v: x.fake }, { k: "O", v: x.third }]; let h = 7; for (const ch of id + n) h = (h * 31 + ch.charCodeAt(0)) % 9973; for (let i = 2; i > 0; i--) { const j = h % (i + 1); h = Math.floor(h / 3) + 11; [o[i], o[j]] = [o[j], o[i]]; } return o; }
+  /* Score one filed verdict against the truth. vd = { v: "A"|"D", r: 1-3, t: "T"|"F"|"O", res }. +1 right verdict; on a double agent also +1 right report and +1 right truth. A perfect 3 drops to 2 if a redaction was revealed. */
+  function verdictScore(alleg, vd) {
+    if (alleg == null || !vd) return null;
+    let pts = 0; const right = (vd.v === "A") === (alleg === 0);
+    if (right) pts++;
+    if (right && alleg > 0 && vd.r === alleg) { pts++; if (vd.t === "T") pts++; }
+    if (vd.res && pts === 3) pts = 2;
+    return { pts, right, max: alleg === 0 ? 1 : 3 };
   }
   /* Achievement badges, earned from a finished game. Pure: depends only on the log, meters, score and hints used. */
   const BADGE_DEFS = [
@@ -730,7 +859,7 @@ const Logic = (function () {
     const c = { S, e, n, minS }, got = BADGE_DEFS.filter((b) => b.test(c)).map(({ id, name, icon, why }) => ({ id, name, icon, why }));
     return { got, total: BADGE_DEFS.length };
   }
-  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk };
+  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, parseSignal, chk, intelFor, proveOpts, verdictScore };
 })();
 if (typeof module !== "undefined") module.exports = Logic;
 
@@ -2101,7 +2230,7 @@ const RECMAPS = (function () {
   let nameNow = "";
   try { localStorage.removeItem("cb_name"); const g0 = store.get("cb_game", null); if (g0 && g0.S && g0.S.name) { g0.S.name = ""; store.set("cb_game", g0); } } catch (e) { }
   const root = document.getElementById("app");
-  let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null, titleCard = false, typedFor = -1, fxTimer = null;
+  let S = null, view = "title", stage = "brief", prevView = "title", picked = null, solved = false, lastDecoded = null, chosen = null, titleCard = false, typedFor = -1, fxTimer = null, curInt = null;   // curInt: the Signal ID whose interrogation is open (no verdict filed yet)
   const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FX_ON = location.hash === "#fx", noFx = () => (navigator.webdriver && !FX_ON) || reduceMotion();   // automated tests skip the effects unless asked
   /* small synthesized sound effects for the title card, typewriter and stamp */
@@ -2243,14 +2372,14 @@ const RECMAPS = (function () {
 
   /* ---------- shared UI ---------- */
   function topbar(extra) {
-    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-go="board">Decoder board</button></nav></header>`;
+    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-arch>Archive</button><button class="mini" data-go="board">Decoder board</button></nav></header>`;
   }
   function hud() {
     const pips = D.ROUNDS.map((r, i) => `<span class="pip ${i < S.i ? "done" : i === S.i ? "now" : ""}" title="Round ${i + 1}"></span>`).join("");
     const bars = METERS.map(([k, n, h]) => `<div class="meter" title="${esc(h)}"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
     return `<div class="hud" role="group" aria-label="Status"><div class="pips" aria-label="Round ${S.i + 1} of 6">${pips}</div>${bars}<div class="score">SCORE <b>${S.score}</b></div></div>`;
   }
-  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); }
+  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); $$("[data-arch]").forEach((b) => b.addEventListener("click", () => openArchive())); }
   function go(v) {
     if (v === "board") { if (view !== "board") prevView = view; }
     
@@ -2258,8 +2387,8 @@ const RECMAPS = (function () {
     try { history.replaceState(null, "", v === "board" ? "#board" : location.pathname + location.search); } catch (e) { }
   }
   function render() {
-    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
-    ({ title: renderTitle, pick: renderPick, round: renderRound, end: renderEnd, board: renderBoard }[view] || renderTitle)();
+    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } curInt = null; closeArchive(); const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
+    ({ title: renderTitle, pick: renderPick, round: renderRound, allegiance: renderAllegiance, end: renderEnd, board: renderBoard }[view] || renderTitle)();
     bindGo(); const h = $("[data-focus]"); if (h) h.focus({ preventScroll: true });
   }
   function copyText(text, btn, done) {
@@ -2285,7 +2414,7 @@ const RECMAPS = (function () {
         <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then submit the decoded messages to your teacher for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
     swapScene($(".hero-art"));
     $("#start").addEventListener("click", () => { if (saved) store.set("cb_game", null); go("pick"); });
-    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done ? "end" : "round"); });
+    const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done || S.fin ? (S.alg ? "end" : "allegiance") : "round"); });
   }
 
   /* ---------- role pick ---------- */
@@ -2361,7 +2490,7 @@ const RECMAPS = (function () {
     if (stage === "brief") $("#next").addEventListener("click", () => { stage = "work"; solved = false; chosen = null; render(); window.scrollTo(0, 0); });
     else if (stage === "work") bindWork();
     else {
-      $("#next").addEventListener("click", () => { S.i++; stage = "brief"; solved = false; chosen = null; titleCard = true; if (S.i >= 6) { S.i = 5; go("end"); } else { saveGame(false); render(); window.scrollTo(0, 0); } });
+      $("#next").addEventListener("click", () => { S.i++; stage = "brief"; solved = false; chosen = null; titleCard = true; if (S.i >= 6) { S.i = 5; S.fin = true; saveGame(false); go(S.alg ? "end" : "allegiance"); } else { saveGame(false); render(); window.scrollTo(0, 0); } });
     }
   }
   function bindWork() {
@@ -2436,7 +2565,27 @@ const RECMAPS = (function () {
   });
 
   /* ---------- end ---------- */
+  /* ---------- Trust or Traitor: the secret allegiance, chosen once after round 6 ---------- */
+  function renderAllegiance() {
+    if (S.alg) { view = "end"; renderEnd(); return; }
+    const role = S.role, rep = D.INTEL[role.id]; let pick = null, lie = 0;
+    root.innerHTML = topbar() + `<main class="wrap tot"><div><p class="kick">FILE CLOSING · ${esc(role.name.toUpperCase())} · ONE LAST DECISION</p><h1 data-focus tabindex="-1">Trust or traitor?</h1></div>
+      <p class="lede">Your Padlet card will carry three intel reports from your front. Classmates who decode your Signal ID must decide whether to trust them. Choose in secret: nobody finds out until your teacher unmasks the agents.</p>
+      <div class="paper"><div class="mlist" role="group" aria-label="Your allegiance">
+        <button class="mitem" data-al="0" aria-pressed="false"><span class="key">L</span><span><b>Loyal agent.</b> All three of your reports are true. You score a point for every classmate who approves you.</span></button>
+        <button class="mitem" data-al="D" aria-pressed="false"><span class="key">D</span><span><b>Double agent.</b> One report carries a lie the enemy wants believed. You score a point for every classmate you fool.</span></button></div>
+        <div id="alrep"></div></div>
+      <div class="row"><button class="btn" id="alok" disabled>Seal my file</button></div><p class="small">Once your file is sealed you can't change your mind: your Signal ID carries your choice.</p></main>`;
+    const ok = $("#alok"), sync = () => { ok.disabled = !(pick === "0" || (pick === "D" && lie)); };
+    const paintRep = () => {
+      $("#alrep").innerHTML = pick !== "D" ? "" : `<h2>Choose the report to falsify</h2><p class="small">The game writes the lie for you. Pick the one you think classmates are least likely to catch.</p><div class="mlist" role="group" aria-label="Report to falsify">${rep.map((x, i) => `<button class="mitem" data-lie="${i + 1}" aria-pressed="${lie === i + 1}"><span class="key">${i + 1}</span><span>${esc(x.t.replace("{X}", x.truth))}</span></button>`).join("")}</div>${lie ? `<p class="lieline"><b>Your card will say:</b> ${esc(rep[lie - 1].t.replace("{X}", rep[lie - 1].fake))}</p>` : ""}`;
+      $$("[data-lie]").forEach((b) => b.addEventListener("click", () => { lie = +b.dataset.lie; paintRep(); sync(); }));
+    };
+    $$("[data-al]").forEach((b) => b.addEventListener("click", () => { pick = b.dataset.al; if (pick === "0") lie = 0; $$("[data-al]").forEach((x) => x.setAttribute("aria-pressed", x === b)); paintRep(); sync(); }));
+    ok.addEventListener("click", () => { S.alg = { v: pick === "D" ? lie : 0, r: Math.floor(Math.random() * 8) }; saveGame(true); go("end"); });
+  }
   function renderEnd() {
+    if (!S.alg) { view = "allegiance"; renderAllegiance(); return; }
     const fs = L.finalScore(S), e = fs.e, rank = L.rank(fs.total), id = L.signalId(S), role = S.role, rIdx = D.RANKS.indexOf(rank);
     S.ended = { fs, e, rank, id };
     const b = board(); b.own = { role: role.id, rounds: 6 }; b.prog = b.prog || {}; b.prog[role.id] = 6; b.mine = b.mine || {}; b.mine[role.id] = id; store.set("cb_board", b); saveGame(true);
@@ -2465,7 +2614,7 @@ const RECMAPS = (function () {
   }
   function cardText(q) {
     const fs = S.ended.fs, role = S.role, L1 = "━━━━━━━━━━━━━━━━━━━━";
-    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
+    return [`${S.name.toUpperCase()} · ${role.name}`, `${S.ended.e.title} · ${S.ended.rank.title} · Score ${fs.total}`, "", `SIGNAL ID: ${S.ended.id}`, `Secrecy ${S.st.s} · Impact ${S.st.i} · Trust ${S.st.t}`, `Badges: ${L.badges(S).got.filter((x) => x.id !== "duty").map((x) => x.name).join(" · ") || "Reporting for Duty"}`, L1, `QUESTION FOR YOU: ${q}`, L1, "INTEL REPORTS FROM MY FRONT", ...L.intelFor(role.id, S.alg ? S.alg.v : 0).map((x, i) => `${i + 1}. ${x.text}`), "Trust me or deny me. Decode my Signal ID to decide.", L1, "Decode my Signal ID in Codebreakers: The Hidden War, then reply with DECODED and my ID.", "#NeedToKnow"].join("\n");
   }
   function cardSVG() {
     const role = S.role, fs = S.ended.fs, W = 640, H = 500, e = S.ended.e, lk = CARD_LOOK[e.id] || CARD_LOOK.steady;
@@ -2505,13 +2654,13 @@ const RECMAPS = (function () {
   }
 
   /* ---------- decoder ---------- */
-  function decoderForm() { return `<div class="dform"><label for="sid" class="sr">Signal ID</label><input id="sid" placeholder="Example: BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="dgo">Decode</button></div><p class="err" id="derr" role="alert"></p><div id="dres" aria-live="polite"></div>`; }
+  function decoderForm() { return `<div class="dform"><label for="sid" class="sr">Signal ID</label><input id="sid" placeholder="Example: BP-ACBACB-K-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="dgo">Decode</button></div><p class="err" id="derr" role="alert"></p><div id="dres" aria-live="polite"></div>`; }
   function bindDecoder() {
     const run = () => {
       const p = L.parseSignal($("#sid").value), err = $("#derr"); $("#dres").innerHTML = "";
-      if (!p) { err.textContent = "That Signal ID does not decode. Check the letters and dashes. It looks like XX-ABCABC-YY."; return; }
+      if (!p) { err.textContent = "That Signal ID does not decode. Check the letters and dashes. It looks like XX-ABCABC-K-YY."; return; }
       err.textContent = ""; const b = board(); if (b.sig.indexOf(p.id) < 0) { b.sig.push(p.id); store.set("cb_board", b); }
-      lastDecoded = p.id; $("#dres").innerHTML = decodedCard(p); bindReply(p);
+      lastDecoded = p.id; showDecoded(p);
     };
     $("#dgo").addEventListener("click", run); $("#sid").addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
     if (lastDecoded && view === "board") { const p = L.parseSignal(lastDecoded); if (p) { $("#sid").value = ""; } }
@@ -2520,10 +2669,84 @@ const RECMAPS = (function () {
     const mine = S && S.role ? S : null;
     const rows = p.picks.map((x, i) => `<li><span class="jd">R${i + 1} · ${esc(rTitle(p.role.id, i))}</span><span class="pc">“${esc(L.piece(i, p.role.id))}”</span><span>${esc(x.label)}</span></li>`).join("");
     const sameRole = mine && mine.role.id === p.role.id;
-    return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}<ol class="journey">${rows}</ol>
+    return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}${interHTML(p)}<ol class="journey">${rows}</ol>
       <div class="field"><label for="rr">Reply about round</label><select id="rr">${D.ROUNDS.map((r, i) => `<option value="${i}">${i + 1}. ${esc(rTitle(p.role.id, i))}</option>`).join("")}</select></div>
       <div class="field"><label for="rq">Question for them (pick one)</label><select id="rq"></select></div>
       <textarea id="rtext" rows="6" readonly aria-label="Reply text"></textarea><div class="row"><button class="mini" id="cprep">Copy reply</button></div><p class="small cmsg" role="status"></p><p class="small">Paste this as a reply on their card post on Padlet.</p></div>`;
+  }
+
+  function showDecoded(p) { $("#dres").innerHTML = decodedCard(p); bindReply(p); bindInter(p); }
+
+  /* ---------- Trust or Traitor: the interrogation (choices only; results sealed until all six messages are decoded) ---------- */
+  const isMine = (id) => Object.values(board().mine || {}).indexOf(id) >= 0;
+  const unsealed = () => fullCount(board()) >= 6;
+  const vdText = (p, vd) => vd.v === "A" ? "APPROVED: you trusted all three reports." : `DENIED: you said report ${vd.r} was false and the truth is “${D.INTEL[p.role.id][vd.r - 1][{ T: "truth", F: "fake", O: "third" }[vd.t]]}”.`;
+  function vdResult(p, vd) {
+    const sc = L.verdictScore(p.alleg, vd), x = p.alleg ? D.INTEL[p.role.id][p.alleg - 1] : null;
+    return `<p class="vres ${sc.right ? "good" : "bad"}"><b>${p.alleg ? "DOUBLE AGENT." : "LOYAL AGENT."}</b> ${p.alleg ? `Report ${p.alleg} was planted: it said “${esc(x.fake)}”, but the truth is “${esc(x.truth)}”.` : "All three reports were true."} You scored ${sc.pts} of ${sc.max}${vd.res ? " (with research)" : ""}.</p>`;
+  }
+  function interHTML(p) {
+    if (p.alleg == null) return `<p class="small">This Signal ID is from an older version of the game, so there are no intel reports to check.</p>`;
+    if (isMine(p.id)) return `<p class="small">This is your own Signal ID, so there is nothing to interrogate.</p>`;
+    const reps = L.intelFor(p.role.id, p.alleg).map((x, i) => `<li><b>Report ${i + 1}.</b> ${esc(x.text)}</li>`).join("");
+    return `<section class="interro"><p class="src">INTERROGATION · TRUST OR TRAITOR</p><p>${esc(p.role.name)}'s card carries these intel reports. Is this agent loyal, or a double agent who planted one lie?</p><ol class="intel">${reps}</ol><div id="istep"></div>
+      <div class="row"><button class="mini" id="iarch">Check the Archive</button></div><p class="small">Reading the Archive is free. Revealing a blacked-out line while this interrogation is open marks your verdict “with research”: a perfect verdict then scores 2 points instead of 3.</p></section>`;
+  }
+  function bindInter(p) {
+    const box = $("#istep"); if (!box) return;
+    const ab = $("#iarch"); if (ab) ab.addEventListener("click", () => openArchive(p.role.id));
+    const b0 = board(), filed = (b0.verdicts || {})[p.id];
+    if (filed) { curInt = null; box.innerHTML = `<p class="vfiled"><b>Verdict filed.</b> ${esc(vdText(p, filed))}</p>${unsealed() ? vdResult(p, filed) : `<p class="small">Results are sealed until you have decoded all six messages.</p>`}`; return; }
+    curInt = p.id; const vd = {};
+    const opt = (attr, val, key, txt, on) => `<button class="mitem" ${attr}="${val}" aria-pressed="${!!on}"><span class="key">${key}</span><span>${txt}</span></button>`;
+    const paint = () => {
+      const res = !!((board().resd || {})[p.id]);
+      let h = `<h3>1. Your verdict</h3><div class="mlist" role="group" aria-label="Verdict">${opt("data-v", "A", "A", "<b>APPROVE.</b> I trust all three reports.", vd.v === "A")}${opt("data-v", "D", "D", "<b>DENY.</b> One of these reports is a lie.", vd.v === "D")}</div>`;
+      if (vd.v === "D") h += `<h3>2. Which report is false?</h3><div class="mlist" role="group" aria-label="False report">${[1, 2, 3].map((n) => opt("data-r", n, n, "Report " + n, vd.r === n)).join("")}</div>`;
+      if (vd.v === "D" && vd.r) h += `<h3>3. Prove it: what is the truth?</h3><div class="mlist" role="group" aria-label="The truth">${L.proveOpts(p.id, p.role.id, vd.r - 1).map((o, i) => opt("data-t", o.k, "ABC"[i], esc(D.INTEL[p.role.id][vd.r - 1].t.replace("{X}", o.v)), vd.t === o.k)).join("")}</div>`;
+      const ready = vd.v === "A" || (vd.v === "D" && vd.r && vd.t);
+      h += `<div class="row"><button class="btn" id="ifile"${ready ? "" : " disabled"}>File verdict</button></div><p class="small">${res ? "<b>Research used</b> for this verdict. " : ""}A filed verdict can't be changed.</p>`;
+      box.innerHTML = h;
+      $$("[data-v]", box).forEach((x) => x.addEventListener("click", () => { vd.v = x.dataset.v; if (vd.v === "A") { delete vd.r; delete vd.t; } paint(); }));
+      $$("[data-r]", box).forEach((x) => x.addEventListener("click", () => { vd.r = +x.dataset.r; delete vd.t; paint(); }));
+      $$("[data-t]", box).forEach((x) => x.addEventListener("click", () => { vd.t = x.dataset.t; paint(); }));
+      $("#ifile").addEventListener("click", () => { const b = board(); b.verdicts = b.verdicts || {}; if (b.verdicts[p.id]) return; b.verdicts[p.id] = Object.assign({}, vd, { res: !!((b.resd || {})[p.id]) }); store.set("cb_board", b); bindInter(p); });
+    };
+    paint();
+  }
+
+  /* ---------- Trust or Traitor: the Archive of declassified files ---------- */
+  let arch = { d: 0, f: 0 }, archKey = null;
+  const redact = (t) => esc(t).replace(/\[\[(.+?)\]\]/g, '<span class="red" tabindex="0" role="button" aria-label="Blacked-out text. Press to reveal.">$1</span>');
+  function closeArchive() { const a = $(".archive"); if (a) { a.remove(); document.body.style.overflow = ""; } if (archKey) { document.removeEventListener("keydown", archKey); archKey = null; } }
+  function noteResearch() { if (!curInt) return; const b = board(); if ((b.verdicts || {})[curInt]) return; b.resd = b.resd || {}; if (b.resd[curInt]) return; b.resd[curInt] = true; store.set("cb_board", b); const n = $(".arch-int"); if (n) n.innerHTML = `<b>Research used</b> for your verdict on ${esc(curInt)}.`; }
+  function openArchive(drawer) {
+    closeArchive(); const back = document.activeElement;
+    if (drawer) { const i = D.ARCHIVE.findIndex((x) => x.id === drawer); if (i >= 0) arch = { d: i, f: 0 }; }
+    const el = document.createElement("div"); el.className = "archive"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "The Archive: declassified files");
+    document.body.appendChild(el); document.body.style.overflow = "hidden";
+    const close = () => { closeArchive(); if (back && back.focus) back.focus(); };
+    archKey = (e) => { if (e.key === "Escape") close(); }; document.addEventListener("keydown", archKey);
+    const paint = (focusSel) => {
+      const d = D.ARCHIVE[arch.d], f = d.files[arch.f], res = curInt && ((board().resd || {})[curInt]);
+      el.innerHTML = `<div class="arch-in" style="--dc:${d.color}"><div class="arch-top"><h2>The Archive <small>Declassified files</small></h2><button class="mini" id="archx">Close</button></div>
+        ${curInt ? `<p class="arch-int">${res ? `<b>Research used</b> for your verdict on ${esc(curInt)}.` : `Interrogation open for ${esc(curInt)}. Revealing a blacked-out line marks that verdict “with research”.`}</p>` : ""}
+        <nav class="drawers" aria-label="Drawers">${D.ARCHIVE.map((x, i) => `<button class="drawer${i === arch.d ? " on" : ""}" data-d="${i}" style="--dc:${x.color}" aria-pressed="${i === arch.d}">${esc(x.name)}</button>`).join("")}</nav>
+        <div class="folder"><div class="ftabs" role="tablist" aria-label="${esc(d.name)} files">${d.files.map((x, i) => `<button class="ftab${i === arch.f ? " on" : ""}" role="tab" aria-selected="${i === arch.f}" data-f="${i}">${esc(x.tab)}</button>`).join("")}</div>
+        <article class="dossier" role="tabpanel"><header class="dhead"><span>${esc(f.org)}</span><s>${esc(f.cls)}</s></header><p class="arstamp" aria-label="Declassified">DECLASSIFIED</p><h3>${esc(f.tab)}</h3><p class="dtext">${redact(f.text)}</p>
+        <p class="dhint">Hover over a black bar, or tap it, to see what is underneath.</p><footer class="dfoot">Reconstruction: the facts are checked; the layout imitates a wartime file.</footer></article></div></div>`;
+      $("#archx", el).addEventListener("click", close);
+      $$("[data-d]", el).forEach((b) => b.addEventListener("click", () => { arch = { d: +b.dataset.d, f: 0 }; paint(`[data-d="${b.dataset.d}"]`); }));
+      $$("[data-f]", el).forEach((b) => b.addEventListener("click", () => { arch.f = +b.dataset.f; paint(`[data-f="${b.dataset.f}"]`); }));
+      $$(".red", el).forEach((s) => {
+        let t = null; const show = () => { if (!s.classList.contains("shown")) { s.classList.add("shown"); s.removeAttribute("aria-label"); s.removeAttribute("role"); } noteResearch(); };
+        s.addEventListener("mouseenter", () => { t = setTimeout(show, 250); }); s.addEventListener("mouseleave", () => { clearTimeout(t); });
+        s.addEventListener("focus", show); s.addEventListener("click", show);
+      });
+      const fc = $(focusSel || "#archx", el); if (fc) fc.focus({ preventScroll: true });
+    };
+    el.addEventListener("click", (e) => { if (e.target === el) close(); });
+    paint();
   }
 
   const REPLY_QS = ["What did you think would happen when you made that choice?", "Which of Secrecy, Impact or Trust were you protecting?", "Would you make the same choice again? Why or why not?", "What did your role know that other roles did not?"];
@@ -2545,11 +2768,23 @@ const RECMAPS = (function () {
   function completionText(b, parsed, refl) {
     const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = nameNow || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
-    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + (refl ? "\n" + refl + "\n" : "");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. ${r.title} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
+  }
+  /* Verdicts in the submission: "<ID> A" (approved) or "<ID> D2T" (denied report 2, picked the truth; F = picked the fake, O = the third choice); "*" = with research. Teacher Check rescores them from the IDs. */
+  function verdictList(b) { return Object.keys(b.verdicts || {}).map((id) => ({ id, vd: b.verdicts[id], p: L.parseSignal(id) })).filter((x) => x.p && x.p.alleg != null); }
+  function verdictLines(b) {
+    const v = verdictList(b); if (!v.length) return "Verdicts: none\n";
+    let pts = 0, max = 0; v.forEach((x) => { const s = L.verdictScore(x.p.alleg, x.vd); pts += s.pts; max += s.max; });
+    return `Verdicts: ${v.map((x) => x.id + " " + (x.vd.v === "A" ? "A" : "D" + x.vd.r + x.vd.t) + (x.vd.res ? "*" : "")).join("; ")}\nInterrogation score: ${pts} of ${max}\n`;
+  }
+  function verdictPanel(b, open) {
+    const v = verdictList(b); if (!v.length) return "";
+    if (!open) return `<p class="small">Verdicts filed: ${v.length}. Results are sealed until you have decoded all six messages.</p>`;
+    return `<div class="paper vlist"><p class="src">UNSEALED · YOUR VERDICTS</p>${v.map((x) => `<div class="vrow"><p><b>${esc(x.id)}</b> · ${esc(x.p.role.name)}<br>${esc(vdText(x.p, x.vd))}</p>${vdResult(x.p, x.vd)}</div>`).join("")}</div>`;
   }
   function completion(b, parsed, full) {
-    if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p></section>`;
-    return `<section class="padlet panel"><h2>All six messages decoded</h2><p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
+    if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p>${verdictPanel(b, false)}</section>`;
+    return `<section class="padlet panel"><h2>All six messages decoded</h2>${verdictPanel(b, true)}<p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
       <div class="field"><label for="cnm">Your name (so your teacher knows who this is; never saved)</label><input id="cnm" maxlength="40" autocomplete="off" value="${esc(nameNow)}"></div>
       <div class="field"><label for="crefl">Your reflection (one or two sentences)</label><textarea id="crefl" rows="3" placeholder="Which message surprised you most, and why?"></textarea></div>
       <div class="field"><label for="cptext2">Your submission</label><textarea id="cptext2" rows="14" readonly></textarea></div>
@@ -2557,12 +2792,15 @@ const RECMAPS = (function () {
   }
 
   /* ---------- board ---------- */
+  function knownFn(b) {
+    const have = {}; b.sig.map(L.parseSignal).filter(Boolean).forEach((p) => { have[p.role.id] = true; });
+    const own = b.own || null, prog = Object.assign({}, b.prog || {}); if (own && prog[own.role] === undefined) prog[own.role] = own.rounds;
+    return (r, rid) => (prog[rid] || 0) > r || !!have[rid];
+  }
+  function fullCount(b) { const known = knownFn(b); return D.ROUNDS.filter((rd, r) => D.ROLES.every((x) => known(r, x.id))).length; }
   function renderBoard() {
-    const b = board(), parsed = b.sig.map(L.parseSignal).filter(Boolean), have = {};
-    parsed.forEach((p) => { have[p.role.id] = true; });
-    const own = b.own || null;
-    const prog = b.prog || {}; if (own && prog[own.role] === undefined) prog[own.role] = own.rounds;
-    const known = (r, rid) => (prog[rid] || 0) > r || !!have[rid];
+    const b = board(), parsed = b.sig.map(L.parseSignal).filter(Boolean);
+    const known = knownFn(b);
     let full = 0;
     const rows = D.ROUNDS.map((rd, r) => {
       const n = D.ROLES.filter((x) => known(r, x.id)).length, done = n === 5; if (done) full++;
@@ -2577,7 +2815,7 @@ const RECMAPS = (function () {
       ${rows}<p class="small"><button class="mini" id="clr">Clear decoded signals</button></p></main>`;
     $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
     bindDecoder();
-    $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); $("#dres").innerHTML = decodedCard(p); bindReply(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
+    $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); showDecoded(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
     const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
     $("#clr").addEventListener("click", () => { const b2 = board(); b2.sig = []; store.set("cb_board", b2); renderBoard(); bindGo(); });
   }

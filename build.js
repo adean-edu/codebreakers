@@ -47,7 +47,7 @@ ${r("checker.css")}
 <h2>SUBMISSIONS</h2><label class="small" for="subs">Paste submissions here</label><textarea id="subs" spellcheck="false" placeholder="MISSION COMPLETE · ..."></textarea>
 <div class="row"><button class="btn" id="go">Check</button><button class="btn ghost" id="clear">Clear</button></div><div id="out" aria-live="polite"></div>
 <h2>LOOK UP ONE SIGNAL ID</h2><p class="small">See the role, ending and all six choices behind any Signal ID, for example one on a Padlet card.</p>
-<div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
+<div class="row"><label class="small" for="one">Signal ID</label><input id="one" placeholder="BP-ACBACB-K-FD" autocomplete="off" spellcheck="false" maxlength="16"><button class="btn" id="onego">Look up</button></div><div id="oneout" aria-live="polite"></div></main>
 <script>
 ${cjs}
 </script></body></html>`);
@@ -56,6 +56,6 @@ const SITE = "https://adean-edu.github.io/codebreakers/";
 const guide = (note, base) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codebreakers: For Teachers</title>${fonts}<style>
 ${r("checker.css")}
 </style></head><body>${r("guide.html").split("{{VERSION_NOTE}}").join(note).split("{{GAME_URL}}").join(base).split("{{CHECK_URL}}").join(base + "check.html")}</body></html>`;
-fs.writeFileSync(__dirname + "/dist/teachers.html", guide(`This is the <b>latest version</b>, which changes whenever the game is improved. To use the game with a class, or to share it with other teachers, use the frozen version, which never changes mid-unit: <a href="v2/teachers.html">${SITE}v2/teachers.html</a>.`, SITE));
+fs.writeFileSync(__dirname + "/dist/teachers.html", guide(`This is the <b>latest version</b>, which changes whenever the game is improved. To use the game with a class, or to share it with other teachers, use the frozen version, which never changes mid-unit: <a href="v3/teachers.html">${SITE}v3/teachers.html</a>.`, SITE));
 module.exports = { guide, SITE };
 console.log("built", (html.length / 1024).toFixed(0) + " KB");
