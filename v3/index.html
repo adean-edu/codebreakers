@@ -2445,7 +2445,7 @@ const RECMAPS = (function () {
       <section class="hero"><div class="hero-art" data-scene="title">${ART.scene("enigma")}</div>
         <div class="hero-t"><span class="stampline">TOP SECRET</span><h1 data-focus tabindex="-1">Codebreakers</h1><p class="subt">The Hidden War</p>
         <p class="lede">You hold one piece of a secret message. The people who hold the rest are your classmates. Crack your fragment, make the call, then use Padlet to piece the message together.</p>
-        <p class="boot">&gt; CLEARANCE: <span>GRANTED</span><br>&gt; OPERATION: <span>SIX ROUNDS, 1939 TO 1944</span><br>&gt; ASSET: <span>YOU</span><b class="blink">_</b></p>
+        <p class="boot">&gt; CLEARANCE: <span>GRANTED</span><br>&gt; OPERATION: <span>SIX ROUNDS, 1939 TO 1945</span><br>&gt; ASSET: <span>YOU</span><b class="blink">_</b></p>
         ${saved && !nameNow ? `<div class="field"><label for="rname">To resume, enter your name or codename again (it is never saved)</label><input id="rname" maxlength="24" autocomplete="off"></div>` : ""}<p class="err" id="rerr" role="alert"></p><div class="row">${saved ? `<button class="btn" id="resume">Resume: ${esc(saved.S.role.name)}, round ${Math.min(saved.S.i + 1, 6)}</button>` : ""}<button class="btn${saved ? " ghost" : ""}" id="start">${saved ? "Start a new game" : "Begin operation"}</button><button class="btn ghost" data-go="board">Decoder board${n ? ` (${n})` : ""}</button></div></div></section>
       <section class="how panel"><h2>Your mission</h2><ol class="steps">
         <li><span><b>Play your role.</b> Six rounds. Each has a private briefing, a coded fragment to crack, and orders to give.</span></li>
@@ -2521,7 +2521,7 @@ const RECMAPS = (function () {
         <div class="paper"><p class="src">In history</p><p>${esc(sc ? hist.t : rd.real)}</p></div>
         ${(() => { const rc = (D.ROLE_HIST[role.id][S.i] || {}).call || D.REALCALL[S.i], same = lg.kind === rc.kind; return `<div class="realcall ${same ? "same" : "diff"}"><p class="rck">THE REAL CALL</p><p class="rcv">${same ? "✓ You made the same call the real people made." : "✗ The real people chose differently."}</p><p class="rct">${esc(rc.t)}</p></div>`; })()}
         <section class="panel"><h2>The message so far</h2><p class="small">Your piece is pinned. The other four belong to other roles. They unlock when you decode classmates' Signal IDs on the Decoder board.</p><ol class="slots">${slots}</ol></section>
-        <div class="row"><button class="btn" id="next">${S.i < 5 ? "Next round" : "Close the file"}</button></div>`;
+        <div class="row"><button class="btn" id="next">${S.i < 5 ? "Next round" : "Epilogue: 1945"}</button></div>`;
     }
     root.innerHTML = topbar() + `<main class="wrap">${hud()}${head}${steps(cur)}<div class="obj" role="note"><span>OBJECTIVE</span><p id="objt">${esc(obj)}</p></div>${body}</main>`;
     if (stage === "brief") { const nowEl = $(".tl .now"); if (nowEl) nowEl.parentNode.scrollLeft = Math.max(0, nowEl.offsetLeft - 60); }
@@ -2607,7 +2607,17 @@ const RECMAPS = (function () {
 
   /* ---------- end ---------- */
   /* ---------- Trust or Traitor: the secret allegiance, chosen once after round 6 ---------- */
+  /* ---------- 1945 epilogue: shown once, after round 6 and before the secret allegiance ---------- */
+  function renderEpilogue() {
+    root.innerHTML = topbar() + `<main class="wrap epi"><div><p class="kick">EPILOGUE · 1945</p><h1 data-focus tabindex="-1">The war ends. The secret does not.</h1></div>
+      <div class="paper"><p class="src">May to September 1945</p><p>Germany surrenders in May 1945. Japan announces its surrender in August, and signs it on 2 September 1945. World War II is over.</p></div>
+      <div class="paper"><p class="src">The silence</p><p>The codebreakers, couriers, case officers and liaison officers go home and say nothing. Most had signed secrecy oaths, and many never told even their families what they had done.</p><p>Britain kept the Ultra secret until 1974, when F. W. Winterbotham, who had organized the Special Liaison Units, published <i>The Ultra Secret</i>. By then the war had been over for almost 30 years.</p></div>
+      <p class="eq"><b>Think about it</b> Why might a government keep a wartime secret long after the war has ended? Was it worth it?</p>
+      <div class="row"><button class="btn" id="epinext">Close the file</button></div></main>`;
+    $("#epinext").addEventListener("click", () => { S.epi = true; saveGame(false); render(); window.scrollTo(0, 0); });
+  }
   function renderAllegiance() {
+    if (!S.alg && !S.epi) { renderEpilogue(); return; }
     if (S.alg) { view = "end"; renderEnd(); return; }
     const role = S.role, rep = D.INTEL[role.id]; let pick = null, lie = 0, lv = null;
     root.innerHTML = topbar() + `<main class="wrap tot"><div><p class="kick">FILE CLOSING · ${esc(role.name.toUpperCase())} · ONE LAST DECISION</p><h1 data-focus tabindex="-1">Trust or traitor?</h1></div>

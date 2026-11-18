@@ -13,7 +13,8 @@ const { chromium } = require('playwright'); const L = require('./src/logic.js');
     await p.waitForSelector('.mitem'); if (r === 0) await p.screenshot({ path: `shots/${mode}-work.png`, fullPage: true });
     await p.keyboard.press(picks[r].toLowerCase()); if(r===0) await p.screenshot({ path: `shots/${mode}-selected.png`, fullPage: true }); await p.click('#send'); await p.waitForSelector('#next',{state:'attached'}); if (r === 0) await p.screenshot({ path: `shots/${mode}-outcome.png`, fullPage: true }); await p.click('#next');
   }
-  // Trust or Traitor: choose the secret allegiance
+  // 1945 epilogue, then Trust or Traitor: choose the secret allegiance
+  await p.waitForSelector('#epinext'); if (!/1945/.test(await p.textContent('main'))) errs.push('EPILOGUE missing 1945'); await p.screenshot({ path: `shots/${mode}-epilogue.png`, fullPage: true }); await p.click('#epinext');
   await p.waitForSelector('[data-al]');
   if (alg) { await p.click('[data-al="D"]'); await p.click(`[data-lie="${alg}"]`); if (!(await p.isDisabled('#alok'))) errs.push('SEAL allowed before a lie was chosen'); await p.click(`[data-lv="${lv}"]`); } else await p.click('[data-al="0"]');
   await p.waitForTimeout(600); await p.screenshot({ path: `shots/${mode}-allegiance.png`, fullPage: true }); await p.click('#alok');
