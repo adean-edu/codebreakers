@@ -2388,16 +2388,39 @@ const RECMAPS = (function () {
   };
   const KIND_NOTE = { cover: "Used with a cover story", share: "Shared honestly", open: "Acted openly", hold: "Held back", hold3: "Stayed silent", blunder: "Guessed" };
 
+  /* ---------- read aloud ----------
+     Reads the current screen (or the open Archive file) paragraph by paragraph with the browser's speech voices.
+     Only voices built into the computer (localService) are used, so no text is sent to an online speech service.
+     Blacked-out Archive text is read as "blacked out", never revealed. Speech stops whenever the screen changes. */
+  const SAY_OK = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  const SAY_SEL = "h1, .subt, .lede, .echo .echok, .echo .echot, .echo .echor, .paper > p, .paper h2, .paper h3, .rec .reck, .rec .rect, .eq, .terms p, .realcall .rcv, .realcall .rct, .mitem > span:last-child, .obj p, .interro > p, .intel li, .vfiled, .vres, .stat, .note, .journey li";
+  let saying = false;
+  const sayVoice = () => { const v = speechSynthesis.getVoices().filter((x) => x.localService && /^en/i.test(x.lang)); return v.find((x) => /en[-_]US/i.test(x.lang)) || v[0] || null; };
+  const sayText = (el) => { const c = el.cloneNode(true); c.querySelectorAll(".red:not(.shown)").forEach((r) => { r.textContent = " blacked out "; }); c.querySelectorAll("svg, button, .key, .sr").forEach((r) => r.remove()); return c.textContent.replace(/[█▌━]+/g, " ").replace(/\s+/g, " ").trim(); };
+  function sayStop() { if (!SAY_OK) return; saying = false; try { speechSynthesis.cancel(); } catch (e) { } $$("[data-say]").forEach((b) => { b.textContent = "Read aloud"; b.setAttribute("aria-pressed", "false"); }); }
+  function sayStart() {
+    const sk = $(".skiptype"); if (sk) sk.click();   // finish the typewriter so the whole text is there
+    const scope = $(".archive .dossier") || $("main"); if (!scope) return;
+    const els = $$(scope.matches(".dossier") ? "h3, .dtext" : SAY_SEL, scope).filter((e) => e.offsetParent !== null);
+    const parts = els.filter((e) => !els.some((o) => o !== e && o.contains(e))).map(sayText).filter((t) => t.length > 1);
+    const voice = sayVoice();
+    if (!voice) { const m = $("#saymsg") || document.body.appendChild(Object.assign(document.createElement("p"), { id: "saymsg", className: "sr" })); m.setAttribute("role", "status"); m.textContent = ""; setTimeout(() => { m.textContent = "Read aloud needs a voice installed on this computer, and none was found."; }, 50); $$("[data-say]").forEach((b) => { b.textContent = "No voice found"; setTimeout(() => { b.textContent = "Read aloud"; }, 2500); }); return; }
+    sayStop(); saying = true; $$("[data-say]").forEach((b) => { b.textContent = "Stop reading"; b.setAttribute("aria-pressed", "true"); });
+    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); u.voice = voice; u.lang = voice.lang; u.rate = 0.95; if (i === parts.length - 1) u.onend = () => { if (saying) sayStop(); }; speechSynthesis.speak(u); });
+  }
+  if (SAY_OK) { try { speechSynthesis.getVoices(); } catch (e) { } }
+  const sayBtn = () => (SAY_OK ? `<button class="mini" data-say aria-pressed="${saying}">${saying ? "Stop reading" : "Read aloud"}</button>` : "");
+
   /* ---------- shared UI ---------- */
   function topbar(extra) {
-    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}<button class="mini" data-arch>Archive</button><button class="mini" data-go="board">Decoder board</button></nav></header>`;
+    return `<header class="bar"><button class="logo" data-go="title" aria-label="Back to the title screen">CODEBREAKERS: THE HIDDEN WAR</button><span class="classif">TOP SECRET // EYES ONLY</span><nav class="bar-r">${extra || ""}${sayBtn()}<button class="mini" data-arch>Archive</button><button class="mini" data-go="board">Decoder board</button></nav></header>`;
   }
   function hud() {
     const pips = D.ROUNDS.map((r, i) => `<span class="pip ${i < S.i ? "done" : i === S.i ? "now" : ""}" title="Round ${i + 1}"></span>`).join("");
     const bars = METERS.map(([k, n, h]) => `<div class="meter" title="${esc(h)}"><span class="ml">${n}</span><span class="mt"><span class="mf m-${k}" style="width:${S.st[k]}%"></span></span><b>${S.st[k]}</b></div>`).join("");
     return `<div class="hud" role="group" aria-label="Status"><div class="pips" aria-label="Round ${S.i + 1} of 6">${pips}</div>${bars}<div class="score">SCORE <b>${S.score}</b></div></div>`;
   }
-  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); $$("[data-arch]").forEach((b) => b.addEventListener("click", () => openArchive())); }
+  function bindGo() { $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go))); $$("[data-arch]").forEach((b) => b.addEventListener("click", () => openArchive())); $$("[data-say]").forEach((b) => b.addEventListener("click", () => (saying ? sayStop() : sayStart()))); }
   function go(v) {
     if (v === "board") { if (view !== "board") prevView = view; }
     
@@ -2405,7 +2428,7 @@ const RECMAPS = (function () {
     try { history.replaceState(null, "", v === "board" ? "#board" : location.pathname + location.search); } catch (e) { }
   }
   function render() {
-    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } curInt = null; closeArchive(); const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
+    if (fxTimer) { clearInterval(fxTimer); fxTimer = null; typeStop(); } const oc = $(".tcard"); if (oc) { oc.remove(); stopCard(); } curInt = null; sayStop(); closeArchive(); const zx = $(".zoombox"); if (zx) { zx.remove(); document.body.style.overflow = ""; }
     ({ title: renderTitle, pick: renderPick, round: renderRound, allegiance: renderAllegiance, end: renderEnd, board: renderBoard }[view] || renderTitle)();
     bindGo(); const h = $("[data-focus]"); if (h) h.focus({ preventScroll: true });
   }
@@ -2749,7 +2772,7 @@ const RECMAPS = (function () {
   /* ---------- Trust or Traitor: the Archive of declassified files ---------- */
   let arch = { d: 0, f: 0 }, archKey = null;
   const redact = (t) => esc(t).replace(/\[\[(.+?)\]\]/g, '<span class="red" tabindex="0" role="button" aria-label="Blacked-out text. Press to reveal.">$1</span>');
-  function closeArchive() { const a = $(".archive"); if (a) { a.remove(); document.body.style.overflow = ""; } if (archKey) { document.removeEventListener("keydown", archKey); archKey = null; } }
+  function closeArchive() { const a = $(".archive"); if (a) { sayStop(); a.remove(); document.body.style.overflow = ""; } if (archKey) { document.removeEventListener("keydown", archKey); archKey = null; } }
   function noteResearch() { if (!curInt) return; const b = board(); if ((b.verdicts || {})[curInt]) return; b.resd = b.resd || {}; if (b.resd[curInt]) return; b.resd[curInt] = true; store.set("cb_board", b); const n = $(".arch-int"); if (n) n.innerHTML = `<b>Research used</b> for your verdict on ${esc(curInt)}.`; }
   function openArchive(drawer) {
     closeArchive(); const back = document.activeElement;
@@ -2759,14 +2782,16 @@ const RECMAPS = (function () {
     const close = () => { closeArchive(); if (back && back.focus) back.focus(); };
     archKey = (e) => { if (e.key === "Escape") close(); }; document.addEventListener("keydown", archKey);
     const paint = (focusSel) => {
+      sayStop();
       const d = D.ARCHIVE[arch.d], f = d.files[arch.f], res = curInt && ((board().resd || {})[curInt]);
-      el.innerHTML = `<div class="arch-in" style="--dc:${d.color}"><div class="arch-top"><h2>The Archive <small>Declassified files</small></h2><button class="mini" id="archx">Close</button></div>
+      el.innerHTML = `<div class="arch-in" style="--dc:${d.color}"><div class="arch-top"><h2>The Archive <small>Declassified files</small></h2><span class="row" style="margin:0">${sayBtn()}<button class="mini" id="archx">Close</button></span></div>
         ${curInt ? `<p class="arch-int">${res ? `<b>Research used</b> for your verdict on ${esc(curInt)}.` : `Interrogation open for ${esc(curInt)}. Revealing a blacked-out line marks that verdict “with research”.`}</p>` : ""}
         <nav class="drawers" aria-label="Drawers">${D.ARCHIVE.map((x, i) => `<button class="drawer${i === arch.d ? " on" : ""}" data-d="${i}" style="--dc:${x.color}" aria-pressed="${i === arch.d}">${esc(x.name)}</button>`).join("")}</nav>
         <div class="folder"><div class="ftabs" role="tablist" aria-label="${esc(d.name)} files">${d.files.map((x, i) => `<button class="ftab${i === arch.f ? " on" : ""}" role="tab" aria-selected="${i === arch.f}" data-f="${i}">${esc(x.tab)}</button>`).join("")}</div>
         <article class="dossier" role="tabpanel"><header class="dhead"><span>${esc(f.org)}</span><s>${esc(f.cls)}</s></header><p class="arstamp" aria-label="Declassified">DECLASSIFIED</p><h3>${esc(f.tab)}</h3><p class="dtext">${redact(f.text)}</p>
         <p class="dhint">Hover over a black bar, or tap it, to see what is underneath.</p><footer class="dfoot">Reconstruction: the facts are checked; the layout imitates a wartime file.</footer></article></div></div>`;
       $("#archx", el).addEventListener("click", close);
+      $$("[data-say]", el).forEach((b) => b.addEventListener("click", () => (saying ? sayStop() : sayStart())));
       $$("[data-d]", el).forEach((b) => b.addEventListener("click", () => { arch = { d: +b.dataset.d, f: 0 }; paint(`[data-d="${b.dataset.d}"]`); }));
       $$("[data-f]", el).forEach((b) => b.addEventListener("click", () => { arch.f = +b.dataset.f; paint(`[data-f="${b.dataset.f}"]`); }));
       $$(".red", el).forEach((s) => {
