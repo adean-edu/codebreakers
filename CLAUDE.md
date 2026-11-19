@@ -253,3 +253,7 @@ The two decks are also plain web pages (teacher: "pushed to the github so the UR
 **1945 epilogue and dates (2026-11-17):** after round 6 ("Epilogue: 1945" button) students see `renderEpilogue` (war ends May to September 1945; Ultra kept secret until 1974, Winterbotham's *The Ultra Secret*; a reflection question), shown once via `S.epi`, before the allegiance screen. Because of it, the game says 1939 to 1945 everywhere (title screen, guide, briefing slides, Spyglass Lab home page). The six rounds themselves still run 1939 to 1944.
 
 **edio is back (2026-11-19):** the teacher decided not to sell the game, so hand-in instructions name edio again: the game's title screen mission, submission panel and copy message; the class Padlet welcome step 5; the briefing's credit slide and notes (claude.ai deck and GitHub); and the guide's welcome-post notes. This supersedes the "generic for other teachers" wording.
+
+## Padlet background (2026-11-19)
+
+The teacher found the old Padlet wallpaper hard to read and off-colour, so it was replaced with `padlet/codebreakers-wallpaper.png` (1920×1080, drawn from `padlet/wall.html` with Playwright): the game's near-black screen with a faint grid, faint amber cipher letters and an amber glow at the top, kept very dim so text stays readable. The board's colour scheme is now **dark** (light title and column text). The font stays fuji (monospace). Auto-remake copies the wallpaper to new copies. To undo: Padlet's ⋯ menu → Settings → Wallpaper, and set Appearance back to light.
