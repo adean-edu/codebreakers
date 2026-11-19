@@ -1,21 +1,21 @@
 <!doctype html><html><body style="margin:0">
-<div id="w" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#0a0e0d">
+<!-- Light "top secret" dossier wallpaper for the class Padlet: game paper colour, faint stamp-red TOP SECRET marks, kept pale so dark text reads. -->
+<div id="w" style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#e4e1d6">
 <svg width="1920" height="1080" style="position:absolute;inset:0">
 <defs>
-<radialGradient id="g" cx="50%" cy="0%" r="70%"><stop offset="0" stop-color="#f0b93a" stop-opacity=".10"/><stop offset="1" stop-color="#f0b93a" stop-opacity="0"/></radialGradient>
-<pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#3b4a43" stroke-opacity=".35" stroke-width="1"/></pattern>
-<pattern id="big" width="240" height="240" patternUnits="userSpaceOnUse"><path d="M240 0H0V240" fill="none" stroke="#3b4a43" stroke-opacity=".55" stroke-width="1"/></pattern>
-<filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/></filter>
-<radialGradient id="v" cx="50%" cy="50%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+<filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/></filter>
+<filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+<pattern id="lines" width="1920" height="36" patternUnits="userSpaceOnUse"><path d="M0 35.5H1920" stroke="#55584f" stroke-opacity=".10"/></pattern>
+<g id="stamp" filter="url(#rough)"><rect x="-210" y="-46" width="420" height="92" rx="6" fill="none" stroke="#c4473e" stroke-width="7"/><rect x="-196" y="-33" width="392" height="66" rx="3" fill="none" stroke="#c4473e" stroke-width="2.5"/><text x="0" y="20" text-anchor="middle" font-family="Impact, Arial Narrow, sans-serif" font-size="56" letter-spacing="8" fill="#c4473e">TOP SECRET</text></g>
+<radialGradient id="v" cx="50%" cy="45%" r="75%"><stop offset=".6" stop-color="#8a7a55" stop-opacity="0"/><stop offset="1" stop-color="#8a7a55" stop-opacity=".22"/></radialGradient>
 </defs>
-<rect width="1920" height="1080" fill="url(#grid)"/>
-<rect width="1920" height="1080" fill="url(#big)"/>
-<g font-family="Courier New, monospace" font-size="22" fill="#f0b93a" fill-opacity=".09" letter-spacing="8" id="txt"></g>
-<rect width="1920" height="1080" fill="url(#g)"/>
-<rect width="1920" height="1080" filter="url(#n)" opacity=".06"/>
+<rect width="1920" height="1080" fill="url(#lines)"/>
+<g opacity=".13" id="stamps"></g>
+<text x="40" y="1050" font-family="Courier New, monospace" font-size="20" letter-spacing="6" fill="#1a1d1b" fill-opacity=".22">CLASSIFIED · NEED TO KNOW · 1939–1945</text>
+<rect width="1920" height="1080" filter="url(#n)" opacity=".10"/>
 <rect width="1920" height="1080" fill="url(#v)"/>
 </svg></div>
 <script>
-const g=document.getElementById('txt');const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ';let s=7;const r=()=>(s=(s*9301+49297)%233280)/233280;
-for(let y=96;y<1080;y+=96){const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',-40+r()*60|0);t.setAttribute('y',y);let w='';for(let i=0;i<90;i++)w+=(i%6==5?' ':A[r()*26|0]);t.textContent=w;g.appendChild(t);}
+const g=document.getElementById('stamps');
+[[260,170,-12],[1000,120,8],[1690,260,-6],[560,520,5],[1400,600,-10],[180,880,9],[980,930,-4],[1760,900,6]].forEach(([x,y,a])=>{const u=document.createElementNS('http://www.w3.org/2000/svg','use');u.setAttribute('href','#stamp');u.setAttribute('transform',`translate(${x} ${y}) rotate(${a})`);g.appendChild(u);});
 </script></body></html>
