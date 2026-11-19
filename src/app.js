@@ -213,7 +213,7 @@
         <li><span><b>Post your file to Padlet.</b> You finish with a case card and a Signal ID.</span></li>
         <li><span><b>Decode classmates.</b> Paste their Signal IDs into the decoder. You see what their role did, and pieces of the secret messages unlock.</span></li>
                 <li><span><b>Reply on Padlet.</b> Reply to each classmate you decode, using a question you pick from the list.</span></li>
-        <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then submit the decoded messages to your teacher for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
+        <li><span><b>Submit the decoded messages.</b> You cannot read all six messages alone. Decode all four other roles, then turn in the decoded messages on edio for credit for the assignment. Do not post them on Padlet.</span></li></ol></section></main>`;
     swapScene($(".hero-art"));
     $("#start").addEventListener("click", () => { if (saved) store.set("cb_game", null); go("pick"); });
     const rs = $("#resume"); if (rs) rs.addEventListener("click", () => { const rn = $("#rname"); if (rn) { const v = rn.value.trim(); if (!v) { $("#rerr").textContent = "Enter your name or codename first."; rn.focus(); return; } nameNow = v; } S = saved.S; S.name = nameNow; picked = S.role.id; stage = "brief"; solved = false; chosen = null; titleCard = !saved.done; typedFor = -1; go(saved.done || S.fin ? (S.alg ? "end" : "allegiance") : "round"); });
@@ -611,7 +611,7 @@
   }
   function completion(b, parsed, full) {
     if (full < 6) return `<section class="panel"><h2>Submission</h2><p>Decode all six messages to unlock your submission for the teacher. You need Signal IDs from all four other roles. ${6 - full} to go.</p>${verdictPanel(b, false)}</section>`;
-    return `<section class="padlet panel"><h2>All six messages decoded</h2>${verdictPanel(b, true)}<p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and submit it to your teacher the way your class turns in assignments. Add a sentence about what you learned.</p>
+    return `<section class="padlet panel"><h2>All six messages decoded</h2>${verdictPanel(b, true)}<p><b>Do not post this on Padlet.</b> Other students could copy it. Copy it and turn it in on edio, in the assignment space. Add a sentence about what you learned.</p>
       <div class="field"><label for="cnm">Your name (so your teacher knows who this is; never saved)</label><input id="cnm" maxlength="40" autocomplete="off" value="${esc(nameNow)}"></div>
       <div class="field"><label for="crefl">Your reflection (one or two sentences)</label><textarea id="crefl" rows="3" placeholder="Which message surprised you most, and why?"></textarea></div>
       <div class="field"><label for="cptext2">Your submission</label><textarea id="cptext2" rows="14" readonly></textarea></div>
@@ -648,7 +648,7 @@
     $("#bk").addEventListener("click", () => go(prevView === "board" ? "title" : prevView));
     bindDecoder();
     $$("[data-sig]").forEach((c) => c.addEventListener("click", () => { const p = L.parseSignal(c.dataset.sig); showDecoded(p); $("#dres").scrollIntoView({ block: "nearest" }); }));
-    const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Submit it to your teacher. Do not post it on Padlet.")); }
+    const cp = $("#cppost"); if (cp) { const ta = $("#cptext2"), refl = $("#crefl"), cnm = $("#cnm"), upd = () => { nameNow = cnm.value.trim(); ta.value = completionText(b, parsed, refl.value.trim()); }; refl.addEventListener("input", upd); cnm.addEventListener("input", upd); upd(); cp.addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Turn it in on edio. Do not post it on Padlet.")); }
     /* Clearing asks first. Option 1 forgets decoded classmates; option 2 also forgets other roles this student played
        (their pieces and Signal IDs), keeping the current game. Filed verdicts are never cleared, so results can't be redone. */
     const box = $("#clrbox"), clr = $("#clr");
