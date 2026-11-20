@@ -30,6 +30,7 @@ const { chromium } = require('playwright'); const L = require('./src/logic.js');
   // decode another role (a double agent who falsified report 2), use the Archive, interrogate
   const o = role === 'NV' ? 'BP' : 'NV'; const S = L.newState(L.roleById(o), 'x'); for (let r = 0; r < 6; r++) { S.i = r; L.choose(S, r % 3); } S.alg = { v: 2, r: 5 }; const sid = L.signalId(S);
   await p.fill('#sid', sid); await p.click('#dgo'); await p.waitForSelector('.decoded'); await p.waitForSelector('[data-v]');
+  { const rt = await p.inputValue('#rtext'); if (!rt.includes('PROOF ' + L.proofCode(id, sid))) errs.push('REPLY has no matching proof code'); }
   await p.click('#iarch'); await p.waitForSelector('.archive .dossier'); await p.click('.ftab:nth-child(2)'); await p.hover('.archive .red'); await p.waitForTimeout(500); await p.screenshot({ path: `shots/${mode}-archive.png` }); await p.keyboard.press('Escape');
   await p.click('[data-v="D"]'); await p.click('[data-r="2"]'); for (const x of await p.$$('[data-t]')) if (await x.getAttribute('data-t') === 'T') { await x.click(); break; }
   await p.click('#ifile'); await p.waitForSelector('.vfiled'); await p.screenshot({ path: `shots/${mode}-decoded.png`, fullPage: true });

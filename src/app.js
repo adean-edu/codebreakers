@@ -497,12 +497,14 @@
     return `<div class="paper decoded"><p class="src">DECODED · ${esc(p.id)}</p><div class="dp"><div>${ART.portrait(p.role.id, "dc" + p.role.id)}</div><div><h3>${esc(p.role.name)}</h3><p><b>${esc(p.ending.title)}</b> · ${esc(p.rank.title)} · score ${p.fs.total}</p><p class="small">Their pieces are now on the board.</p></div></div>${sameRole ? `<p class="warn">This is the same role as yours, so it adds no new pieces. Look for a different role to fill the board.</p>` : ""}${interHTML(p)}<ol class="journey">${rows}</ol>
       <div class="field"><label for="rr">Reply about round</label><select id="rr">${D.ROUNDS.map((r, i) => `<option value="${i}">${i + 1}. ${esc(rTitle(p.role.id, i))}</option>`).join("")}</select></div>
       <div class="field"><label for="rq">Question for them (pick one)</label><select id="rq"></select></div>
-      <textarea id="rtext" rows="6" readonly aria-label="Reply text"></textarea><div class="row"><button class="mini" id="cprep">Copy reply</button></div><p class="small cmsg" role="status"></p><p class="small">Paste this as a reply on their card post on Padlet.</p></div>`;
+      <textarea id="rtext" rows="6" readonly aria-label="Reply text"></textarea><div class="row"><button class="mini" id="cprep">Copy reply</button></div><p class="small cmsg" role="status"></p><p class="small" id="rproof"></p><p class="small">Paste this as a reply on their card post on Padlet.</p></div>`;
   }
 
   function showDecoded(p) { $("#dres").innerHTML = decodedCard(p); bindReply(p); bindInter(p); }
 
   /* ---------- Trust or Traitor: the interrogation (choices only; results sealed until all six messages are decoded) ---------- */
+  /* The player's own Signal ID for reply proof codes: the role they are playing now, else the first finished one. */
+  const myId = () => { const b = board(), m = b.mine || {}; return (b.own && m[b.own.role]) || Object.values(m)[0] || null; };
   const isMine = (id) => Object.values(board().mine || {}).indexOf(id) >= 0;
   const unsealed = () => fullCount(board()) >= 6;
   const vdText = (p, vd) => vd.v === "A" ? "APPROVED: you trusted all three reports." : `DENIED: you said report ${vd.r} was false and the truth is “${D.INTEL[p.role.id][vd.r - 1][{ T: "truth", F: "fake", O: "third" }[vd.t]]}”.`;
@@ -585,7 +587,9 @@
       let mine = mineRole ? `I played ${mineRole.name}.` : "";
       if (S && S.log[r]) mine = `I chose: ${S.log[r].label}\n` + (S.log[r].label === p.picks[r].label ? "We made the same call." : "We made different calls.");
       const L1 = "━━━━━━━━━━━━━━━━━━━━";
-      ta.value = [`DECODED ${p.id} (${p.role.name})`, L1, `ROUND ${r + 1}: ${rTitle(p.role.id, r)}`, L1, `You chose: ${p.picks[r].label}`, ...(mine ? ["", mine] : []), "", L1, "QUESTION FOR YOU", L1, qs[+rq.value || 0]].join("\n");
+      const me = myId(), proof = me && !isMine(p.id) ? L.proofCode(me, p.id) : null;
+      const pn = $("#rproof"); if (pn) pn.innerHTML = proof ? `Your proof code for this reply is <b>${proof}</b>. It is already in the reply, and it goes in your submission, so your teacher can find your reply on the Padlet.` : `<b>No proof code yet.</b> Finish your own game first, then come back and copy this reply. Replies without a proof code may not count.`;
+      ta.value = [`DECODED ${p.id} (${p.role.name})`, ...(proof ? [`PROOF ${proof}`] : []), L1, `ROUND ${r + 1}: ${rTitle(p.role.id, r)}`, L1, `You chose: ${p.picks[r].label}`, ...(mine ? ["", mine] : []), "", L1, "QUESTION FOR YOU", L1, qs[+rq.value || 0]].join("\n");
     };
     rrs.addEventListener("change", fill); rq.addEventListener("change", paint); fill();
     $("#cprep").addEventListener("click", (e) => copyText(ta.value, e.currentTarget, "Copied. Paste it as a reply on their Padlet post."));
@@ -595,8 +599,10 @@
   function completionText(b, parsed, refl) {
     const prog = b.prog || {}, mine = (b.own && L.roleById(b.own.role)) || null, nm = nameNow || "Anonymous";
     const ids = parsed.map((p) => p.id + " (" + p.role.short + ")").join(", ");
-    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. Message ${i + 1} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
+    return `MISSION COMPLETE · ${nm.toUpperCase()}${mine ? " · " + mine.name : ""}\nI decoded all six secret messages with help from classmates.\n\n` + D.ROUNDS.map((r, i) => `${i + 1}. Message ${i + 1} (${r.date}): ${r.msg.join(" ")}`).join("\n") + `\n\nMy Signal ID: ${Object.values(b.mine || {}).join(", ") || "not recorded"}\nDecoded with Signal IDs from: ${ids || "none yet"}\n` + replyLine(parsed) + verdictLines(b) + (refl ? "\n" + refl + "\n" : "");
   }
+  /* Reply proof codes in the submission: "Reply codes: <ID> R-XXX; …", one per decoded classmate. Teacher Check recomputes them. */
+  function replyLine(parsed) { const me = myId(), list = parsed.filter((p) => !isMine(p.id)); if (!me || !list.length) return "Reply codes: none\n"; return `Reply codes: ${list.map((p) => p.id + " " + L.proofCode(me, p.id)).join("; ")}\n`; }
   /* Verdicts in the submission: "<ID> A" (approved) or "<ID> D2T" (denied report 2, picked the truth; F = picked the fake, O = the third choice); "*" = with research. Teacher Check rescores them from the IDs. */
   function verdictList(b) { return Object.keys(b.verdicts || {}).map((id) => ({ id, vd: b.verdicts[id], p: L.parseSignal(id) })).filter((x) => x.p && x.p.alleg != null); }
   function verdictLines(b) {

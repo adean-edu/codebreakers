@@ -98,6 +98,9 @@ const Logic = (function () {
     const c = { S, e, n, minS }, got = BADGE_DEFS.filter((b) => b.test(c)).map(({ id, name, icon, why }) => ({ id, name, icon, why }));
     return { got, total: BADGE_DEFS.length };
   }
-  return { badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, sealAlg, parseSignal, chk, intelFor, plantedLie, proveOpts, verdictScore };
+  /* Reply proof code (v4): ties a reply on a classmate's card to the decoder's own Signal ID, so the teacher can search the Padlet for it.
+     R- plus 3 characters from a hash of "<own ID>><target ID>". Not secure, just not guessable at a glance. */
+  function proofCode(own, target) { const s = String(own).toUpperCase() + ">" + String(target).toUpperCase(); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 131 + s.charCodeAt(i) * (i + 3)) % 32768; return "R-" + ALPHA[h >> 10] + ALPHA[(h >> 5) & 31] + ALPHA[h & 31]; }
+  return { proofCode, badges, clamp, roleIdx, roleById, order, kindOf, shiftFor, encode, decode, piece, newState, choose, ending, finalScore, rank, signalId, sealAlg, parseSignal, chk, intelFor, plantedLie, proveOpts, verdictScore };
 })();
 if (typeof module !== "undefined") module.exports = Logic;

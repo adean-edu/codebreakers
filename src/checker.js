@@ -14,14 +14,15 @@
     const line = (label) => { const m = new RegExp("^\\s*" + label + "\\s*:(.*)$", "mi").exec(text); return m ? m[1] : null; };
     const ownLine = line("My Signal IDs?"), decLine = line("Decoded with Signal IDs from");
     const msgs = {}; text.split(/\r?\n/).forEach((ln) => { const m = /^\s*([1-6])\.\s.*\):\s*(.+)$/.exec(ln); if (m) msgs[+m[1] - 1] = m[2].trim(); });
+    const rcLine = line("Reply codes"), replies = []; if (rcLine) { const re = /\b([A-Z]{2}-[ABC]{6}(?:-[A-Z0-9])?-[A-Z0-9]{2})\s+(R-[A-Z0-9]{3})\b/g; let m; while ((m = re.exec(rcLine.toUpperCase()))) replies.push({ id: m[1], code: m[2] }); }
     const vdLine = line("Verdicts"), verdicts = [];
     if (vdLine) { let m; VD_RE.lastIndex = 0; while ((m = VD_RE.exec(vdLine.toUpperCase()))) verdicts.push({ id: m[1], vd: m[2] === "A" ? { v: "A", res: !!m[5] } : { v: "D", r: +m[3], t: m[4], res: !!m[5] } }); }
-    const refl = (text.split(/^\s*Decoded with Signal IDs from:.*$/mi)[1] || "").replace(/^\s*(Verdicts|Interrogation score)\s*:.*$/gmi, "");
+    const refl = (text.split(/^\s*Decoded with Signal IDs from:.*$/mi)[1] || "").replace(/^\s*(Verdicts|Interrogation score|Reply codes)\s*:.*$/gmi, "");
     return {
       name: (head[1] || "").trim() || "(no name)", roleName: (head[2] || "").trim(),
       own: ownLine === null ? null : (ownLine.toUpperCase().match(ID_RE) || []),
       dec: decLine === null ? [] : (decLine.toUpperCase().match(ID_RE) || []),
-      decRaw: decLine, msgs, refl: refl.trim(), verdicts, hasVd: vdLine !== null
+      decRaw: decLine, msgs, refl: refl.trim(), verdicts, hasVd: vdLine !== null, replies, hasRc: rcLine !== null
     };
   }
 
@@ -54,11 +55,15 @@
     let right = 0; const wrong = [];
     D.ROUNDS.forEach((rd, i) => { if (norm(sub.msgs[i]) === norm(rd.msg.join(" "))) right++; else wrong.push(i + 1); });
     if (wrong.length) notes.push(`Message${wrong.length > 1 ? "s" : ""} wrong or missing: round ${wrong.join(", ")}.`);
+    // Reply proof codes (v4): each must match one of the student's own Signal IDs and a classmate they decoded. A wrong code is a note to check, not a fail.
+    const rc = { good: [], bad: [] };
+    sub.replies.forEach((x) => { const real = (sub.own || []).some((o) => L.parseSignal(o) && L.proofCode(o, x.id) === x.code); (real && sub.dec.indexOf(x.id) >= 0 ? rc.good : rc.bad).push(x); });
+    if (rc.bad.length) warn.push(`Reply code${rc.bad.length > 1 ? "s that do" : " that does"} not match this student: ${rc.bad.map((x) => x.code).join(", ")} (edited, or copied from someone else).`);
     const ok = !notes.length && (ownOk || sub.own === null || !sub.own.length);
     // Trust or Traitor: rescore every verdict from the Signal IDs (the student's own "Interrogation score" line is ignored)
     const vs = { pts: 0, max: 0, n: 0, right: 0, res: 0, list: [] };
     sub.verdicts.forEach((x) => { const p = L.parseSignal(x.id); if (!p || p.alleg == null || (sub.own || []).indexOf(x.id) >= 0) return; const s = L.verdictScore(p.alleg, x.vd); vs.pts += s.pts; vs.max += s.max; vs.n++; if (s.right) vs.right++; if (x.vd.res) vs.res++; vs.list.push({ id: x.id, p, vd: x.vd, s }); });
-    return { sub, role, covered, missing, right, notes, warn, ok, nRoles: D.ROLE_IDS.length - missing.length, vs };
+    return { rc, sub, role, covered, missing, right, notes, warn, ok, nRoles: D.ROLE_IDS.length - missing.length, vs };
   }
 
   /* Cross-checks between students: shared own Signal IDs, identical reflections. */
@@ -96,20 +101,22 @@
     if (!parts.length) { $("#out").innerHTML = `<p class="err">No submissions found. Each one starts with "MISSION COMPLETE".</p>`; return; }
     const rows = parts.map((t) => check(readOne(t))); crossCheck(rows); const ag = agents(rows);
     const vdCell = (r) => r.vs.n ? `${r.vs.pts} of ${r.vs.max}<div class="small">${r.vs.right} of ${r.vs.n} right${r.vs.res ? ` · research on ${r.vs.res}` : ""}</div>` : (r.sub.hasVd ? "None filed" : "—");
+    const rcCell = (r) => r.rc.good.length ? `${r.rc.good.length}<div class="mono small">${r.rc.good.map((x) => esc(x.code)).join(" ")}</div>` : (r.sub.hasRc ? "0" : "—");
     const agCell = (r) => r.agent ? `${r.agent.p.alleg ? "Double" : "Loyal"}: ${r.agent.pts}` : "—";
     const nOk = rows.filter((r) => r.ok).length, nNote = rows.filter((r) => r.ok && r.warn.length).length;
     $("#out").innerHTML = `<p class="sum"><b>${rows.length}</b> submission${rows.length > 1 ? "s" : ""} checked · <b class="ok">${nOk} complete</b>${nNote ? ` (${nNote} with a note to check)` : ""} · <b class="bad">${rows.length - nOk} not complete</b></p>
-      <table><thead><tr><th>Student</th><th>Role</th><th>Own Signal ID</th><th>Roles covered</th><th>Messages</th><th>Result</th><th>Verdicts</th><th>As agent</th><th>Notes</th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ok ? (r.warn.length ? "w" : "g") : "b"}">
+      <table><thead><tr><th>Student</th><th>Role</th><th>Own Signal ID</th><th>Roles covered</th><th>Messages</th><th>Result</th><th>Reply codes</th><th>Verdicts</th><th>As agent</th><th>Notes</th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.ok ? (r.warn.length ? "w" : "g") : "b"}">
         <td>${esc(r.sub.name)}</td><td>${esc(r.role ? r.role.name : r.sub.roleName || "?")}</td><td class="mono">${esc((r.sub.own || []).join(", ") || "none")}</td>
         <td>${r.nRoles} of 5<div class="roles">${D.ROLES.map((x) => `<span class="${r.covered[x.id] ? "on" : ""}" title="${esc(x.name + ": " + (r.covered[x.id] || "missing"))}">${x.id}</span>`).join("")}</div></td>
-        <td>${r.right} of 6</td><td><b>${r.ok ? (r.warn.length ? "Complete, check note" : "✓ Complete") : "✗ Not complete"}</b></td><td>${vdCell(r)}</td><td>${agCell(r)}</td>
+        <td>${r.right} of 6</td><td><b>${r.ok ? (r.warn.length ? "Complete, check note" : "✓ Complete") : "✗ Not complete"}</b></td><td>${rcCell(r)}</td><td>${vdCell(r)}</td><td>${agCell(r)}</td>
         <td>${r.notes.concat(r.warn).map((n) => `<div>${esc(n)}</div>`).join("") || "None"}</td></tr>`).join("")}</tbody></table>
       <div class="row"><button class="btn" id="tsv">Copy results for a spreadsheet</button><span class="small" id="tsvmsg" role="status"></span></div>
+      <p class="small"><b>Reply codes</b> (version 4 and later): every reply the game writes carries a proof code such as R-7KQ, made from the student's own Signal ID and the classmate's, so only codes that match the student are counted. To confirm a reply was really posted, search the Padlet for its code (Ctrl+F) and check it sits under this student's name.</p>
       <p class="small"><b>Verdicts</b> (Trust or Traitor): +1 for the right verdict; on a double agent, +1 more for the right report and +1 for the right truth. A perfect verdict made with research (a blacked-out line revealed in the Archive) scores 2 instead of 3. <b>As agent</b>: a loyal agent scores 1 per classmate who approved them, a double agent 1 per classmate fooled.</p>
       <div class="row"><button class="btn ghost" id="unbtn" aria-expanded="false">Show the Unmasking</button><span class="small">Reveals who was a double agent. Show it to the class only when everyone is done.</span></div><div id="unmask" hidden>${unmaskHTML(rows, ag)}</div>`;
     $("#unbtn").addEventListener("click", (e) => { const u = $("#unmask"), open = u.hidden; u.hidden = !open; e.currentTarget.textContent = open ? "Hide the Unmasking" : "Show the Unmasking"; e.currentTarget.setAttribute("aria-expanded", open); if (open) u.scrollIntoView({ block: "start" }); });
     $("#tsv").addEventListener("click", () => {
-      const tsv = [["Student", "Role", "Own Signal ID", "Roles covered", "Messages", "Result", "Verdict points", "Verdicts filed", "Research used", "Allegiance", "Agent points", "Notes"].join("\t")].concat(rows.map((r) => [r.sub.name, r.role ? r.role.name : r.sub.roleName, (r.sub.own || []).join(" "), r.nRoles + "/5", r.right + "/6", r.ok ? (r.warn.length ? "Complete (check note)" : "Complete") : "Not complete", r.vs.n ? r.vs.pts + "/" + r.vs.max : "", r.vs.n, r.vs.res, r.agent ? (r.agent.p.alleg ? "Double" : "Loyal") : "", r.agent ? r.agent.pts : "", r.notes.concat(r.warn).join(" ")].join("\t"))).join("\n");
+      const tsv = [["Student", "Role", "Own Signal ID", "Roles covered", "Messages", "Result", "Reply codes", "Verdict points", "Verdicts filed", "Research used", "Allegiance", "Agent points", "Notes"].join("\t")].concat(rows.map((r) => [r.sub.name, r.role ? r.role.name : r.sub.roleName, (r.sub.own || []).join(" "), r.nRoles + "/5", r.right + "/6", r.ok ? (r.warn.length ? "Complete (check note)" : "Complete") : "Not complete", r.rc.good.map((x) => x.code).join(" "), r.vs.n ? r.vs.pts + "/" + r.vs.max : "", r.vs.n, r.vs.res, r.agent ? (r.agent.p.alleg ? "Double" : "Loyal") : "", r.agent ? r.agent.pts : "", r.notes.concat(r.warn).join(" ")].join("\t"))).join("\n");
       navigator.clipboard.writeText(tsv).then(() => { $("#tsvmsg").textContent = "Copied. Paste into a spreadsheet."; }, () => { $("#tsvmsg").textContent = "Your browser would not copy."; });
     });
   }
